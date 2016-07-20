@@ -20,5 +20,5 @@ export function pageLoaded(args: observable.EventData) {
 
     openTok.init('45614192', sessionID, page.ios);
     openTok.doConnect(token);
-    // openTok.doPublish(page.ios);
+    openTok.doPublish(page.ios);
 }

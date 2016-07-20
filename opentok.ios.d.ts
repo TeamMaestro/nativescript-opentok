@@ -1,7 +1,8 @@
 export declare class OpenTok {
-    _session: any;
-    _publisher: any;
-    _subscriber: any;
+    static ObjCProtocols: any[];
+    private _session;
+    private _publisher;
+    private _subscriber;
     init(apiKey: string, sessionId: string, delegate: any): void;
     doConnect(token: string): void;
     doDisconnect(): void;

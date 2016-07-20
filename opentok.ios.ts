@@ -1,12 +1,14 @@
 import {Common} from './opentok-common';
 
-declare var OTSession, OTPublisher, OTSubscriber, CGRect;
+declare var OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
 
 export class OpenTok {
 
-    _session: any;
-    _publisher: any;
-    _subscriber: any;
+    public static ObjCProtocols = [OTSessionDelegate];
+
+    private _session: any;
+    private _publisher: any;
+    private _subscriber: any;
 
     /**
      * Creates the Objective-C OTSession object, which represents an existing OpenTok Session
@@ -15,7 +17,7 @@ export class OpenTok {
      * @param {string} sessionId The generated OpenTok session id
      * @param {*} delegate The UIView reference
      */
-    init(apiKey: string, sessionId: string, delegate: any) {
+    public init(apiKey: string, sessionId: string, delegate: any) {
         this._session = new OTSession(apiKey, sessionId, delegate);
         if(!this._session) {
             console.log('OpenTok initialization failed');
@@ -29,13 +31,13 @@ export class OpenTok {
      * Asynchronously begins the session connect process. Some time later, we will
      * expect a delegate method to call us back with the results of this action.
      */
-    doConnect(token: string) {
+    public doConnect(token: string) {
         let session = this._session;
         if(session) {
-            try {
-                session.connectWithToken(token);
-            } catch(error) {
-                console.log(error);
+            var errorRef = new interop.Reference();
+            session.connectWithTokenError(token, errorRef);
+            if(errorRef.value) {
+                console.log('Error connecting with token - ' + errorRef.value);
             }
         }
     }
@@ -45,7 +47,7 @@ export class OpenTok {
      * This method tears down all OTPublisher and OTSubscriber objects that have been initialized.
      * When the session disconnects, the [OTSessionDelegate sessionDidDisconnect:] message is sent to the session’s delegate.
      */
-    doDisconnect() {
+    public doDisconnect() {
         let session = this._session;
         if(session) {
             try {
@@ -61,7 +63,7 @@ export class OpenTok {
      * binds to the device camera and microphone, and will provide A/V streams
      * to the OpenTok session.
      */
-    doPublish(delegate: any, videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
+    public doPublish(delegate: any, videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         let session = this._session;
         if(session) {
             this._publisher = new OTPublisher(delegate);
@@ -71,7 +73,7 @@ export class OpenTok {
                 console.log('Failed to publish to session: ' + error);
             }
             if(this._publisher) {
-                // view.addSubview(publisher!.view)
+                delegate.view.addSubview(this._publisher.view)
                 if(!videoLocationX)
                     videoLocationX = 0.0;
                 if(!videoLocationY)
@@ -80,7 +82,7 @@ export class OpenTok {
                     videoWidth = 100;
                 if(!videoHeight)
                     videoHeight = 100;
-                this._publisher.view.frame = CGRect(videoLocationX, videoLocationY, videoWidth, videoHeight);
+                this._publisher.view.frame = CGRectMake(videoLocationX, videoLocationY, videoWidth, videoHeight);
             }
         }
     }
@@ -91,7 +93,7 @@ export class OpenTok {
      * this method does not add the subscriber to the view hierarchy. Instead, we
      * add the subscriber only after it has connected and begins receiving data.
      */
-    doSubscribe(stream: any, delegate: any) {
+    public doSubscribe(stream: any, delegate: any) {
         let session = this._session;
         if(session) {
             this._subscriber = new OTSubscriber(stream, delegate);
@@ -106,7 +108,7 @@ export class OpenTok {
     /**
      * Cleans the subscriber from the view hierarchy, if any.
      */
-    doUnsubscribe() {
+    public doUnsubscribe() {
         let subscriber = this._subscriber;
         if(subscriber) {
             if(this._session) {
@@ -125,7 +127,7 @@ export class OpenTok {
      * Cleans up the publisher and its view. At this point, the publisher should not
      * be attached to the session any more.
      */
-    cleanupPublisher() {
+    public cleanupPublisher() {
         let publisher = this._publisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
@@ -140,7 +142,7 @@ export class OpenTok {
      * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
      * be automatically removed from the session during cleanup of the stream.
      */
-    cleanupSubscriber() {
+    public cleanupSubscriber() {
         let subscriber = this._subscriber;
         if(subscriber) {
             subscriber.view.removeFromSuperview();
