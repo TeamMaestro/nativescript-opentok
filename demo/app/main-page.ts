@@ -13,12 +13,12 @@ export function pageLoaded(args: observable.EventData) {
     var page = <pages.Page>args.object;
     // page.bindingContext = new HelloWorldModel();
 
-    var sessionID = '2_MX40NTA0NDI1Mn5-MTQ2NzE0MjAxOTMxMn5wUytVOE1Ndyt5VWRDd1FvSno5NGl2NFF-fg';
-    var token = 'T1==cGFydG5lcl9pZD00NTA0NDI1MiZzaWc9NDc0OWZkNmQ1YzllOGU4OWVjZmIyMTIxZTg4MjIxODZlOGM2ZGQ3YjpzZXNzaW9uX2lkPTJfTVg0ME5UQTBOREkxTW41LU1UUTJOekUwTWpBeE9UTXhNbjV3VXl0Vk9FMU5keXQ1VldSRGQxRnZTbm81TkdsMk5GRi1mZyZjcmVhdGVfdGltZT0xNDY3MTQyMDMxJm5vbmNlPTAuNTAzMzk0NzAwODE5NjI2NSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDY5NzM0MDMw';
+    var sessionID = '2_MX40NTYxNDE5Mn5-MTQ2ODk5NjUxMTM0MH5kaGRGY3ErdGUzVTFTY1N2TTJCUllkZ0x-fg';
+    var token = 'T1==cGFydG5lcl9pZD00NTYxNDE5MiZzaWc9ZTQzMTE0YjQ2M2ZlYWMzODZiZDYyZWJjYWJjZjM1ZWE2OTM0NGY1ODpzZXNzaW9uX2lkPTJfTVg0ME5UWXhOREU1TW41LU1UUTJPRGs1TmpVeE1UTTBNSDVrYUdSR1kzRXJkR1V6VlRGVFkxTjJUVEpDVWxsa1oweC1mZyZjcmVhdGVfdGltZT0xNDY4OTk2NTM0Jm5vbmNlPTAuMTE4ODU0NDgwNTYyNzMxNjImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MTU4ODUzNA==';
 
     var openTok = new OpenTok();
 
-    openTok.init('45044252', sessionID, page.ios);
+    openTok.init('45614192', sessionID, page.ios);
     openTok.doConnect(token);
-    openTok.doPublish(page.ios);
+    // openTok.doPublish(page.ios);
 }

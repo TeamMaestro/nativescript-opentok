@@ -2,19 +2,26 @@ import {Common} from './opentok-common';
 
 declare var OTSession, OTPublisher, OTSubscriber, CGRect;
 
-export class OpenTok extends Common {
+export class OpenTok {
 
-    public session: any;
-    public publisher: any;
-    public subscriber: any;
+    _session: any;
+    _publisher: any;
+    _subscriber: any;
 
+    /**
+     * Creates the Objective-C OTSession object, which represents an existing OpenTok Session
+     *
+     * @param {string} apiKey The OpenTok api key
+     * @param {string} sessionId The generated OpenTok session id
+     * @param {*} delegate The UIView reference
+     */
     init(apiKey: string, sessionId: string, delegate: any) {
-        this.session = new OTSession(apiKey, sessionId, delegate);
-        if(!this.session) {
+        this._session = new OTSession(apiKey, sessionId, delegate);
+        if(!this._session) {
             console.log('OpenTok initialization failed');
         }
         else {
-            console.log('OpenTok initialized: ' + this.session);
+            console.log('OpenTok initialized: ' + this._session);
         }
     }
 
@@ -23,10 +30,26 @@ export class OpenTok extends Common {
      * expect a delegate method to call us back with the results of this action.
      */
     doConnect(token: string) {
-        let session = this.session;
+        let session = this._session;
         if(session) {
             try {
                 session.connectWithToken(token);
+            } catch(error) {
+                console.log(error);
+            }
+        }
+    }
+
+    /**
+     * Disconnect from an active OpenTok session.
+     * This method tears down all OTPublisher and OTSubscriber objects that have been initialized.
+     * When the session disconnects, the [OTSessionDelegate sessionDidDisconnect:] message is sent to the session’s delegate.
+     */
+    doDisconnect() {
+        let session = this._session;
+        if(session) {
+            try {
+                session.disconnect();
             } catch(error) {
                 console.log(error);
             }
@@ -39,15 +62,15 @@ export class OpenTok extends Common {
      * to the OpenTok session.
      */
     doPublish(delegate: any, videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
-        let session = this.session;
+        let session = this._session;
         if(session) {
-            this.publisher = new OTPublisher(delegate);
+            this._publisher = new OTPublisher(delegate);
             try {
-                this.session.publish(this.publisher);
+                this._session.publish(this._publisher);
             } catch(error) {
                 console.log('Failed to publish to session: ' + error);
             }
-            if(this.publisher) {
+            if(this._publisher) {
                 // view.addSubview(publisher!.view)
                 if(!videoLocationX)
                     videoLocationX = 0.0;
@@ -57,7 +80,7 @@ export class OpenTok extends Common {
                     videoWidth = 100;
                 if(!videoHeight)
                     videoHeight = 100;
-                this.publisher.view.frame = CGRect(videoLocationX, videoLocationY, videoWidth, videoHeight);
+                this._publisher.view.frame = CGRect(videoLocationX, videoLocationY, videoWidth, videoHeight);
             }
         }
     }
@@ -69,11 +92,11 @@ export class OpenTok extends Common {
      * add the subscriber only after it has connected and begins receiving data.
      */
     doSubscribe(stream: any, delegate: any) {
-        let session = this.session;
+        let session = this._session;
         if(session) {
-            this.subscriber = new OTSubscriber(stream, delegate);
+            this._subscriber = new OTSubscriber(stream, delegate);
             try {
-                session.subscribe(this.subscriber);
+                session.subscribe(this._subscriber);
             } catch(error) {
                 console.log('Failed to subscribe to session: ' + error);
             }
@@ -84,16 +107,16 @@ export class OpenTok extends Common {
      * Cleans the subscriber from the view hierarchy, if any.
      */
     doUnsubscribe() {
-        let subscriber = this.subscriber;
+        let subscriber = this._subscriber;
         if(subscriber) {
-            if(this.session) {
+            if(this._session) {
                 try {
-                    this.session.unsubscribe(subscriber);
+                    this._session.unsubscribe(subscriber);
                 } catch(error) {
                     console.log('Failed to unsubscribe from session: ' + error);
                 }
                 subscriber.view.removeFromSuperview();
-                this.subscriber = null;
+                this._subscriber = null;
             }
         }
     }
@@ -103,7 +126,7 @@ export class OpenTok extends Common {
      * be attached to the session any more.
      */
     cleanupPublisher() {
-        let publisher = this.publisher;
+        let publisher = this._publisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
             publisher = null;
@@ -118,7 +141,7 @@ export class OpenTok extends Common {
      * be automatically removed from the session during cleanup of the stream.
      */
     cleanupSubscriber() {
-        let subscriber = this.subscriber;
+        let subscriber = this._subscriber;
         if(subscriber) {
             subscriber.view.removeFromSuperview();
             subscriber = null;
