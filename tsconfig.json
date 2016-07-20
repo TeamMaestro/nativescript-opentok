@@ -8,9 +8,10 @@
     },
     "files": [
       "demo/node_modules/tns-core-modules/tns-core-modules.d.ts",
-      "opentok.common.ts",
+      "opentok-common.ts",
       "opentok.android.ts",
-      "opentok.ios.ts"
+      "opentok.ios.ts",
+      ""
     ],
     "compileOnSave": false
 }

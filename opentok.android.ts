@@ -1,5 +1,5 @@
-import {Common} from './opentok.common';
+import {Common} from './opentok-common';
 
-export class OpenTokPlugin extends Common {
+export class OpenTok extends Common {
 
 }
