@@ -1,0 +1,11 @@
+android {
+    productFlavors {
+        "nativescriptopentok" {
+            dimension "nativescriptopentok"
+        }
+    }
+}
+
+dependencies {
+      compile 'com.opentok.android:opentok-android-sdk:2.8.+'
+}
