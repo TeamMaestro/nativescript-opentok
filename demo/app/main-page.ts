@@ -1,5 +1,6 @@
 import * as observable from 'data/observable';
 import * as pages from 'ui/page';
+
 import {HelloWorldModel} from './main-view-model';
 
 import {OpenTok} from 'nativescript-opentok';
@@ -20,5 +21,5 @@ export function pageLoaded(args: observable.EventData) {
 
     openTok.init('45614192', sessionID, page.ios);
     openTok.doConnect(token);
-    openTok.doPublish(page.ios);
+    openTok.doPublish();
 }
