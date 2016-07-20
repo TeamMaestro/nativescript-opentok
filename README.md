@@ -25,9 +25,13 @@ export function pageLoaded(args: observable.EventData) {
     var openTok = new OpenTok();
     openTok.init('API_KEY', 'SESSION_ID', page.ios);
     openTok.doConnect('TOKEN');
-    openTok.doPublish(page.ios);
+    openTok.doPublish();
 }
 ```
+
+### Images
+
+![alt text](resources/example.png "Example OpenTok ")
 
 ### References
 - https://github.com/thepatrick/Opentok-HelloWorld-Swift
