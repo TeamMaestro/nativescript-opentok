@@ -1,6 +1,6 @@
 import {Common} from './opentok-common';
 
-declare var OTSession, OTPublisher, OTSubscriber;
+declare var OTSession, OTPublisher, OTSubscriber, CGRect;
 
 export class OpenTok extends Common {
 
@@ -12,6 +12,9 @@ export class OpenTok extends Common {
         this.session = new OTSession(apiKey, sessionId, delegate);
         if(!this.session) {
             console.log('OpenTok initialization failed');
+        }
+        else {
+            console.log('OpenTok initialized: ' + this.session);
         }
     }
 
@@ -25,7 +28,7 @@ export class OpenTok extends Common {
             try {
                 session.connectWithToken(token);
             } catch(error) {
-                console.log('Failed to connect to session with token: ' + token + ', error: ' + error);
+                console.log(error);
             }
         }
     }
@@ -35,7 +38,7 @@ export class OpenTok extends Common {
      * binds to the device camera and microphone, and will provide A/V streams
      * to the OpenTok session.
      */
-    doPublish(delegate: any) {
+    doPublish(delegate: any, videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         let session = this.session;
         if(session) {
             this.publisher = new OTPublisher(delegate);
@@ -44,8 +47,18 @@ export class OpenTok extends Common {
             } catch(error) {
                 console.log('Failed to publish to session: ' + error);
             }
-            // view.addSubview(publisher!.view)
-            // publisher!.view.frame = CGRect(x: 0.0, y: 0, width: videoWidth, height: videoHeight)
+            if(this.publisher) {
+                // view.addSubview(publisher!.view)
+                if(!videoLocationX)
+                    videoLocationX = 0.0;
+                if(!videoLocationY)
+                    videoLocationY = 0;
+                if(!videoWidth)
+                    videoWidth = 100;
+                if(!videoHeight)
+                    videoHeight = 100;
+                this.publisher.view.frame = CGRect(videoLocationX, videoLocationY, videoWidth, videoHeight);
+            }
         }
     }
 
@@ -79,9 +92,36 @@ export class OpenTok extends Common {
                 } catch(error) {
                     console.log('Failed to unsubscribe from session: ' + error);
                 }
-                // subscriber.view.removeFromSuperview()
+                subscriber.view.removeFromSuperview();
                 this.subscriber = null;
             }
+        }
+    }
+
+    /**
+     * Cleans up the publisher and its view. At this point, the publisher should not
+     * be attached to the session any more.
+     */
+    cleanupPublisher() {
+        let publisher = this.publisher;
+        if(publisher) {
+            publisher.view.removeFromSuperview();
+            publisher = null;
+            // this is a good place to notify the end-user that publishing has stopped.
+        }
+    }
+
+    /**
+     * Cleans the subscriber from the view hierarchy, if any.
+     * NB: You do *not* have to call unsubscribe in your controller in response to
+     * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
+     * be automatically removed from the session during cleanup of the stream.
+     */
+    cleanupSubscriber() {
+        let subscriber = this.subscriber;
+        if(subscriber) {
+            subscriber.view.removeFromSuperview();
+            subscriber = null;
         }
     }
 
