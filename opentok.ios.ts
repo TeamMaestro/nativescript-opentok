@@ -64,6 +64,11 @@ export class OpenTok {
      * Sets up an instance of OTPublisher to use with this session. OTPubilsher
      * binds to the device camera and microphone, and will provide A/V streams
      * to the OpenTok session.
+     *
+     * @param {number} videoLocationX The X-coordinate position of the video frame
+     * @param {number} videoLocationY The Y-coordinate position of the video frame
+     * @param {number} videoWidth The width of the video frame (pixels)
+     * @param {number} videoHeight The height of the video frame (pixels)
      */
     public doPublish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         let session = this._session;
@@ -152,10 +157,17 @@ export class OpenTok {
         }
     }
 
-    public subscriberDidConnectToStream(subscriber: any) {
-        console.log('subscriberDidConnectToString: ' + subscriber.stream.connection.connectionId);
-        subscriber.view.frame = CGRectMake(0, 100, 100, 100);
-        this._uiview.addSubview(subscriber.view);
+    // OTSubscriber delegate callbacks
+
+    public subscriberDidConnectToStream(subscriberKit: any) {
+        if(this._subscriber) {
+            console.log('subscriberDidConnectToStream: ' + subscriberKit);
+            let view = this._subscriber.view;
+            if(view) {
+                view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
+                this._uiview.addSubview(view);
+            }
+        }
     }
 
 }

@@ -12,5 +12,5 @@ export declare class OpenTok {
     doUnsubscribe(): void;
     cleanupPublisher(): void;
     cleanupSubscriber(): void;
-    subscriberDidConnectToStream(subscriber: any): void;
+    subscriberDidConnectToStream(subscriberKit: any): void;
 }

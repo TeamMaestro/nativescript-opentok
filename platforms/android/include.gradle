@@ -6,6 +6,14 @@ android {
     }
 }
 
+allprojects {
+    repositories {
+        maven {
+            url  "http://tokbox.bintray.com/maven"
+        }
+    }
+}
+
 dependencies {
-      compile 'com.opentok.android:opentok-android-sdk:2.8.+'
+    compile 'com.opentok.android:opentok-android-sdk:2.8.+'
 }

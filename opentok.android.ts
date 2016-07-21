@@ -1,5 +1,19 @@
-import {Common} from './opentok-common';
+export class OpenTok {
 
-export class OpenTok extends Common {
+    public init(apiKey: string, sessionId: string, delegate: any) {
+
+    }
+
+    public doConnect(token: string) {
+
+    }
+
+    public doPublish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
+
+    }
+
+    public doSubscribe(stream: any, delegate: any) {
+
+    }
 
 }
