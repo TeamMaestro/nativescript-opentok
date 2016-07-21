@@ -1,6 +1,8 @@
 import * as observable from 'data/observable';
 import * as pages from 'ui/page';
 
+import app = require("application");
+
 import {HelloWorldModel} from './main-view-model';
 
 import {OpenTok} from 'nativescript-opentok';
@@ -19,14 +21,19 @@ export function pageLoaded(args: observable.EventData) {
 
     var openTok = new OpenTok();
 
-    if(page.ios) {
+    if(app.android) {
+        console.log('Running Android');
+        openTok.init(app.android.currentContext, '45614192', sessionID);
+        openTok.doConnect(token);
+        openTok.doPublish(page.android);
+    }
+    else if(app.ios) {
+        console.log('Running iOS');
         openTok.init('45614192', sessionID, page.ios);
-    }
-    else if(page.android) {
-        openTok.init('45614192', sessionID, page.android);
-    }
-    openTok.doConnect(token);
-    openTok.doPublish(100, 100, 100, 100);
 
-    openTok.doPublish(0, 0, 100, 100);
+        openTok.doConnect(token);
+        openTok.doPublish(100, 100, 100, 100);
+        openTok.doPublish(0, 0, 100, 100);
+    }
+
 }

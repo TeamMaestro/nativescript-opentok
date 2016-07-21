@@ -1,6 +1,11 @@
 export declare class OpenTok {
-    init(apiKey: string, sessionId: string, delegate: any): void;
+    private _session;
+    private _publisher;
+    private _context;
+    constructor();
+    init(context: any, apiKey: string, sessionId: string): void;
     doConnect(token: string): void;
-    doPublish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number): void;
+    doPublish(publisherViewContainer: any): void;
+    private attachPublisherView(publisherViewContainer);
     doSubscribe(stream: any, delegate: any): void;
 }
