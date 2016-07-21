@@ -11,6 +11,11 @@ OpenTok: https://tokbox.com/developer/
 2. Ability to generate a valid session id (either through OpenTok account or back-end service)
 3. Ability to generate a valid token (either through OpenTok account or back-end service)
 
+### Installation
+Node Package Manager (NPM)
+
+`npm install nativescript-opentok --save`
+
 ### Integration
 Import OpenTok nativescript plugin into your Nativescript page (i.e. main-page.ts)
 ```
