@@ -6,10 +6,11 @@ OpenTok: https://tokbox.com/developer/
 
 ## Getting Started
 
-### Prerequisites
-1. API Key with OpenTok
-2. Ability to generate a valid session id (either through OpenTok account or back-end service)
-3. Ability to generate a valid token (either through OpenTok account or back-end service)
+### Requirements
+-  API Key with OpenTok. [Get one here](https://dashboard.tokbox.com/signups/new).
+-  Ability to generate a valid session id (either through OpenTok account or back-end service)
+-  Ability to generate a valid token (either through OpenTok account or back-end service)
+-  Opentok.framework requires projects to be built for only armv7 (device); i386 (simulator), armv6, armv7s, and arm64 are not supported.
 
 ### Installation
 Node Package Manager (NPM)
@@ -38,5 +39,9 @@ export function pageLoaded(args: observable.EventData) {
 
 ![alt text](resources/example.png "Example OpenTok ")
 
+### Notes
+- Publishing is not supported in the Simulator because it does not have access to your webcam.
+
 ### References
 - https://github.com/thepatrick/Opentok-HelloWorld-Swift
+- https://github.com/EddyVerbruggen/nativescript-barcodescanner (Android camera access code)
