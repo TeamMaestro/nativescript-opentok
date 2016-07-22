@@ -1,5 +1,5 @@
 import { isAndroid } from "platform";
-import {TNSSessionI} from '../common';
+import {TNSSessionI, TNSPublisherI} from '../common';
 import * as app from 'application';
 
 var frame = require("ui/frame");
@@ -10,11 +10,11 @@ const Session = com.opentok.android.Session;
 const Subscriber = com.opentok.android.Subscriber;
 const Publisher = com.opentok.android.Publisher;
 const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
-const RelativeLayout = android.widget.RelativeLayout;
+const AbsoluteLayout = android.widget.AbsoluteLayout;
 
 var CAMERA_PERMISSION_REQUEST_CODE = 555;
 
-export class TNSSession implements TNSSessionI {
+export class TNSSession implements TNSSessionI, TNSPublisherI {
 
     private _apiKey: string;
 
@@ -85,7 +85,7 @@ export class TNSSession implements TNSSessionI {
             this._publisher = new Publisher(app.android.context, 'publisher');
             this._publisher.setPublisherListener(session.StreamPropertiesListener);
             console.log('Init publisher: ' + this._publisher);
-            this.attachPublisherView();
+            this.attachPublisherView(videoLocationX, videoLocationY, videoWidth, videoHeight);
             session.publish(this._publisher);
         }
     }
@@ -106,14 +106,16 @@ export class TNSSession implements TNSSessionI {
             CAMERA_PERMISSION_REQUEST_CODE);
     }
 
-    private attachPublisherView() {
+    private attachPublisherView(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         this._publisher.setCameraListener(this._session.StreamPropertiesListener);
         this._publisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
-        var layoutParams = new RelativeLayout.LayoutParams(
-            app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels,
-            app.android.foregroundActivity.getResources().getDisplayMetrics().heightPixels);
-        // layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        // layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        if(!videoWidth || videoWidth === -1) {
+            videoWidth = app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels;
+        }
+        if(!videoHeight || videoHeight === -1) {
+            videoHeight = app.android.foregroundActivity.getResources().getDisplayMetrics().heightPixels;
+        }
+        var layoutParams = new AbsoluteLayout.LayoutParams(videoWidth, videoHeight, videoLocationX, videoLocationY);
         app.android.foregroundActivity.addContentView(this._publisher.getView(), layoutParams);
     }
 
@@ -134,6 +136,46 @@ export class TNSSession implements TNSSessionI {
         return new Promise((resolve, reject) => {
 
         });
+    }
+
+    toggleVideo(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let publisher = this._publisher;
+            if(publisher) {
+                publisher.setPublishVideo(!publisher.getPublishVideo());
+                resolve(publisher.getPublishVideo());
+            }
+            else {
+                reject('Publisher not defined');
+            }
+        });
+    }
+
+    toggleAudio(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let publisher = this._publisher;
+            if(publisher) {
+                publisher.setPublishAudio(!publisher.getPublishAudio());
+                resolve(publisher.getPublishAudio());
+            }
+            else {
+                reject('Publisher not defined');
+            }
+        });
+    }
+
+    setVideoActive(state: boolean) {
+        let publisher = this._publisher;
+        if(publisher) {
+            publisher.setPublishVideo(state);
+        }
+    }
+
+    setAudioActive(state: boolean) {
+        let publisher = this._publisher;
+        if(publisher) {
+            publisher.setPublishAudio(state);
+        }
     }
 
 }
