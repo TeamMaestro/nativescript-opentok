@@ -48,6 +48,7 @@ private getToken() {
 
 ### Notes
 - Publishing is not supported in the Simulator because it does not have access to your webcam.
+- `TNS` stands for **T**elerik **N**ative**S**cript
 
 ### References
 - https://github.com/thepatrick/Opentok-HelloWorld-Swift
