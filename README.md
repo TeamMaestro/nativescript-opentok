@@ -24,7 +24,7 @@ import {TNSSession} from 'nativescript-opentok';
 ```
 Instantiate the OpenTok class and initialize using your API key and session id. Connect using a valid token and publish to the page you want to append the video stream to. 
 ```
-this.session = new TNSSession('45614192');
+this.session = new TNSSession('API_KEY');
 this.session.create(this.getSessionID()).then((result) => {
     this.session.connect(this.getToken()).then((result) => {
         this.session.publish(100, 100, 100, 100);
