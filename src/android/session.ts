@@ -12,6 +12,8 @@ const Publisher = com.opentok.android.Publisher;
 const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
 const RelativeLayout = android.widget.RelativeLayout;
 
+var CAMERA_PERMISSION_REQUEST_CODE = 555;
+
 export class TNSSession implements TNSSessionI {
 
     private _apiKey: string;
@@ -27,17 +29,20 @@ export class TNSSession implements TNSSessionI {
             return;
         }
         this._apiKey = apiKey;
+        if(!this.cameraAccessPermissionGranted()) {
+            this.requestCameraPermission();
+        }
     }
 
     public create(sessionId: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            if(!this._apiKey) {
+            if (!this._apiKey) {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
             this._session = new Session(app.android.context, this._apiKey, sessionId);
             this._session.setSessionListener(this._session.SessionListener);
-            if(this._session) {
+            if (this._session) {
                 console.log('OpenTok session: ' + this._session);
                 resolve(true);
             }
@@ -57,11 +62,11 @@ export class TNSSession implements TNSSessionI {
     public connect(token: string): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
-            if(session) {
+            if (session) {
                 try {
                     session.connect(token);
                     resolve(true);
-                } catch(err) {
+                } catch (err) {
                     reject(err);
                 }
             }
@@ -72,36 +77,54 @@ export class TNSSession implements TNSSessionI {
         return new Promise((resolve, reject) => {
 
         });
-     }
+    }
 
-    public publish(publisherViewContainer: any) {
+    public publish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         let session = this._session;
-        if(session) {
+        if (session) {
             this._publisher = new Publisher(app.android.context, 'publisher');
-            this._publisher.setPublisherListener(session.StreamPropertiesListener);
+            // this._publisher.setPublisherListener(session.StreamPropertiesListener);
             console.log('Init publisher: ' + this._publisher);
-            this.attachPublisherView(frame.topmost().currentPage);
+            this.attachPublisherView();
             session.publish(this._publisher);
         }
     }
 
-    private attachPublisherView(publisherViewContainer: any) {
+    private cameraAccessPermissionGranted() {
+        var hasPermission = android.os.Build.VERSION.SDK_INT < 23; // Android M. (6.0)
+        if (!hasPermission) {
+            hasPermission = android.content.pm.PackageManager.PERMISSION_GRANTED ==
+                android.support.v4.content.ContextCompat.checkSelfPermission(app.android.currentContext, android.Manifest.permission.CAMERA);
+        }
+        return hasPermission;
+    }
+
+    private requestCameraPermission() {
+        android.support.v4.app.ActivityCompat.requestPermissions(
+            app.android.currentContext,
+            [android.Manifest.permission.CAMERA],
+            CAMERA_PERMISSION_REQUEST_CODE);
+    }
+
+    private attachPublisherView() {
         // this._publisher.setCameraListener(this._session.StreamPropertiesListener);
         this._publisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
-        var layoutParams = new RelativeLayout.LayoutParams(320, 240);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        publisherViewContainer.addView(this._publisher.getView(), layoutParams);
+        var layoutParams = new RelativeLayout.LayoutParams(
+            app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels,
+            app.android.foregroundActivity.getResources().getDisplayMetrics().heightPixels);
+        // layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        // layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        app.android.foregroundActivity.addContentView(this._publisher.getView(), layoutParams);
     }
 
     public subscribe(stream: any): Promise<any> {
         return new Promise((resolve, reject) => {
             console.log('Stream Received: ' + stream);
-            if(!this._subscriber) {
+            if (!this._subscriber) {
                 this._subscriber = new Subscriber(app.android.context, stream);
                 this._subscriber.setSubscriberListener(app.android.context);
                 this._subscriber.getRenderer().setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
-                        BaseVideoRenderer.STYLE_VIDEO_FILL);
+                    BaseVideoRenderer.STYLE_VIDEO_FILL);
                 this._session.subscribe(this._subscriber);
             }
         });
