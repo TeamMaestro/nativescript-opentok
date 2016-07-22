@@ -3,12 +3,13 @@ import {TNSSessionI} from '../common';
 
 var frame = require("ui/frame");
 
-declare var OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
+declare var NSObject, OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
 
 export class TNSSession implements TNSSessionI {
 
     private _apiKey: string;
 
+    private _sessionDelegate: any;
     private _session: any;
     private _publisher: any;
     private _subscriber: any;
@@ -29,6 +30,8 @@ export class TNSSession implements TNSSessionI {
                 reject('API Key Set');
             }
             this._session = new OTSession(this._apiKey, sessionId, frame.topmost().currentPage.ios);
+            this._sessionDelegate = TNSSessionDelegate.alloc().init();
+            this._session.delegate = this._sessionDelegate;
             if(this._session) {
                 console.log('OpenTok session: ' + this._session);
                 resolve(true);
@@ -207,4 +210,26 @@ export class TNSSession implements TNSSessionI {
         }
     }
 
+    public sessionDidConnectSession(session: any) {
+
+    }
+
 }
+
+var TNSSessionDelegate = NSObject.extend({
+    sessionDidConnect(session: any) {
+        console.log('Session Did Connect');
+    },
+    sessionDidDisconnect(session: any) {
+        console.log('Session Did Disconnect');
+    },
+    sessionDidReconnect(session:any) {
+        console.log('Session Did Reconnect');
+    },
+    sessionDidBeginReconnecting(session: any) {
+        console.log('Session Did Begin Reconnecting');
+    },
+    streamCreated(session: any) {
+        console.log('Stream Created');
+    }
+});
