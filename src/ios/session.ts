@@ -1,11 +1,11 @@
 import * as app from 'application';
-import {TNSSessionI} from '../common';
+import {TNSSessionI, TNSPublisherI} from '../common';
 
 var frame = require("ui/frame");
 
 declare var NSObject, OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
 
-export class TNSSession implements TNSSessionI {
+export class TNSSession implements TNSSessionI, TNSPublisherI  {
 
     private _apiKey: string;
 
@@ -212,6 +212,46 @@ export class TNSSession implements TNSSessionI {
 
     public sessionDidConnectSession(session: any) {
 
+    }
+
+    toggleVideo(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let publisher = this._publisher;
+            if(publisher) {
+                publisher.publishVideo = !publisher.publishVideo;
+                resolve(publisher.publishVideo);
+            }
+            else {
+                reject('Publisher not defined');
+            }
+        });
+    }
+
+    toggleAudio(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let publisher = this._publisher;
+            if(publisher) {
+                publisher.publishAudio = !publisher.publishAudio;
+                resolve(publisher.publishAudio);
+            }
+            else {
+                reject('Publisher not defined');
+            }
+        });
+    }
+
+    setVideoActive(state: boolean) {
+        let publisher = this._publisher;
+        if(publisher) {
+            publisher.publishVideo = state;
+        }
+    }
+
+    setAudioActive(state: boolean) {
+        let publisher = this._publisher;
+        if(publisher) {
+            publisher.publishAudio = state;
+        }
     }
 
 }

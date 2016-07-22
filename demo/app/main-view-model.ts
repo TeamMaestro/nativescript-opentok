@@ -18,6 +18,14 @@ export class OpenTokDemo extends Observable {
         }, (err) => {});
     }
 
+    toggleVideo() {
+        this.session.toggleVideo().then((result) => {
+            console.log('Set video stream state to: ' + result);
+        }, (err) => {
+            console.log('Error toggling video stream state: ' + err);
+        });;
+    }
+
     private getSessionID() {
         return '2_MX40NTYxNDE5Mn5-MTQ2ODk5NjUxMTM0MH5kaGRGY3ErdGUzVTFTY1N2TTJCUllkZ0x-fg';
     }

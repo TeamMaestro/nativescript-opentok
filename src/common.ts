@@ -39,3 +39,15 @@ export interface TNSSessionI {
     unsubscribe(): Promise<any>;
 
 }
+
+export interface TNSPublisherI {
+
+    toggleVideo(): Promise<any>;
+
+    toggleAudio(): Promise<any>;
+
+    setVideoActive(state: boolean);
+
+    setAudioActive(state: boolean);
+
+}
