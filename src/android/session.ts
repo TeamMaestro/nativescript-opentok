@@ -83,7 +83,7 @@ export class TNSSession implements TNSSessionI {
         let session = this._session;
         if (session) {
             this._publisher = new Publisher(app.android.context, 'publisher');
-            // this._publisher.setPublisherListener(session.StreamPropertiesListener);
+            this._publisher.setPublisherListener(session.StreamPropertiesListener);
             console.log('Init publisher: ' + this._publisher);
             this.attachPublisherView();
             session.publish(this._publisher);
@@ -107,7 +107,7 @@ export class TNSSession implements TNSSessionI {
     }
 
     private attachPublisherView() {
-        // this._publisher.setCameraListener(this._session.StreamPropertiesListener);
+        this._publisher.setCameraListener(this._session.StreamPropertiesListener);
         this._publisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
         var layoutParams = new RelativeLayout.LayoutParams(
             app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels,
