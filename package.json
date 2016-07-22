@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Integrates OpenTok for NativeScript.",
   "main": "opentok.js",
-  "typings": "opentok.d.ts",
   "nativescript": {
     "platforms": {
       "android": "2.1.1",
