@@ -4,22 +4,29 @@ import {TNSSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
-    private session: any;
+    private _session: any;
 
     constructor() {
         super();
-        this.session = new TNSSession('45614192');
-        this.session.create(this.getSessionID()).then((result) => {
-            this.session.connect(this.getToken()).then((result) => {
-                this.session.publish(100, 100, 100, 100);
+        this._session = new TNSSession('45614192', true, true);
+        this._session.create(this.getSessionID()).then((result) => {
+            this._session.connect(this.getToken()).then((result) => {
+                this._session.publish(100, 100, 100, 100);
             }, (err) => {
                 console.log('Error connecting');
             });
         }, (err) => {});
+        this._session.delegate().sessionEvents.on('sessionDidConnect',  (eventData) => {
+            console.log('sessionDidConnect', eventData);
+        });
+        this._session.publisher().delegate().publisherEvents.on('didChangeCameraPosition', (eventData) => {
+            console.log('didChangeCameraPosition', eventData);
+        });
+
     }
 
     toggleVideo() {
-        this.session.toggleVideo().then((result) => {
+        this._session.toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
         }, (err) => {
             console.log('Error toggling video stream state: ' + err);

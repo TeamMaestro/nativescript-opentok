@@ -1,21 +1,25 @@
 import * as app from 'application';
+import {topmost} from 'ui/frame';
+
 import {TNSSessionI, TNSPublisherI} from '../common';
+import {TNSOTSessionDelegate} from './session-delegate';
+import {TNSOTPublisher} from './publisher';
 
-var frame = require("ui/frame");
-
-declare var NSObject, OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
+declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, CGRectMake, interop;
 
 export class TNSSession implements TNSSessionI, TNSPublisherI  {
 
     private _apiKey: string;
-
-    private _sessionDelegate: any;
     private _session: any;
     private _publisher: any;
     private _subscriber: any;
+    private _delegate: any;
 
-    constructor(apiKey: string) {
+    constructor(apiKey: string, emitEvents?: boolean, emitPublisherEvents?: boolean) {
         this._apiKey = apiKey;
+        this._delegate = new TNSOTSessionDelegate();
+        this._delegate.initSession(emitEvents);
+        this._publisher = new TNSOTPublisher(emitPublisherEvents);
     }
 
     /**
@@ -29,9 +33,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this._session = new OTSession(this._apiKey, sessionId, frame.topmost().currentPage.ios);
-            this._sessionDelegate = TNSSessionDelegate.alloc().init();
-            this._session.delegate = this._sessionDelegate;
+            this._session = new OTSession(this._apiKey, sessionId, this._delegate);
             if(this._session) {
                 console.log('OpenTok session: ' + this._session);
                 resolve(true);
@@ -97,29 +99,19 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * @param {number} videoLocationY The Y-coordinate position of the video frame
      * @param {number} videoWidth The width of the video frame (pixels)
      * @param {number} videoHeight The height of the video frame (pixels)
+     * @returns {Promise<any>}
      */
-    public publish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
-        let session = this._session;
-        if(session) {
-            this._publisher = new OTPublisher(frame.topmost().currentPage.ios);
-            try {
-                this._session.publish(this._publisher);
-            } catch(error) {
-                console.log('Failed to publish to session: ' + error);
+    public publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            let session = this._session;
+            if(session) {
+                this._publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
+                    resolve(result);
+                }, (error) => {
+                    reject(error);
+                });
             }
-            if(this._publisher) {
-                frame.topmost().currentPage.ios.view.addSubview(this._publisher.view)
-                if(!videoLocationX)
-                    videoLocationX = 0.0;
-                if(!videoLocationY)
-                    videoLocationY = 0;
-                if(!videoWidth)
-                    videoWidth = 100;
-                if(!videoHeight)
-                    videoHeight = 100;
-                this._publisher.view.frame = CGRectMake(videoLocationX, videoLocationY, videoWidth, videoHeight);
-            }
-        }
+        });
     }
 
     /**
@@ -135,7 +127,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
-                this._subscriber = new OTSubscriber(stream, frame.topmost().currentPage.ios);
+                this._subscriber = new OTSubscriber(stream, topmost().currentPage.ios);
                 try {
                     session.subscribe(this._subscriber);
                     resolve(true);
@@ -175,7 +167,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * be attached to the session any more.
      */
     public cleanupPublisher() {
-        let publisher = this._publisher;
+        let publisher = this._publisher.nativePublisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
             publisher = null;
@@ -205,18 +197,14 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
             let view = this._subscriber.view;
             if(view) {
                 view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-                frame.topmost().currentPage.ios.addSubview(view);
+                topmost().currentPage.ios.addSubview(view);
             }
         }
     }
 
-    public sessionDidConnectSession(session: any) {
-
-    }
-
     toggleVideo(): Promise<any> {
         return new Promise((resolve, reject) => {
-            let publisher = this._publisher;
+            let publisher = this._publisher.nativePublisher;
             if(publisher) {
                 publisher.publishVideo = !publisher.publishVideo;
                 resolve(publisher.publishVideo);
@@ -229,7 +217,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
 
     toggleAudio(): Promise<any> {
         return new Promise((resolve, reject) => {
-            let publisher = this._publisher;
+            let publisher = this._publisher.nativePublisher;
             if(publisher) {
                 publisher.publishAudio = !publisher.publishAudio;
                 resolve(publisher.publishAudio);
@@ -254,22 +242,12 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
         }
     }
 
-}
-
-var TNSSessionDelegate = NSObject.extend({
-    sessionDidConnect(session: any) {
-        console.log('Session Did Connect');
-    },
-    sessionDidDisconnect(session: any) {
-        console.log('Session Did Disconnect');
-    },
-    sessionDidReconnect(session:any) {
-        console.log('Session Did Reconnect');
-    },
-    sessionDidBeginReconnecting(session: any) {
-        console.log('Session Did Begin Reconnecting');
-    },
-    streamCreated(session: any) {
-        console.log('Stream Created');
+    delegate(): any {
+        return this._delegate;
     }
-});
+
+    publisher(): any {
+        return this._publisher;
+    }
+
+}

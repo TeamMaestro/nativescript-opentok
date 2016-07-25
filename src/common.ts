@@ -40,6 +40,12 @@ export interface TNSSessionI {
 
 }
 
+export interface OTSessionDelegateI {
+
+    sessionDidConnect(session: any);
+
+}
+
 export interface TNSPublisherI {
 
     toggleVideo(): Promise<any>;
