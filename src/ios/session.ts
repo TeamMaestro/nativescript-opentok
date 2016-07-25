@@ -202,46 +202,6 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
         }
     }
 
-    toggleVideo(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this._publisher.nativePublisher;
-            if(publisher) {
-                publisher.publishVideo = !publisher.publishVideo;
-                resolve(publisher.publishVideo);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
-    }
-
-    toggleAudio(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this._publisher.nativePublisher;
-            if(publisher) {
-                publisher.publishAudio = !publisher.publishAudio;
-                resolve(publisher.publishAudio);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
-    }
-
-    setVideoActive(state: boolean) {
-        let publisher = this._publisher;
-        if(publisher) {
-            publisher.publishVideo = state;
-        }
-    }
-
-    setAudioActive(state: boolean) {
-        let publisher = this._publisher;
-        if(publisher) {
-            publisher.publishAudio = state;
-        }
-    }
-
     delegate(): any {
         return this._delegate;
     }

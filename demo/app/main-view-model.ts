@@ -26,7 +26,7 @@ export class OpenTokDemo extends Observable {
     }
 
     toggleVideo() {
-        this._session.toggleVideo().then((result) => {
+        this._session.publisher().toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
         }, (err) => {
             console.log('Error toggling video stream state: ' + err);
@@ -41,21 +41,4 @@ export class OpenTokDemo extends Observable {
         return 'T1==cGFydG5lcl9pZD00NTYxNDE5MiZzaWc9ZTQzMTE0YjQ2M2ZlYWMzODZiZDYyZWJjYWJjZjM1ZWE2OTM0NGY1ODpzZXNzaW9uX2lkPTJfTVg0ME5UWXhOREU1TW41LU1UUTJPRGs1TmpVeE1UTTBNSDVrYUdSR1kzRXJkR1V6VlRGVFkxTjJUVEpDVWxsa1oweC1mZyZjcmVhdGVfdGltZT0xNDY4OTk2NTM0Jm5vbmNlPTAuMTE4ODU0NDgwNTYyNzMxNjImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MTU4ODUzNA==';
     }
 
-    /*
-    // if(app.android) {
-      //     console.log('Running Android');
-      //     var openTokAndroid = new OpenTokAndroid();
-      //     openTokAndroid.init('45614192', sessionID);
-      //     openTokAndroid.doConnect(token);
-      //     openTokAndroid.doPublish(app.android.context);
-      // }
-      // else if(app.ios) {
-      //     console.log('Running iOS');
-      //     var openTokiOS = new OpenTokiOS();
-      //     openTokiOS.init('45614192', sessionID, page.ios);
-      //     openTokiOS.doConnect(token);
-      //     openTokiOS.doPublish(100, 100, 100, 100);
-      //     openTokiOS.doPublish(0, 0, 100, 100);
-      // }
-  */
 }
