@@ -1,4 +1,4 @@
-export interface TNSSessionI {
+export interface TNSOTSessionI {
     /**
      * Creates the OTSession object, which represents an existing OpenTok Session
      *
@@ -40,13 +40,7 @@ export interface TNSSessionI {
 
 }
 
-export interface OTSessionDelegateI {
-
-    sessionDidConnect(session: any);
-
-}
-
-export interface TNSPublisherI {
+export interface TNSOTPublisherI {
 
     toggleVideo(): Promise<any>;
 

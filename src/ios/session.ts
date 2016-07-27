@@ -1,13 +1,13 @@
 import * as app from 'application';
 import {topmost} from 'ui/frame';
 
-import {TNSSessionI, TNSPublisherI} from '../common';
+import {TNSOTSessionI} from '../common';
 import {TNSOTSessionDelegate} from './session-delegate';
 import {TNSOTPublisher} from './publisher';
 
 declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, CGRectMake, interop;
 
-export class TNSSession implements TNSSessionI, TNSPublisherI  {
+export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
     private _session: any;

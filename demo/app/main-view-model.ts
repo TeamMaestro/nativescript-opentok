@@ -1,6 +1,6 @@
 import {Observable} from 'data/observable';
 
-import {TNSSession} from 'nativescript-opentok';
+import {TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
@@ -8,29 +8,37 @@ export class OpenTokDemo extends Observable {
 
     constructor() {
         super();
-        this._session = new TNSSession('45614192', true, true);
+        this._session = new TNSOTSession('45614192', true, true);
         this._session.create(this.getSessionID()).then((result) => {
             this._session.connect(this.getToken()).then((result) => {
-                this._session.publish(100, 100, 100, 100);
+                this._session.publish(300, 300, 450, 450);
             }, (err) => {
                 console.log('Error connecting');
             });
         }, (err) => {});
-        this._session.delegate().sessionEvents.on('sessionDidConnect',  (eventData) => {
-            console.log('sessionDidConnect', eventData);
-        });
-        this._session.publisher().delegate().publisherEvents.on('didChangeCameraPosition', (eventData) => {
-            console.log('didChangeCameraPosition', eventData);
-        });
+        // this._session.delegate().sessionEvents.on('sessionDidConnect',  (eventData) => {
+        //     console.log('sessionDidConnect', eventData);
+        // });
+        // this._session.publisher().delegate().publisherEvents.on('didChangeCameraPosition', (eventData) => {
+        //     console.log('didChangeCameraPosition', eventData);
+        // });
 
     }
 
     toggleVideo() {
         this._session.publisher().toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
-        }, (err) => {
-            console.log('Error toggling video stream state: ' + err);
+        }, (error) => {
+            console.log('Error toggling video stream state: ' + error);
         });;
+    }
+
+    toggleAudio() {
+
+    }
+
+    toggleCamera() {
+        this._session.publisher().toggleCameraPosition();
     }
 
     private getSessionID() {
