@@ -1,9 +1,10 @@
 import {topmost} from 'ui/frame';
 import {TNSOTPublisherDelegate} from './publisher-delegate';
+import {TNSOTPublisherI} from '../common';
 
 declare var OTPublisher: any, CGRectMake: any, AVCaptureDevicePositionBack: any, AVCaptureDevicePositionFront: any;
 
-export class TNSOTPublisher {
+export class TNSOTPublisher implements TNSOTPublisherI {
 
     public nativePublisher: any;
     private _delegate: any;
@@ -23,7 +24,6 @@ export class TNSOTPublisher {
             if (session) {
                 this.nativePublisher = new OTPublisher(this._delegate);
                 this.nativePublisher.publishAudio = true;
-                // this.nativePublisher.cameraPosition = AVCaptureDevicePositionBack;
                 try {
                     session.publish(this.nativePublisher);
                 } catch (error) {
@@ -104,17 +104,20 @@ export class TNSOTPublisher {
 
     /**
      * Toggles the camera used to publish the video stream
-     *
      */
     toggleCameraPosition(){
         let publisher = this.nativePublisher;
-        if(publisher.cameraPosition === AVCaptureDevicePositionBack)
-            publisher.cameraPosition = AVCaptureDevicePositionFront;
-        else
-            publisher.cameraPosition = AVCaptureDevicePositionBack;
+        if(publisher) {
+            if(publisher.cameraPosition === AVCaptureDevicePositionBack) {
+                publisher.cameraPosition = AVCaptureDevicePositionFront;
+            }
+            else {
+                publisher.cameraPosition = AVCaptureDevicePositionBack;
+            }
+        }
     }
 
-    delegate(): any {
+    instance(): any {
         return this._delegate;
     }
 

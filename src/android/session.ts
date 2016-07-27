@@ -23,7 +23,7 @@ export class TNSOTSession implements TNSOTSessionI {
     private _context: any;
     private _subscriber: any;
 
-    private _delegate: any;
+    private _delegate: TNSSessionListener;
 
     constructor(apiKey: string, emitEvents?: boolean, emitPublisherEvents?: boolean) {
         if (!isAndroid) {
@@ -39,14 +39,11 @@ export class TNSOTSession implements TNSOTSessionI {
     }
 
     public create(sessionId: string): Promise<any> {
-        console.log('Hello!');
         return new Promise((resolve, reject) => {
-            console.log('sup bitches');
             if (!this._apiKey) {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            console.log('this far...');
             this._session = new Session(app.android.context, this._apiKey, sessionId);
             // this._session.setSessionListener(this._delegate);
             if (this._session) {
@@ -54,7 +51,6 @@ export class TNSOTSession implements TNSOTSessionI {
                 resolve(true);
             }
             else {
-                console.log('OpenTok SESSION FAILED!');
                 reject('OpenTok session creation failed.');
             }
         });
@@ -117,21 +113,13 @@ export class TNSOTSession implements TNSOTSessionI {
     private attachPublisherView(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         // this._publisher.setCameraListener(this._session.StreamPropertiesListener);
         this._publisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
-        // if(!videoWidth || videoWidth === -1) {
+        if(!videoWidth || videoWidth === -1) {
             videoWidth = app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels;
-        // }
-        // if(!videoHeight || videoHeight === -1) {
+        }
+        if(!videoHeight || videoHeight === -1) {
             videoHeight = app.android.foregroundActivity.getResources().getDisplayMetrics().heightPixels;
-        // }
+        }
         var layoutParams = new AbsoluteLayout.LayoutParams(300, 300, 120, 120);
-        for(let test in this._publisher) {
-            console.log('Test - ' + test);
-        }
-
-        for(let view in this._publisher.getView()) {
-            console.log('view - ' + view);
-        }
-        console.log('****** VIEW TYPE ****** ' + this._publisher.getView().getClass().getName());
 
         app.android.foregroundActivity.addContentView(this._publisher.getView(), layoutParams);
 
@@ -198,7 +186,7 @@ export class TNSOTSession implements TNSOTSessionI {
         }
     }
 
-    delegate(): any {
+    instance(): TNSSessionListener {
         return this._delegate;
     }
 

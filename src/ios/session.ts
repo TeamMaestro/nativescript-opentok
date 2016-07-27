@@ -11,15 +11,14 @@ export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
     private _session: any;
-    private _publisher: any;
+    private _publisher: TNSOTPublisher;
     private _subscriber: any;
-    private _delegate: any;
+    private _delegate: TNSOTSessionDelegate;
 
-    constructor(apiKey: string, emitEvents?: boolean, emitPublisherEvents?: boolean) {
+    constructor(apiKey: string) {
         this._apiKey = apiKey;
-        this._delegate = new TNSOTSessionDelegate();
-        this._delegate.initSession(emitEvents);
-        this._publisher = new TNSOTPublisher(emitPublisherEvents);
+        this.bindSessionEvents(true);
+        this.bindPublisherEvents(true);
     }
 
     /**
@@ -27,7 +26,7 @@ export class TNSOTSession implements TNSOTSessionI {
      *
      * @param {string} sessionId The generated OpenTok session id
      */
-    public create(sessionId: string): Promise<any> {
+    create(sessionId: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if(!this._apiKey) {
                 console.log('API key not set. Please use the constructor to set the API key');
@@ -35,8 +34,7 @@ export class TNSOTSession implements TNSOTSessionI {
             }
             this._session = new OTSession(this._apiKey, sessionId, this._delegate);
             if(this._session) {
-                console.log('OpenTok session: ' + this._session);
-                resolve(true);
+                resolve();
             }
             else {
                 reject('OpenTok session creation failed.');
@@ -51,18 +49,17 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {string} token The OpenTok token to join an existing session
      * @returns {Promise<any>}
      */
-    public connect(token: string): Promise<any> {
+    connect(token: string): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
                 var errorRef = new interop.Reference();
                 session.connectWithTokenError(token, errorRef);
                 if(errorRef.value) {
-                    console.log('Error connecting with token - ' + errorRef.value);
                     reject(errorRef.value);
                 }
                 else {
-                    resolve(true);
+                    resolve();
                 }
             }
         });
@@ -75,13 +72,13 @@ export class TNSOTSession implements TNSOTSessionI {
      *
      * @returns {Promise<any>}
      */
-    public disconnect(): Promise<any> {
+    disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
                 try {
                     session.disconnect();
-                    resolve(true);
+                    resolve();
                 } catch(error) {
                     console.log(error);
                     reject(error);
@@ -101,7 +98,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {number} videoHeight The height of the video frame (pixels)
      * @returns {Promise<any>}
      */
-    public publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
+    publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             let session = this._session;
             if(session) {
@@ -123,7 +120,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {any} stream The OTSession stream to subscribe to
      * @returns {Promise<any>}
      */
-    public subscribe(stream: any): Promise<any> {
+	subscribe(stream: any): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
@@ -143,7 +140,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * Cleans the subscriber from the view hierarchy, if any.
      * @returns {Promise<any>}
      */
-    public unsubscribe(): Promise<any> {
+	unsubscribe(): Promise<any> {
         return new Promise((resolve, reject) => {
             let subscriber = this._subscriber;
             if(subscriber) {
@@ -166,7 +163,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * Cleans up the publisher and its view. At this point, the publisher should not
      * be attached to the session any more.
      */
-    public cleanupPublisher() {
+	cleanupPublisher() {
         let publisher = this._publisher.nativePublisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
@@ -181,7 +178,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
      * be automatically removed from the session during cleanup of the stream.
      */
-    public cleanupSubscriber() {
+	cleanupSubscriber() {
         let subscriber = this._subscriber;
         if(subscriber) {
             subscriber.view.removeFromSuperview();
@@ -191,7 +188,7 @@ export class TNSOTSession implements TNSOTSessionI {
 
     // OTSubscriber delegate callbacks
 
-    public subscriberDidConnectToStream(subscriberKit: any) {
+	subscriberDidConnectToStream(subscriberKit: any) {
         if(this._subscriber) {
             console.log('subscriberDidConnectToStream: ' + subscriberKit);
             let view = this._subscriber.view;
@@ -202,11 +199,40 @@ export class TNSOTSession implements TNSOTSessionI {
         }
     }
 
-    delegate(): any {
+    /**
+     * Binds the custom session delegate for registering to existing events
+     *
+     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
+     */
+    bindSessionEvents(emitEvents:boolean = true) {
+        this._delegate = new TNSOTSessionDelegate();
+        this._delegate.initSession(emitEvents);
+    }
+
+    /**
+     * Binds the custom publisher delegate for registering to existing events
+     *
+     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
+     */
+    bindPublisherEvents(emitEvents: boolean = true) {
+        this._publisher = new TNSOTPublisher(emitEvents);
+    }
+
+    /**
+     * Returns the custom session delegate instance
+     *
+     * @returns {TNSOTSessionDelegate} Custom implementation of OTSessionDelegate
+     */
+    instance(): TNSOTSessionDelegate {
         return this._delegate;
     }
 
-    publisher(): any {
+    /**
+     * Returns the custom publisher delegate instance
+     *
+     * @returns {TNSOTPublisher} Custom implementation of OTPublisherKitDelegate
+     */
+    publisher(): TNSOTPublisher {
         return this._publisher;
     }
 

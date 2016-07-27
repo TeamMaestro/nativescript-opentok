@@ -1,6 +1,6 @@
 {
   "name": "nativescript-opentok",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Integrates OpenTok for NativeScript.",
   "main": "opentok.js",
   "nativescript": {
@@ -27,12 +27,13 @@
     "TokBox",
     "JavaScript",
     "Android",
-    "iOS"
+    "iOS",
+    "{N}"
   ],
   "contributors": [],
   "author": {
     "name": "Sean Perkins",
-    "email": "sean@meetmaestro.com.com"
+    "email": "sean@meetmaestro.com"
   },
   "bugs": {
     "url": "https://github.com/sean-perkins/nativescript-opentok/issues"
