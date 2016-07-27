@@ -32,6 +32,9 @@ this.session.create(this.getSessionID()).then((result) => {
         console.log('Error connecting');
     });
 }, (err) => {});
+this._session.instance().sessionEvents.on('sessionDidConnect',  (eventData) => {
+    console.log('sessionDidConnect', eventData);
+});
 
 private getSessionID() {
     return '';// session id string
