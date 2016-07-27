@@ -20,11 +20,11 @@ Node Package Manager (NPM)
 ### Integration
 Import OpenTok nativescript plugin into your Nativescript page (i.e. main-page.ts)
 ```
-import {TNSSession} from 'nativescript-opentok';
+import {TNSOTSession} from 'nativescript-opentok';
 ```
 Instantiate the OpenTok class and initialize using your API key and session id. Connect using a valid token and publish to the page you want to append the video stream to. 
 ```
-this.session = new TNSSession('API_KEY');
+this.session = new TNSOTSession('API_KEY');
 this.session.create(this.getSessionID()).then((result) => {
     this.session.connect(this.getToken()).then((result) => {
         this.session.publish(100, 100, 100, 100);
