@@ -1,6 +1,8 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded">
-  <StackLayout id="publisherContainer">
+  <StackLayout id="publisherContainer" orientation="vertical">
     <Label text="OpenTok" class="message" textWrap="true"/>
-    <Button text="Toggle Video" tap="{{ toggleVideo }}" />
+    <Button text="Toggle Publisher Video" tap="{{ togglePublisherVideo }}" />
+    <Button text="Toggle Publisher Audio" tap="{{ togglePublisherAudio }}" />
+    <Button text="Toggle Publisher Camera" tap="{{ togglePublisherCamera }}" />
   </StackLayout>
 </Page>

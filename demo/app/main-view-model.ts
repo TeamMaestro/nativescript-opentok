@@ -1,54 +1,52 @@
 import {Observable} from 'data/observable';
 
-import {TNSSession} from 'nativescript-opentok';
+import {TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
-    private session: any;
+    private _session: any;
 
     constructor() {
         super();
-        this.session = new TNSSession('45614192');
-        this.session.create(this.getSessionID()).then((result) => {
-            this.session.connect(this.getToken()).then((result) => {
-                this.session.publish(100, 100, 100, 100);
+        this._session = new TNSOTSession('45628212');
+        this._session.create(this.getSessionID()).then((result) => {
+            this._session.connect(this.getToken()).then((result) => {
+                this._session.publish(300, 300, 450, 450);
             }, (err) => {
                 console.log('Error connecting');
             });
         }, (err) => {});
+        this._session.instance().sessionEvents.on('sessionDidConnect',  (eventData) => {
+            console.log('sessionDidConnect', eventData);
+        });
+        // this._session.publisher().instance().publisherEvents.on('didChangeCameraPosition', (eventData) => {
+        //     console.log('didChangeCameraPosition', eventData);
+        // });
+
     }
 
-    toggleVideo() {
-        this.session.toggleVideo().then((result) => {
+    togglePublisherVideo() {
+        this._session.publisher().toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
-        }, (err) => {
-            console.log('Error toggling video stream state: ' + err);
+        }, (error) => {
+            console.log('Error toggling video stream state: ' + error);
         });;
     }
 
+    togglePublisherAudio() {
+        this._session.publisher().toggleAudio();
+    }
+
+    togglePublisherCamera() {
+        this._session.publisher().toggleCameraPosition();
+    }
+
     private getSessionID() {
-        return '2_MX40NTYxNDE5Mn5-MTQ2ODk5NjUxMTM0MH5kaGRGY3ErdGUzVTFTY1N2TTJCUllkZ0x-fg';
+        return '1_MX40NTYyODIxMn5-MTQ2OTY0NjU3OTA2NX5aSjVYVndXREx4QUY3QjJOTGt1RGxDS0Z-fg';
     }
 
     private getToken() {
-        return 'T1==cGFydG5lcl9pZD00NTYxNDE5MiZzaWc9ZTQzMTE0YjQ2M2ZlYWMzODZiZDYyZWJjYWJjZjM1ZWE2OTM0NGY1ODpzZXNzaW9uX2lkPTJfTVg0ME5UWXhOREU1TW41LU1UUTJPRGs1TmpVeE1UTTBNSDVrYUdSR1kzRXJkR1V6VlRGVFkxTjJUVEpDVWxsa1oweC1mZyZjcmVhdGVfdGltZT0xNDY4OTk2NTM0Jm5vbmNlPTAuMTE4ODU0NDgwNTYyNzMxNjImcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MTU4ODUzNA==';
+        return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9ZTFlM2Q4MjYxZDI4ZDQzZjBhYWEzYzlkOGIxZGI1Mjg3YTY1NGE0ODpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTJPVFkwTmpVM09UQTJOWDVhU2pWWVZuZFhSRXg0UVVZM1FqSk9UR3QxUkd4RFMwWi1mZyZjcmVhdGVfdGltZT0xNDY5NjQ2NTk5Jm5vbmNlPTAuMzQyMTI5NjI2MDc4NTMxMTUmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MjIzODU5OQ==';
     }
 
-    /*
-    // if(app.android) {
-      //     console.log('Running Android');
-      //     var openTokAndroid = new OpenTokAndroid();
-      //     openTokAndroid.init('45614192', sessionID);
-      //     openTokAndroid.doConnect(token);
-      //     openTokAndroid.doPublish(app.android.context);
-      // }
-      // else if(app.ios) {
-      //     console.log('Running iOS');
-      //     var openTokiOS = new OpenTokiOS();
-      //     openTokiOS.init('45614192', sessionID, page.ios);
-      //     openTokiOS.doConnect(token);
-      //     openTokiOS.doPublish(100, 100, 100, 100);
-      //     openTokiOS.doPublish(0, 0, 100, 100);
-      // }
-  */
 }

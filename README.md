@@ -44,7 +44,7 @@ private getToken() {
 
 ### Images
 
-![alt text](resources/example.png "Example OpenTok ")
+# <img src="http://i.imgur.com/PxyZEFX.jpg" />
 
 ### Notes
 - Publishing is not supported in the Simulator because it does not have access to your webcam.

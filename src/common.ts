@@ -1,4 +1,4 @@
-export interface TNSSessionI {
+export interface TNSOTSessionI {
     /**
      * Creates the OTSession object, which represents an existing OpenTok Session
      *
@@ -38,16 +38,44 @@ export interface TNSSessionI {
      */
     unsubscribe(): Promise<any>;
 
+    instance(): any;
+
+    publisher(): any;
+
+
 }
 
-export interface TNSPublisherI {
-
+export interface TNSOTPublisherI {
+    /**
+     * Toggles the visibility state of the publisher video stream
+     *
+     * @returns {Promise<any>}
+     */
     toggleVideo(): Promise<any>;
-
+    /**
+     * Toggles the mute state of the publisher audio stream
+     *
+     * @returns {Promise<any>}
+     */
     toggleAudio(): Promise<any>;
-
+    /**
+     * Sets the visibility state of the publisher video stream
+     *
+     * @param {boolean} state The visibility state, {true} visible, {false} hidden
+     */
     setVideoActive(state: boolean);
-
+    /**
+     * Sets the mute state of the publisher audio stream
+     *
+     * @param {boolean} state The mute state, {true} not muted, {false} muted
+     */
     setAudioActive(state: boolean);
+    /**
+     * Toggles the camera used to publish the video stream
+     */
+    toggleCameraPosition();
+
+    instance(): any;
+
 
 }

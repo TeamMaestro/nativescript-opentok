@@ -1,21 +1,24 @@
 import * as app from 'application';
-import {TNSSessionI, TNSPublisherI} from '../common';
+import {topmost} from 'ui/frame';
 
-var frame = require("ui/frame");
+import {TNSOTSessionI} from '../common';
+import {TNSOTSessionDelegate} from './session-delegate';
+import {TNSOTPublisher} from './publisher';
 
-declare var NSObject, OTSession, OTSessionDelegate, OTPublisher, OTSubscriber, CGRectMake, interop;
+declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, CGRectMake, interop;
 
-export class TNSSession implements TNSSessionI, TNSPublisherI  {
+export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
-
-    private _sessionDelegate: any;
     private _session: any;
-    private _publisher: any;
+    private _publisher: TNSOTPublisher;
     private _subscriber: any;
+    private _delegate: TNSOTSessionDelegate;
 
     constructor(apiKey: string) {
         this._apiKey = apiKey;
+        this.bindSessionEvents(true);
+        this.bindPublisherEvents(true);
     }
 
     /**
@@ -23,18 +26,15 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      *
      * @param {string} sessionId The generated OpenTok session id
      */
-    public create(sessionId: string): Promise<any> {
+    create(sessionId: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if(!this._apiKey) {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this._session = new OTSession(this._apiKey, sessionId, frame.topmost().currentPage.ios);
-            this._sessionDelegate = TNSSessionDelegate.alloc().init();
-            this._session.delegate = this._sessionDelegate;
+            this._session = new OTSession(this._apiKey, sessionId, this._delegate);
             if(this._session) {
-                console.log('OpenTok session: ' + this._session);
-                resolve(true);
+                resolve();
             }
             else {
                 reject('OpenTok session creation failed.');
@@ -49,18 +49,17 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * @param {string} token The OpenTok token to join an existing session
      * @returns {Promise<any>}
      */
-    public connect(token: string): Promise<any> {
+    connect(token: string): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
                 var errorRef = new interop.Reference();
                 session.connectWithTokenError(token, errorRef);
                 if(errorRef.value) {
-                    console.log('Error connecting with token - ' + errorRef.value);
                     reject(errorRef.value);
                 }
                 else {
-                    resolve(true);
+                    resolve();
                 }
             }
         });
@@ -73,13 +72,13 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      *
      * @returns {Promise<any>}
      */
-    public disconnect(): Promise<any> {
+    disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
                 try {
                     session.disconnect();
-                    resolve(true);
+                    resolve();
                 } catch(error) {
                     console.log(error);
                     reject(error);
@@ -97,29 +96,19 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * @param {number} videoLocationY The Y-coordinate position of the video frame
      * @param {number} videoWidth The width of the video frame (pixels)
      * @param {number} videoHeight The height of the video frame (pixels)
+     * @returns {Promise<any>}
      */
-    public publish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
-        let session = this._session;
-        if(session) {
-            this._publisher = new OTPublisher(frame.topmost().currentPage.ios);
-            try {
-                this._session.publish(this._publisher);
-            } catch(error) {
-                console.log('Failed to publish to session: ' + error);
+    publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            let session = this._session;
+            if(session) {
+                this._publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
+                    resolve(result);
+                }, (error) => {
+                    reject(error);
+                });
             }
-            if(this._publisher) {
-                frame.topmost().currentPage.ios.view.addSubview(this._publisher.view)
-                if(!videoLocationX)
-                    videoLocationX = 0.0;
-                if(!videoLocationY)
-                    videoLocationY = 0;
-                if(!videoWidth)
-                    videoWidth = 100;
-                if(!videoHeight)
-                    videoHeight = 100;
-                this._publisher.view.frame = CGRectMake(videoLocationX, videoLocationY, videoWidth, videoHeight);
-            }
-        }
+        });
     }
 
     /**
@@ -131,11 +120,11 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * @param {any} stream The OTSession stream to subscribe to
      * @returns {Promise<any>}
      */
-    public subscribe(stream: any): Promise<any> {
+	subscribe(stream: any): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this._session;
             if(session) {
-                this._subscriber = new OTSubscriber(stream, frame.topmost().currentPage.ios);
+                this._subscriber = new OTSubscriber(stream, topmost().currentPage.ios);
                 try {
                     session.subscribe(this._subscriber);
                     resolve(true);
@@ -151,7 +140,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * Cleans the subscriber from the view hierarchy, if any.
      * @returns {Promise<any>}
      */
-    public unsubscribe(): Promise<any> {
+	unsubscribe(): Promise<any> {
         return new Promise((resolve, reject) => {
             let subscriber = this._subscriber;
             if(subscriber) {
@@ -174,8 +163,8 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * Cleans up the publisher and its view. At this point, the publisher should not
      * be attached to the session any more.
      */
-    public cleanupPublisher() {
-        let publisher = this._publisher;
+	cleanupPublisher() {
+        let publisher = this._publisher.nativePublisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
             publisher = null;
@@ -189,7 +178,7 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
      * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
      * be automatically removed from the session during cleanup of the stream.
      */
-    public cleanupSubscriber() {
+	cleanupSubscriber() {
         let subscriber = this._subscriber;
         if(subscriber) {
             subscriber.view.removeFromSuperview();
@@ -199,77 +188,52 @@ export class TNSSession implements TNSSessionI, TNSPublisherI  {
 
     // OTSubscriber delegate callbacks
 
-    public subscriberDidConnectToStream(subscriberKit: any) {
+	subscriberDidConnectToStream(subscriberKit: any) {
         if(this._subscriber) {
             console.log('subscriberDidConnectToStream: ' + subscriberKit);
             let view = this._subscriber.view;
             if(view) {
                 view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-                frame.topmost().currentPage.ios.addSubview(view);
+                topmost().currentPage.ios.addSubview(view);
             }
         }
     }
 
-    public sessionDidConnectSession(session: any) {
-
+    /**
+     * Binds the custom session delegate for registering to existing events
+     *
+     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
+     */
+    bindSessionEvents(emitEvents:boolean = true) {
+        this._delegate = new TNSOTSessionDelegate();
+        this._delegate.initSession(emitEvents);
     }
 
-    toggleVideo(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this._publisher;
-            if(publisher) {
-                publisher.publishVideo = !publisher.publishVideo;
-                resolve(publisher.publishVideo);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
+    /**
+     * Binds the custom publisher delegate for registering to existing events
+     *
+     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
+     */
+    bindPublisherEvents(emitEvents: boolean = true) {
+        this._publisher = new TNSOTPublisher(emitEvents);
     }
 
-    toggleAudio(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this._publisher;
-            if(publisher) {
-                publisher.publishAudio = !publisher.publishAudio;
-                resolve(publisher.publishAudio);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
+    /**
+     * Returns the custom session delegate instance
+     *
+     * @returns {TNSOTSessionDelegate} Custom implementation of OTSessionDelegate
+     */
+    instance(): TNSOTSessionDelegate {
+        return this._delegate;
     }
 
-    setVideoActive(state: boolean) {
-        let publisher = this._publisher;
-        if(publisher) {
-            publisher.publishVideo = state;
-        }
-    }
-
-    setAudioActive(state: boolean) {
-        let publisher = this._publisher;
-        if(publisher) {
-            publisher.publishAudio = state;
-        }
+    /**
+     * Returns the custom publisher delegate instance
+     *
+     * @returns {TNSOTPublisher} Custom implementation of OTPublisherKitDelegate
+     */
+    publisher(): TNSOTPublisher {
+        return this._publisher;
     }
 
 }
-
-var TNSSessionDelegate = NSObject.extend({
-    sessionDidConnect(session: any) {
-        console.log('Session Did Connect');
-    },
-    sessionDidDisconnect(session: any) {
-        console.log('Session Did Disconnect');
-    },
-    sessionDidReconnect(session:any) {
-        console.log('Session Did Reconnect');
-    },
-    sessionDidBeginReconnecting(session: any) {
-        console.log('Session Did Begin Reconnecting');
-    },
-    streamCreated(session: any) {
-        console.log('Stream Created');
-    }
-});
