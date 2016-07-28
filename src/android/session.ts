@@ -124,4 +124,8 @@ export class TNSOTSession implements TNSOTSessionI {
         this._publisher;
     }
 
+    publisher() {
+
+    }
+
 }

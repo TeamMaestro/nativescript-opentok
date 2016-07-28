@@ -1,6 +1,9 @@
 {
-  "name": "nativescript-opentok",
-  "dependencies": {
-    "es6-promise": "registry:npm/es6-promise#3.0.0+20160723033700"
+  "resolution": "main",
+  "tree": {
+    "main": "opentok.d.ts",
+    "global": false,
+    "name": "natvescript-opentok",
+    "type": "typings"
   }
 }
