@@ -1,32 +1,36 @@
+///<reference path="../node_modules/nativescript-opentok/opentok.ios.d.ts"/>
+///<reference path="../node_modules/nativescript-opentok/opentok.android.d.ts"/>
+
 import {Observable} from 'data/observable';
 
 import {TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
-    private _session: any;
+    private session: any;
 
     constructor() {
         super();
-        this._session = new TNSOTSession('45628212');
-        this._session.create(this.getSessionID()).then((result) => {
-            this._session.connect(this.getToken()).then((result) => {
-                this._session.publish(300, 300, 450, 450);
+        this.session = new TNSOTSession('45628212');
+        this.session.create(this.getSessionID()).then((result) => {
+            this.session.connect(this.getToken()).then((result) => {
+                this.session.publish(300, 300, 450, 450);
             }, (err) => {
                 console.log('Error connecting');
             });
+            console.log('SessionEvents(NS): ' + this.session.instance().sessionEvents);
         }, (err) => {});
-        this._session.instance().sessionEvents.on('sessionDidConnect',  (eventData) => {
-            console.log('sessionDidConnect', eventData);
-        });
-        // this._session.publisher().instance().publisherEvents.on('didChangeCameraPosition', (eventData) => {
+        // this.session.instance().sessionEvents.on('sessionDidConnect',  (eventData) => {
+        //     console.log('sessionDidConnect', eventData);
+        // });
+        // this.session.publisher().instance().publisherEvents.on('didChangeCameraPosition', (eventData) => {
         //     console.log('didChangeCameraPosition', eventData);
         // });
 
     }
 
     togglePublisherVideo() {
-        this._session.publisher().toggleVideo().then((result) => {
+        this.session.publisher().toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
         }, (error) => {
             console.log('Error toggling video stream state: ' + error);
@@ -34,11 +38,11 @@ export class OpenTokDemo extends Observable {
     }
 
     togglePublisherAudio() {
-        this._session.publisher().toggleAudio();
+        this.session.publisher().toggleAudio();
     }
 
     togglePublisherCamera() {
-        this._session.publisher().toggleCameraPosition();
+        this.session.publisher().toggleCameraPosition();
     }
 
     private getSessionID() {
