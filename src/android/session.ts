@@ -190,4 +190,8 @@ export class TNSOTSession implements TNSOTSessionI {
         return this._delegate;
     }
 
+    publisher() {
+
+    }
+
 }
