@@ -2,3 +2,4 @@ demo/
 resources/
 *.png
 *.log
+*.ts
