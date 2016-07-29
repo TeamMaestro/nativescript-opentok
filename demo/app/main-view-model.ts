@@ -1,9 +1,8 @@
 ///<reference path="../node_modules/nativescript-opentok/opentok.ios.d.ts"/>
-///<reference path="../node_modules/nativescript-opentok/opentok.android.d.ts"/>
 
 import {Observable} from 'data/observable';
 
-import {TNSOTSession} from 'nativescript-opentok';
+import { TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 

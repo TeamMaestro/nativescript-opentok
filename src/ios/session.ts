@@ -204,7 +204,7 @@ export class TNSOTSession implements TNSOTSessionI {
      *
      * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
      */
-    bindSessionEvents(emitEvents:boolean = true) {
+    private bindSessionEvents(emitEvents:boolean = true) {
         this._delegate = new TNSOTSessionDelegate();
         this._delegate.initSession(emitEvents);
     }
@@ -214,7 +214,7 @@ export class TNSOTSession implements TNSOTSessionI {
      *
      * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
      */
-    bindPublisherEvents(emitEvents: boolean = true) {
+    private bindPublisherEvents(emitEvents: boolean = true) {
         this._publisher = new TNSOTPublisher(emitEvents);
     }
 
