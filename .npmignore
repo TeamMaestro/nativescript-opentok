@@ -1,6 +1,9 @@
 demo/
-resources/
 *.png
 *.log
 *.ts
 !*.d.ts
+!src/android/*
+!src/ios/*
+*.map
+tsconfig.json

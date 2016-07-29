@@ -1,6 +1,6 @@
 import {Observable} from 'data/observable';
 
-import {TNSOTSession} from 'nativescript-opentok';
+import { TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
@@ -8,6 +8,7 @@ export class OpenTokDemo extends Observable {
 
     constructor() {
         super();
+
         this._session = new TNSOTSession('45628212');
         this._session.create(this.getSessionID()).then((result) => {
             this._session.connect(this.getToken()).then((result) => {

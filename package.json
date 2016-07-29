@@ -1,8 +1,9 @@
 {
   "name": "nativescript-opentok",
-  "version": "1.2.6",
+  "version": "1.2.10",
   "description": "Integrates OpenTok for NativeScript.",
   "main": "opentok.js",
+  "typings": "./index.d.ts",
   "nativescript": {
     "platforms": {
       "android": "2.1.1",
@@ -46,5 +47,8 @@
     "tns-core-modules": "^2.1.0",
     "tns-platform-declarations": "^2.0.0",
     "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "@types/es6-promise": "0.0.28"
   }
 }
