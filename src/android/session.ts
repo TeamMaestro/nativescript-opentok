@@ -15,12 +15,11 @@ const RelativeLayout = android.widget.RelativeLayout;
 export class TNSOTSession implements TNSOTSessionI {
 
     private apiKey: string;
-
     private session: any;
-    private _publisher: any;
     private subscriber: any;
-
     private sessionListener: any;
+
+    public publisher: any;
 
     constructor(apiKey: string) {
         this.apiKey = apiKey;
@@ -75,7 +74,7 @@ export class TNSOTSession implements TNSOTSessionI {
 
     public publish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         if (this.session) {
-            this._publisher.init(this.session, videoLocationX, videoLocationY, videoWidth, videoHeight);
+            this.publisher.init(this.session, videoLocationX, videoLocationY, videoWidth, videoHeight);
         }
     }
 
@@ -113,19 +112,12 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
      */
     bindPublisherEvents(emitEvents: boolean = true) {
-        this._publisher = new TNSOTPublisher(emitEvents);
+        this.publisher = new TNSOTPublisher(emitEvents);
     }
 
     instance(): any {
         return this.sessionListener;
     }
 
-    publisher(): any {
-        this._publisher;
-    }
-
-    publisher() {
-
-    }
 
 }

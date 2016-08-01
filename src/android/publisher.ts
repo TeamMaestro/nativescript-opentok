@@ -1,7 +1,6 @@
-// import {topmost} from 'ui/frame';
-// import {TNSOTPublisherDelegate} from './publisher-delegate';
-import {TNSOTPublisherI} from '../common';
 import * as app from 'application';
+
+import {TNSOTPublisherI} from '../common';
 
 declare var com: any, android: any;
 
@@ -12,7 +11,7 @@ const RelativeLayout = android.widget.RelativeLayout;
 
 export class TNSOTPublisher implements TNSOTPublisherI {
 
-    public nativePublisher: this;
+    public nativePublisher: any;
 
     constructor(emitEvents?: boolean) {
         // this._delegate = new TNSOTPublisherDelegate();
@@ -22,9 +21,11 @@ export class TNSOTPublisher implements TNSOTPublisherI {
     init(session: any, videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
         return new Promise((resolve, reject) => {
             this.nativePublisher = new Publisher(app.android.context);
+            // this.nativePublisher.setPublisherListener(app.android.context);
             // this.nativePublisher.setPublisherListener(session.StreamPropertiesListener);
             console.log('Init publisher: ' + this.nativePublisher);
             this.attachPublisherView(videoLocationX, videoLocationY, videoWidth, videoHeight);
+            this.nativePublisher.startPreview();
             try {
                 session.publish(this.nativePublisher);
                 resolve();

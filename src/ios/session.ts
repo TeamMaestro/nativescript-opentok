@@ -11,9 +11,10 @@ export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
     private _session: any;
-    private _publisher: TNSOTPublisher;
     private _subscriber: any;
     private _delegate: TNSOTSessionDelegate;
+
+    public publisher: TNSOTPublisher;
 
     constructor(apiKey: string) {
         this._apiKey = apiKey;
@@ -102,7 +103,7 @@ export class TNSOTSession implements TNSOTSessionI {
         return new Promise<any>((resolve, reject) => {
             let session = this._session;
             if(session) {
-                this._publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
+                this.publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
                     resolve(result);
                 }, (error) => {
                     reject(error);
@@ -164,7 +165,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * be attached to the session any more.
      */
 	cleanupPublisher() {
-        let publisher = this._publisher.nativePublisher;
+        let publisher = this.publisher.nativePublisher;
         if(publisher) {
             publisher.view.removeFromSuperview();
             publisher = null;
@@ -215,7 +216,7 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
      */
     private bindPublisherEvents(emitEvents: boolean = true) {
-        this._publisher = new TNSOTPublisher(emitEvents);
+        this.publisher = new TNSOTPublisher(emitEvents);
     }
 
     /**
@@ -225,15 +226,6 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     instance(): TNSOTSessionDelegate {
         return this._delegate;
-    }
-
-    /**
-     * Returns the custom publisher delegate instance
-     *
-     * @returns {TNSOTPublisher} Custom implementation of OTPublisherKitDelegate
-     */
-    publisher(): TNSOTPublisher {
-        return this._publisher;
     }
 
 }

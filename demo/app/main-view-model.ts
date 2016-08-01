@@ -22,14 +22,14 @@ export class OpenTokDemo extends Observable {
         // this.session.instance().sessionEvents.on('sessionDidConnect',  (eventData) => {
         //     console.log('sessionDidConnect', eventData);
         // });
-        // this.session.publisher().instance().publisherEvents.on('didChangeCameraPosition', (eventData) => {
+        // this.session.publisher.instance().publisherEvents.on('didChangeCameraPosition', (eventData) => {
         //     console.log('didChangeCameraPosition', eventData);
         // });
 
     }
 
     togglePublisherVideo() {
-        this.session.publisher().toggleVideo().then((result) => {
+        this.session.publisher.toggleVideo().then((result) => {
             console.log('Set video stream state to: ' + result);
         }, (error) => {
             console.log('Error toggling video stream state: ' + error);
@@ -37,11 +37,11 @@ export class OpenTokDemo extends Observable {
     }
 
     togglePublisherAudio() {
-        this.session.publisher().toggleAudio();
+        this.session.publisher.toggleAudio();
     }
 
     togglePublisherCamera() {
-        this.session.publisher().toggleCameraPosition();
+        this.session.publisher.toggleCameraPosition();
     }
 
     private getSessionID() {

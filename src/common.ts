@@ -40,7 +40,7 @@ export interface TNSOTSessionI {
 
     instance(): any;
 
-    publisher(): any;
+    publisher: any;
 
 
 }
