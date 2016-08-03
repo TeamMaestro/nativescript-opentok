@@ -1,11 +1,12 @@
 import {Observable, EventData} from 'data/observable';
 import {topmost} from 'ui/frame';
 
-declare var OTPublisherDelegate: any;
+declare var OTPublisherDelegate: any,
+            OTPublisherKitDelegate: any;
 
 export class TNSOTPublisherDelegate extends NSObject {
 
-    public static ObjCProtocols = [OTPublisherDelegate];
+    public static ObjCProtocols = [OTPublisherKitDelegate];
 
     private didChangeCameraPositionEvent: EventData;
     private streamCreatedEvent: EventData;
@@ -39,7 +40,6 @@ export class TNSOTPublisherDelegate extends NSObject {
      * @param {*} stream The stream that was created.
      */
     streamCreated(publisher: any, stream: any) {
-        console.log('publisher stream created');
         if(this.publisherEvents) {
             this.publisherEvents.notify(this.streamCreatedEvent);
         }
@@ -64,7 +64,6 @@ export class TNSOTPublisherDelegate extends NSObject {
      * @param {*} error The error (an OTError object). The OTPublisherErrorCode enum (defined in the OTError class) defines values for the code property of this object.
      */
     didFailWithError(publisher: any, error: any) {
-        console.log('did fail');
         if(this.publisherEvents) {
             this.publisherEvents.notify(this.didFailWithErrorEvent);
         }

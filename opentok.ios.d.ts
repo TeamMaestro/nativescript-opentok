@@ -25,6 +25,8 @@ export declare class TNSOTSession implements TNSOTSessionI {
 
     instance(): any;
 
-    publisher(): any;
+    publisher: any;
+
+    session: any;
 
 }

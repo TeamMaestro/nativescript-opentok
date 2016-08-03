@@ -5,7 +5,13 @@ import {TNSOTSessionI} from '../common';
 import {TNSOTSessionDelegate} from './session-delegate';
 import {TNSOTPublisher} from './publisher';
 
-declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, CGRectMake, interop;
+declare var OTSession: any,
+            OTSessionDelegate: any,
+            OTPublisher: any,
+            OTSubscriber: any,
+            CGRectMake: any,
+            interop: any,
+            OTSessionErrorCode: any;
 
 export class TNSOTSession implements TNSOTSessionI {
 
@@ -56,7 +62,10 @@ export class TNSOTSession implements TNSOTSessionI {
                 var errorRef = new interop.Reference();
                 this.session.connectWithTokenError(token, errorRef);
                 if(errorRef.value) {
-                    reject(errorRef.value);
+                    reject({
+                        code: errorRef.value.code,
+                        message: this.getOTSessionErrorCodeMessage(errorRef.value.code)
+                    });
                 }
                 else {
                     resolve(this.session);
@@ -193,6 +202,22 @@ export class TNSOTSession implements TNSOTSessionI {
                 view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
                 topmost().currentPage.ios.addSubview(view);
             }
+        }
+    }
+
+
+    private getOTSessionErrorCodeMessage(code: number) {
+        switch(code) {
+            case OTSessionErrorCode.OTSessionIllegalState:// 1015
+                return 'A method has been invoked at an illegal or inappropriate time for this session. For example, attempting to connect an already connected session will return this error.';
+            case OTSessionErrorCode.OTAuthorizationFailure:// 1004
+                return 'An invalid API key or token was provided';
+            case OTSessionErrorCode.OTErrorInvalidSession:// 1005
+                return 'An invalid session ID was provided';
+            case OTSessionErrorCode.OTSessionConnectionTimeout:// 1021
+                return 'The connection timed out while attempting to connect to the session.';
+            default:
+                return 'No message';
         }
     }
 

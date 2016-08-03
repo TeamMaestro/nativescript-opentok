@@ -3,7 +3,7 @@ import {topmost} from 'ui/frame';
 
 declare var OTSessionDelegate: any;
 
-export class TNSOTSessionDelegate extends NSObject implements OTSessionDelegate {
+export class TNSOTSessionDelegate extends NSObject {
 
     public static ObjCProtocols = [OTSessionDelegate];
 
@@ -76,7 +76,12 @@ export class TNSOTSessionDelegate extends NSObject implements OTSessionDelegate 
      * @param {*} stream The stream associated with this event.
      */
     sessionStreamCreated(session: any, stream: any) {
-        console.log('Stream Created!!!! - ' + stream);
+        if(this.sessionEvents) {
+            this.sessionEvents.notify(this._streamCreatedEvent);
+        }
+    }
+
+    streamCreated(session: any, stream: any) {
         if(this.sessionEvents) {
             this.sessionEvents.notify(this._streamCreatedEvent);
         }
