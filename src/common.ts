@@ -41,6 +41,7 @@ export interface TNSOTSessionI {
     instance(): any;
 
     publisher: any;
+    session: any;
 
 
 }

@@ -76,6 +76,7 @@ export class TNSOTSessionDelegate extends NSObject implements OTSessionDelegate 
      * @param {*} stream The stream associated with this event.
      */
     sessionStreamCreated(session: any, stream: any) {
+        console.log('Stream Created!!!! - ' + stream);
         if(this.sessionEvents) {
             this.sessionEvents.notify(this._streamCreatedEvent);
         }

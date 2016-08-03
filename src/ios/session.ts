@@ -10,10 +10,10 @@ declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, C
 export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
-    private _session: any;
     private _subscriber: any;
     private _delegate: TNSOTSessionDelegate;
 
+    public session: any;
     public publisher: TNSOTPublisher;
 
     constructor(apiKey: string) {
@@ -33,9 +33,9 @@ export class TNSOTSession implements TNSOTSessionI {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this._session = new OTSession(this._apiKey, sessionId, this._delegate);
-            if(this._session) {
-                resolve();
+            this.session = new OTSession(this._apiKey, sessionId, this._delegate);
+            if(this.session) {
+                resolve(this.session);
             }
             else {
                 reject('OpenTok session creation failed.');
@@ -52,15 +52,14 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     connect(token: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
+            if(this.session) {
                 var errorRef = new interop.Reference();
-                session.connectWithTokenError(token, errorRef);
+                this.session.connectWithTokenError(token, errorRef);
                 if(errorRef.value) {
                     reject(errorRef.value);
                 }
                 else {
-                    resolve();
+                    resolve(this.session);
                 }
             }
         });
@@ -75,10 +74,9 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
+            if(this.session) {
                 try {
-                    session.disconnect();
+                    this.session.disconnect();
                     resolve();
                 } catch(error) {
                     console.log(error);
@@ -101,9 +99,8 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            let session = this._session;
-            if(session) {
-                this.publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
+            if(this.session) {
+                this.publisher.init(this.session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
                     resolve(result);
                 }, (error) => {
                     reject(error);
@@ -123,11 +120,10 @@ export class TNSOTSession implements TNSOTSessionI {
      */
 	subscribe(stream: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
+            if(this.session) {
                 this._subscriber = new OTSubscriber(stream, topmost().currentPage.ios);
                 try {
-                    session.subscribe(this._subscriber);
+                    this.session.subscribe(this._subscriber);
                     resolve(true);
                 } catch(error) {
                     console.log('Failed to subscribe to session: ' + error);
@@ -145,9 +141,9 @@ export class TNSOTSession implements TNSOTSessionI {
         return new Promise((resolve, reject) => {
             let subscriber = this._subscriber;
             if(subscriber) {
-                if(this._session) {
+                if(this.session) {
                     try {
-                        this._session.unsubscribe(subscriber);
+                        this.session.unsubscribe(subscriber);
                         resolve(true);
                     } catch(error) {
                         console.log('Failed to unsubscribe from session: ' + error);

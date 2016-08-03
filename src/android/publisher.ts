@@ -25,9 +25,11 @@ export class TNSOTPublisher implements TNSOTPublisherI {
             // this.nativePublisher.setPublisherListener(session.StreamPropertiesListener);
             console.log('Init publisher: ' + this.nativePublisher);
             this.attachPublisherView(videoLocationX, videoLocationY, videoWidth, videoHeight);
+            this.nativePublisher.setPublishVideo(true);
             this.nativePublisher.startPreview();
             try {
                 session.publish(this.nativePublisher);
+                this.nativePublisher.getCapturer().init();
                 resolve();
             }
             catch(error) {

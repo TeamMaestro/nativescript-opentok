@@ -15,10 +15,10 @@ const RelativeLayout = android.widget.RelativeLayout;
 export class TNSOTSession implements TNSOTSessionI {
 
     private apiKey: string;
-    private session: any;
     private subscriber: any;
     private sessionListener: any;
 
+    public session: any;
     public publisher: any;
 
     constructor(apiKey: string) {
@@ -118,6 +118,5 @@ export class TNSOTSession implements TNSOTSessionI {
     instance(): any {
         return this.sessionListener;
     }
-
 
 }
