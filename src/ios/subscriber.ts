@@ -99,7 +99,7 @@ class TNSSubscriberKitDelegate extends NSObject {
         console.log('Subscriber did connect to stream!');
         // Todo - add subscriber subview here
         subscriber.view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-        topmost().currentPage.ios.addSubview(subscriber.view);
+        topmost().currentPage.ios.view.addSubview(subscriber.view);
     }
 
     subscriberDidDisconnectFromStream(subscriber: any) {
