@@ -6,41 +6,67 @@ import { TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
-    private session: any;
+    private _apiKey: string = '45628212';
+    private _session: any;
 
     constructor() {
         super();
-        this.session = new TNSOTSession('45628212');
-        this.session.create(this.sessionId);
+        this._session = new TNSOTSession(this._apiKey, {
+            publisher: {
+                videoLocationX: 240,
+                videoLocationY: 200,
+                videoWidth: 250,
+                videoHeight: 250
+            },
+            subscriber: {
+                videoLocationX: 800,
+                videoLocationY: 200,
+                videoWidth: 120,
+                videoHeight: 120
+            }
+        });
+        this._session.initSession(this.sessionId);
     }
 
     initPublisher() {
-        this.session.connect(this.publisherToken).then((result) => {
-            this.session.publish(75, 200, 250, 250);
-        }, (err) => {
-            console.log('Publisher Error: ' + err.message);
+        this._session.connect(this.publisherToken);
+
+        this._session.sessionEvents.on('sessionDidConnect', (result) => {
+            console.log('sessionConnected event');
+        });
+
+        this._session.sessionEvents.on('connectionCreated', () => {
+            console.log('connectionCreated Event');
+        });
+
+        this._session.sessionEvents.on('streamCreated', () => {
+            console.log('streamCreated event on session object');
         });
     }
 
     initSubscriber() {
-        this.session.connect(this.subscriberToken).then((result) => {}, (err) => {
-            console.log('Subscriber Error: ' + err.message);
+        this._session.connect(this.subscriberToken);
+
+        this._session.sessionEvents.on('sessionDidConnect', (result) => {
+            console.log('sessionConnected event');
+            this._session.publish();
+            this._session.publisherEvents.on('streamCreated', () => {
+                console.log('streamCreated event on publisher object');
+            });
         });
-        this.session.sessionEvents.on('sessionDidConnect', (result) => {
-            console.log('[OpenTok] Session connected with id: ' + JSON.stringify(result.object));
-        });
+
     }
 
     togglePublisherVideo() {
-        this.session.publisher.toggleVideo();
+        this._session.publisher.toggleVideo();
     }
 
     togglePublisherAudio() {
-        this.session.publisher.toggleAudio();
+        this._session.publisher.toggleAudio();
     }
 
     togglePublisherCamera() {
-        this.session.publisher.toggleCameraPosition();
+        this._session.publisher.toggleCameraPosition();
     }
 
     private get sessionId(): string {
@@ -52,7 +78,8 @@ export class OpenTokDemo extends Observable {
     }
 
     private get subscriberToken(): string {
-        return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9YjY0ZDNhYTRmZWU3YzExYWM5MWY1MjIyZTc5ZGQ3NTNlNTlkMTMxMzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDI1MjMzMSZub25jZT0wLjA0MjY4NTM2NjIzNTY3MzQzJnJvbGU9c3Vic2NyaWJlciZleHBpcmVfdGltZT0xNDcyODQ0MzMx';
+        // return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9YjY0ZDNhYTRmZWU3YzExYWM5MWY1MjIyZTc5ZGQ3NTNlNTlkMTMxMzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDI1MjMzMSZub25jZT0wLjA0MjY4NTM2NjIzNTY3MzQzJnJvbGU9c3Vic2NyaWJlciZleHBpcmVfdGltZT0xNDcyODQ0MzMx';
+        return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
     }
 
 }

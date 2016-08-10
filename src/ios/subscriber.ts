@@ -10,8 +10,7 @@ declare var OTSubscriber: any,
 
 export class TNSOTSubscriber  {
 
-    private _subscriberKitDelegate;
-
+    private _subscriberKitDelegate: TNSSubscriberKitDelegate;
     private _nativeSubscriber: any;
 
     constructor() {
@@ -22,6 +21,25 @@ export class TNSOTSubscriber  {
     subscribe(session: any, stream: any) {
         this._nativeSubscriber = new OTSubscriber(stream, this._subscriberKitDelegate);
         session.subscribe(this._nativeSubscriber);
+    }
+
+    /**
+     * Cleans the subscriber from the view hierarchy, if any.
+     *
+     * @param {*} session THe session to unsubscribe from
+     */
+    unsubscribe(session: any) {
+        if(this._nativeSubscriber) {
+            if(session) {
+                try {
+                    session.unsubscribe(this._nativeSubscriber);
+                } catch(error) {
+                    console.log('Failed to unsubscribe from session: ' + error);
+                }
+                this._nativeSubscriber.view.removeFromSuperview();
+                this._nativeSubscriber = null;
+            }
+        }
     }
 
     /**
@@ -45,29 +63,6 @@ export class TNSOTSubscriber  {
     get subscriberEvents(): Observable {
         return this._subscriberKitDelegate.subscriberEvents;
     }
-
-    /**
-     * Cleans the subscriber from the view hierarchy, if any.
-     * @returns {Promise<any>}
-     */
-	// unsubscribe(): Promise<any> {
-    //     return new Promise((resolve, reject) => {
-    //         let subscriber = this._subscriber;
-    //         if(subscriber) {
-    //             if(this.session) {
-    //                 try {
-    //                     this.session.unsubscribe(subscriber);
-    //                     resolve(true);
-    //                 } catch(error) {
-    //                     console.log('Failed to unsubscribe from session: ' + error);
-    //                     reject(error);
-    //                 }
-    //                 subscriber.view.removeFromSuperview();
-    //                 this._subscriber = null;
-    //             }
-    //         }
-    //     });
-    // }
 
 }
 
@@ -96,8 +91,14 @@ class TNSSubscriberKitDelegate extends NSObject {
     }
 
     subscriberDidConnectToStream(subscriber) {
-        console.log('Subscriber did connect to stream!');
-        // Todo - add subscriber subview here
+         if(this._subscriberEvents) {
+            this._subscriberEvents.notify({
+                eventName: 'subscriberDidConnectToStream',
+                object: new Observable({
+                    subscriber: subscriber
+                })
+            });
+        }
         subscriber.view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
         topmost().currentPage.ios.view.addSubview(subscriber.view);
     }
