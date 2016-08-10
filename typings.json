@@ -3,7 +3,7 @@
   "tree": {
     "main": "index.d.ts",
     "global": false,
-    "name": "natvescript-opentok",
+    "name": "nativescript-opentok",
     "type": "typings"
   }
 }

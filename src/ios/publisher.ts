@@ -1,39 +1,52 @@
+import {Observable} from 'data/observable';
 import {topmost} from 'ui/frame';
-import {TNSOTPublisherDelegate} from './publisher-delegate';
 import {TNSOTPublisherI} from '../common';
 
 declare var OTPublisher: any,
             CGRectMake: any,
+            OTPublisherKitDelegate: any,
             AVCaptureDevicePositionBack: any,
             AVCaptureDevicePositionFront: any;
 
 export class TNSOTPublisher implements TNSOTPublisherI {
 
-    public nativePublisher: any;
-    private _delegate: any;
+    private _publisherKitDelegate: TNSPublisherKitDelegate;
 
-    constructor(emitEvents?: boolean) {
-        this._delegate = new TNSOTPublisherDelegate();
-        this._delegate.initPublisher(emitEvents);
+    public nativePublisher: any;
+
+    constructor() {
+        this._publisherKitDelegate = new TNSPublisherKitDelegate();
+        this._publisherKitDelegate.initPublisherEvents();
     }
 
-    init(session: any, videoLocationX: number = 0, videoLocationY: number = 0, videoWidth: number = 100, videoHeight: number = 100): Promise<any> {
-        return new Promise((resolve, reject) => {
-            if (session) {
-                this.nativePublisher = new OTPublisher(this._delegate);
-                this.nativePublisher.publishAudio = true;
-                try {
-                    session.publish(this.nativePublisher);
-                } catch (error) {
-                    reject(error);
-                }
-                if (this.nativePublisher) {
-                    topmost().currentPage.ios.view.addSubview(this.nativePublisher.view)
-                    this.nativePublisher.view.frame = CGRectMake(videoLocationX, videoLocationY, videoWidth, videoHeight);
-                }
-                resolve(this.nativePublisher);
-            }
-        });
+    publish(session: any, videoLocationX: number = 0, videoLocationY: number = 0, videoWidth: number = 100, videoHeight: number = 100) {
+        this.nativePublisher = new OTPublisher(this._publisherKitDelegate);
+        this.nativePublisher.publishAudio = true;
+        try {
+            session.publish(this.nativePublisher);
+        } catch (error) {
+            console.log(error);
+        }
+        if (this.nativePublisher) {
+            topmost().currentPage.ios.view.addSubview(this.nativePublisher.view)
+            this.nativePublisher.view.frame = CGRectMake(videoLocationX, videoLocationY, videoWidth, videoHeight);
+        }
+    }
+
+    /**
+     * Cleans up the publisher and its view. At this point, the publisher should not
+     * be attached to the session any more.
+     */
+	cleanup() {
+        let publisher = this.nativePublisher;
+        if(publisher) {
+            publisher.view.removeFromSuperview();
+            publisher = null;
+            this._publisherKitDelegate.publisherEvents.notify({
+                eventName: 'didStopPublishing',
+                object: null
+            });
+        }
     }
 
     /**
@@ -41,17 +54,11 @@ export class TNSOTPublisher implements TNSOTPublisherI {
      *
      * @returns {Promise<any>}
      */
-    toggleVideo(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this.nativePublisher;
-            if(publisher) {
-                publisher.publishVideo = !publisher.publishVideo;
-                resolve(publisher.publishVideo);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
+    toggleVideo() {
+        let publisher = this.nativePublisher;
+        if(publisher) {
+            publisher.publishVideo = !publisher.publishVideo;
+        }
     }
 
     /**
@@ -59,17 +66,11 @@ export class TNSOTPublisher implements TNSOTPublisherI {
      *
      * @returns {Promise<any>}
      */
-    toggleAudio(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let publisher = this.nativePublisher;
-            if(publisher) {
-                publisher.publishAudio = !publisher.publishAudio;
-                resolve(publisher.publishAudio);
-            }
-            else {
-                reject('Publisher not defined');
-            }
-        });
+    toggleAudio() {
+        let publisher = this.nativePublisher;
+        if(publisher) {
+            publisher.publishAudio = !publisher.publishAudio;
+        }
     }
 
     /**
@@ -99,7 +100,7 @@ export class TNSOTPublisher implements TNSOTPublisherI {
     /**
      * Toggles the camera used to publish the video stream
      */
-    toggleCameraPosition(){
+    toggleCameraPosition() {
         let publisher = this.nativePublisher;
         if(publisher) {
             if(publisher.cameraPosition === AVCaptureDevicePositionBack) {
@@ -111,10 +112,96 @@ export class TNSOTPublisher implements TNSOTPublisherI {
         }
     }
 
-    instance(): any {
-        return this._delegate;
+    get publisherEvents(): Observable {
+        return this._publisherKitDelegate.publisherEvents;
     }
 
+    /**
+     * The streaming state of the publisher's audio stream
+     *
+     * @readonly
+     * @type {boolean} Whether the audio stream is active
+     */
+    get publishAudio(): boolean {
+        let publisher = this.nativePublisher;
+        return publisher.publishAudio;
+    }
 
+    /**
+     * The streaming state of the publisher's video stream
+     *
+     * @readonly
+     * @type {boolean} Whether the video stream is active
+     */
+    get publishVideo(): boolean {
+        let publisher = this.nativePublisher;
+        return publisher.publishVideo;
+    }
+
+}
+
+class TNSPublisherKitDelegate extends NSObject {
+
+    public static ObjCProtocols = [OTPublisherKitDelegate];
+
+    private _publisherEvents: Observable;
+
+    initPublisherEvents(emitEvents: boolean = true) {
+        if(emitEvents) {
+            this._publisherEvents = new Observable();
+        }
+    }
+
+    didChangeCameraPosition(publisher: any, position: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'didChangeCameraPosition',
+                object: new Observable({
+                    publisher: publisher,
+                    position: position
+                })
+            });
+        }
+    }
+
+    streamCreated(publisher: any, stream: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'streamCreated',
+                object: new Observable({
+                    publisher: publisher,
+                    stream: stream
+                })
+            });
+        }
+    }
+
+    streamDestroyed(publisher: any, stream: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'streamDestroyed',
+                object: new Observable({
+                    publisher: publisher,
+                    stream: stream
+                })
+            });
+        }
+    }
+
+    didFailWithError(publisher: any, error: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'didFailWithError',
+                object: new Observable({
+                    publisher: publisher,
+                    error: error
+                })
+            });
+        }
+    }
+
+    get publisherEvents(): Observable {
+        return this._publisherEvents;
+    }
 
 }
