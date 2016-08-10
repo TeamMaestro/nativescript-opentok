@@ -10,18 +10,17 @@ declare var OTPublisher: any,
 
 export class TNSOTPublisher implements TNSOTPublisherI {
 
-    private _publisherDelegate;
-    private _publisherEvents: Observable;
+    private _publisherKitDelegate: TNSPublisherKitDelegate;
 
     public nativePublisher: any;
 
     constructor() {
-        this._publisherEvents = new Observable();
-        this.registerPublisherDelegate();
+        this._publisherKitDelegate = new TNSPublisherKitDelegate();
+        this._publisherKitDelegate.initPublisherEvents();
     }
 
     publish(session: any, videoLocationX: number = 0, videoLocationY: number = 0, videoWidth: number = 100, videoHeight: number = 100) {
-        this.nativePublisher = OTPublisher.alloc().initWithDelegate(this._publisherDelegate);
+        this.nativePublisher = new OTPublisher(this._publisherKitDelegate);
         this.nativePublisher.publishAudio = true;
         try {
             session.publish(this.nativePublisher);
@@ -43,7 +42,7 @@ export class TNSOTPublisher implements TNSOTPublisherI {
         if(publisher) {
             publisher.view.removeFromSuperview();
             publisher = null;
-            this._publisherEvents.notify({
+            this._publisherKitDelegate.publisherEvents.notify({
                 eventName: 'didStopPublishing',
                 object: null
             });
@@ -114,7 +113,7 @@ export class TNSOTPublisher implements TNSOTPublisherI {
     }
 
     get publisherEvents(): Observable {
-        return this._publisherEvents;
+        return this._publisherKitDelegate.publisherEvents;
     }
 
     /**
@@ -139,47 +138,70 @@ export class TNSOTPublisher implements TNSOTPublisherI {
         return publisher.publishVideo;
     }
 
-    private registerPublisherDelegate() {
-        this._publisherDelegate = NSObject.extend({
-            didChangeCameraPosition(publisher: any, position: any) {
-                this._publisherEvents.notify({
-                    eventName: 'didChangeCameraPosition',
-                    object: new Observable({
-                        publisher: publisher,
-                        position: position
-                    })
-                });
-            },
-            streamCreated(publisher: any, stream: any) {
-                this._publisherEvents.notify({
-                    eventName: 'streamCreated',
-                    object: new Observable({
-                        publisher: publisher,
-                        stream: stream
-                    })
-                });
-            },
-            streamDestroyed(publisher: any, stream: any) {
-                this._publisherEvents.notify({
-                    eventName: 'streamDestroyed',
-                    object: new Observable({
-                        publisher: publisher,
-                        stream: stream
-                    })
-                });
-            },
-            didFailWithError(publisher: any, error: any) {
-                this._publisherEvents.notify({
-                    eventName: 'didFailWithError',
-                    object: new Observable({
-                        publisher: publisher,
-                        error: error
-                    })
-                });
-            }
-        }, {
-            protocols: [OTPublisherKitDelegate]
-        });
+}
+
+class TNSPublisherKitDelegate extends NSObject {
+
+    public static ObjCProtocols = [OTPublisherKitDelegate];
+
+    private _publisherEvents: Observable;
+
+    initPublisherEvents(emitEvents: boolean = true) {
+        if(emitEvents) {
+            this._publisherEvents = new Observable();
+        }
+    }
+
+    didChangeCameraPosition(publisher: any, position: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'didChangeCameraPosition',
+                object: new Observable({
+                    publisher: publisher,
+                    position: position
+                })
+            });
+        }
+    }
+
+    streamCreated(publisher: any, stream: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'streamCreated',
+                object: new Observable({
+                    publisher: publisher,
+                    stream: stream
+                })
+            });
+        }
+    }
+
+    streamDestroyed(publisher: any, stream: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'streamDestroyed',
+                object: new Observable({
+                    publisher: publisher,
+                    stream: stream
+                })
+            });
+        }
+    }
+
+    didFailWithError(publisher: any, error: any) {
+        if(this._publisherEvents) {
+            this._publisherEvents.notify({
+                eventName: 'didFailWithError',
+                object: new Observable({
+                    publisher: publisher,
+                    error: error
+                })
+            });
+        }
+    }
+
+    get publisherEvents(): Observable {
+        return this._publisherEvents;
     }
 
 }

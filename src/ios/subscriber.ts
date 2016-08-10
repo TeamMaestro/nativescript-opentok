@@ -11,17 +11,16 @@ declare var OTSubscriber: any,
 export class TNSOTSubscriber  {
 
     private _subscriberKitDelegate;
-    private _subscriberEvents: Observable;
 
     private _nativeSubscriber: any;
 
     constructor() {
-        this._subscriberEvents = new Observable();
-        this.registerSubcriberKitDelegate();
+        this._subscriberKitDelegate = new TNSSubscriberKitDelegate();
+        this._subscriberKitDelegate.initSubscriberEvents();
     }
 
     subscribe(session: any, stream: any) {
-        this._nativeSubscriber = OTSubscriber.alloc().initWithStreamDelegate(stream, this._subscriberKitDelegate);
+        this._nativeSubscriber = new OTSubscriber(stream, this._subscriberKitDelegate);
         session.subscribe(this._nativeSubscriber);
     }
 
@@ -36,7 +35,7 @@ export class TNSOTSubscriber  {
         if(subscriber) {
             subscriber.view.removeFromSuperview();
             subscriber = null;
-            this._subscriberEvents.notify({
+            this._subscriberKitDelegate.subscriberEvents.notify({
                 eventName: 'didStopSubscribing',
                 object: null
             });
@@ -44,57 +43,10 @@ export class TNSOTSubscriber  {
     }
 
     get subscriberEvents(): Observable {
-        return this._subscriberEvents;
+        return this._subscriberKitDelegate.subscriberEvents;
     }
 
-    private registerSubcriberKitDelegate() {
-        this._subscriberKitDelegate = NSObject.extend({
-            subscriberDidFailWithError(subscriber: any, error: any) {
-                if(this._subscriberEvents) {
-                    this._subscriberEvents.notify({
-                        eventName: 'didFailWithError',
-                        object: new Observable({
-                            subscriber: subscriber,
-                            error: error
-                        })
-                    });
-                }
-            },
-            subscriberDidConnectToStream(subscriber) {
-                console.log('Subscriber did connect to stream!');
-                // Todo - add subscriber subview here
-                subscriber.view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-                topmost().currentPage.ios.addSubview(subscriber.view);
-            },
-            subscriberDidDisconnectFromStream(subscriber: any) {
-                if(this._subscriberEvents) {
-                    this._subscriberEvents.notify({
-                        eventName: 'didDisconnectFromStream',
-                        object: subscriber
-                    });
-                }
-            },
-            subscriberDidReconnectToStream(subscriber: any) {
-
-            },
-            subscriberVideoDisableWarning(subscriber: any) {
-
-            },
-            subscriberVideoDisableWarningLifted(subscriber: any) {
-
-            },
-            subscriberVideoDisabledReason(subscriber, reason) {
-
-            },
-            subscriberVideoEnabledReason(subscriber, reason) {
-
-            }
-        }, {
-            protocols: [OTSubscriberKitDelegate]
-        });
-    }
-
-      /**
+    /**
      * Cleans the subscriber from the view hierarchy, if any.
      * @returns {Promise<any>}
      */
@@ -116,5 +68,76 @@ export class TNSOTSubscriber  {
     //         }
     //     });
     // }
+
+}
+
+class TNSSubscriberKitDelegate extends NSObject {
+
+    public static ObjCProtocols = [OTSubscriberKitDelegate];
+
+    private _subscriberEvents: Observable;
+
+    initSubscriberEvents(emitEvents: boolean = true) {
+        if(emitEvents) {
+            this._subscriberEvents = new Observable();
+        }
+    }
+
+    subscriberDidFailWithError(subscriber: any, error: any) {
+        if(this._subscriberEvents) {
+            this._subscriberEvents.notify({
+                eventName: 'didFailWithError',
+                object: new Observable({
+                    subscriber: subscriber,
+                    error: error
+                })
+            });
+        }
+    }
+
+    subscriberDidConnectToStream(subscriber) {
+        console.log('Subscriber did connect to stream!');
+        // Todo - add subscriber subview here
+        subscriber.view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
+        topmost().currentPage.ios.addSubview(subscriber.view);
+    }
+
+    subscriberDidDisconnectFromStream(subscriber: any) {
+        if(this._subscriberEvents) {
+            this._subscriberEvents.notify({
+                eventName: 'didDisconnectFromStream',
+                object: subscriber
+            });
+        }
+    }
+
+    subscriberDidReconnectToStream(subscriber: any) {
+         if(this._subscriberEvents) {
+            this._subscriberEvents.notify({
+                eventName: 'didReconnectToStream',
+                object: subscriber
+            });
+        }
+    }
+
+    subscriberVideoDisableWarning(subscriber: any) {
+
+    }
+
+    subscriberVideoDisableWarningLifted(subscriber: any) {
+
+    }
+
+    subscriberVideoDisabledReason(subscriber, reason) {
+
+    }
+
+    subscriberVideoEnabledReason(subscriber, reason) {
+
+    }
+
+    get subscriberEvents(): Observable {
+        return this._subscriberEvents;
+    }
 
 }

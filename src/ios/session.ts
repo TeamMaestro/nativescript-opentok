@@ -18,18 +18,14 @@ export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
 
-    private _sessionDelegate;
+    private _session: any;
     private _publisher: TNSOTPublisher;
-    private _subscriber: TNSOTSubscriber;
-
-    private _sessionEvents: Observable;
-
-    public session: any;
+    private _sessionDelegate: TNSSessionDelegate;
 
     constructor(apiKey: string) {
         this._apiKey = apiKey;
-        this._sessionEvents = new Observable();
-        this.registerSessionDelegate();
+        this._sessionDelegate = new TNSSessionDelegate();
+        this._sessionDelegate.initSessionEvents();
     }
 
     /**
@@ -43,9 +39,9 @@ export class TNSOTSession implements TNSOTSessionI {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this.session = OTSession.alloc().initWithApiKeySessionIdDelegate(this._apiKey, sessionId, this._sessionDelegate);
-            if(this.session) {
-                resolve(this.session);
+            this._session = new OTSession(this._apiKey, sessionId, this._sessionDelegate);
+            if(this._session) {
+                resolve(this._session);
             }
             else {
                 reject('OpenTok session creation failed.');
@@ -62,9 +58,9 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     connect(token: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            if(this.session) {
+            if(this._session) {
                 var errorRef = new interop.Reference();
-                this.session.connectWithTokenError(token, errorRef);
+                this._session.connectWithTokenError(token, errorRef);
                 if(errorRef.value) {
                     reject({
                         code: errorRef.value.code,
@@ -72,7 +68,7 @@ export class TNSOTSession implements TNSOTSessionI {
                     });
                 }
                 else {
-                    resolve(this.session);
+                    resolve(this._session);
                 }
             }
         });
@@ -87,9 +83,9 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
-            if(this.session) {
+            if(this._session) {
                 try {
-                    this.session.disconnect();
+                    this._session.disconnect();
                     resolve();
                 } catch(error) {
                     console.log(error);
@@ -112,7 +108,7 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number) {
         this._publisher = new TNSOTPublisher();
-        this._publisher.publish(this.session, videoLocationX, videoLocationY, videoWidth, videoHeight);
+        this._publisher.publish(this._session, videoLocationX, videoLocationY, videoWidth, videoHeight);
     }
 
     private getOTSessionErrorCodeMessage(code: number) {
@@ -130,100 +126,8 @@ export class TNSOTSession implements TNSOTSessionI {
         }
     }
 
-    private registerSessionDelegate() {
-        this._sessionDelegate = NSObject.extend({
-            sessionDidConnect(session: any) {
-                // this._sessionEvents.notify({
-                //     eventName: 'sessionDidConnect',
-                //     object: null
-                // });
-            },
-            sessionDidDisconnect(session: any) {
-                this._sessionEvents.notify({
-                    eventName: 'sessionDidDisconnect',
-                    object: new Observable(session)
-                });
-            },
-            sessionDidReconnect(session: any) {
-                this._sessionEvents.notify({
-                    eventName: 'sessionDidReconnect',
-                    object: new Observable(session)
-                });
-            },
-            sessionDidBeginReconnecting(session: any) {
-                this._sessionEvents.notify({
-                    eventName: 'sessionDidBeginReconnecting',
-                    object: new Observable(session)
-                });
-            },
-            sessionStreamCreated(session: any, stream: any) {
-                this._sessionEvents.notify({
-                    eventName: 'streamCreated',
-                    object: new Observable({
-                        session: session,
-                        stream: stream
-                    })
-                });
-                this._subscriber = new TNSOTSubscriber();
-                this._subscriber.subscribe(session, stream);
-            },
-            sessionDidFailWithError(session: any, error: any) {
-                this._sessionEvents.notify({
-                    eventName: 'didFailWithError',
-                    object: new Observable({
-                        session: session,
-                        error: error
-                    })
-                });
-            },
-            sessionConnectionDestroyed(session: any, connection: any) {
-                if(this.sessionEvents) {
-                    this.sessionEvents.notify({
-                        eventName: 'connectionDestroyed',
-                        object: new Observable({
-                            session: session,
-                            connection: connection
-                        })
-                    });
-                }
-            },
-            sessionConnectionCreated(session: any, connection: any) {
-                if(this.sessionEvents) {
-                    this.sessionEvents.notify({
-                        eventName: 'connectionCreated',
-                        object: new Observable({
-                            session: session,
-                            connection: connection
-                        })
-                    });
-                }
-            },
-            sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
-                if(this.sessionEvents) {
-                    this.sessionEvents.notify({
-                        eventName: 'archiveStartedWithId',
-                        object: new Observable({
-                            session: session,
-                            archiveId: archiveId,
-                            name: name
-                        })
-                    });
-                }
-            },
-            sessionArchiveStoppedWithId(session: any, archiveId: string) {
-                if(this.sessionEvents) {
-                    this.sessionEvents.notify({
-                        eventName: 'archiveStoppedWithId',
-                        object: new Observable({
-                            session: session,
-                            archiveId: archiveId
-                        })
-                    });
-                }
-            }
-        }, {
-            protocols: [OTSessionDelegate]
-        });
+    get session(): any {
+        return this._session;
     }
 
     get publisher(): TNSOTPublisher {
@@ -231,11 +135,11 @@ export class TNSOTSession implements TNSOTSessionI {
     }
 
     get subscriber(): TNSOTSubscriber {
-        return this._subscriber;
+        return this._sessionDelegate.subscriber;
     }
 
     get sessionEvents(): Observable {
-        return this._sessionEvents;
+        return this._sessionDelegate.sessionEvents;
     }
 
     get publisherEvents(): Observable {
@@ -243,7 +147,141 @@ export class TNSOTSession implements TNSOTSessionI {
     }
 
     get subscriberEvents(): Observable {
-        return this._subscriber.subscriberEvents;
+        return this._sessionDelegate.subscriber.subscriberEvents;
+    }
+
+}
+
+class TNSSessionDelegate extends NSObject {
+
+    public static ObjCProtocols = [OTSessionDelegate];
+
+    private _sessionEvents: Observable
+    private _subscriber: TNSOTSubscriber;
+
+    initSessionEvents(emitEvents: boolean = true) {
+        if(emitEvents) {
+            this._sessionEvents = new Observable();
+        }
+    }
+
+    sessionDidConnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidConnect',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionDidDisconnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidDisconnect',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionDidReconnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidReconnect',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionDidBeginReconnecting(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidBeginReconnecting',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionStreamCreated(session: any, stream: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'streamCreated',
+                object: new Observable({
+                    session: session,
+                    stream: stream
+                })
+            });
+        }
+        this._subscriber = new TNSOTSubscriber();
+        this._subscriber.subscribe(session, stream);
+    }
+
+    sessionDidFailWithError(session: any, error: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'didFailWithError',
+                object: new Observable({
+                    session: session,
+                    error: error
+                })
+            });
+        }
+    }
+
+    sessionConnectionDestroyed(session: any, connection: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'connectionDestroyed',
+                object: new Observable({
+                    session: session,
+                    connection: connection
+                })
+            });
+        }
+    }
+
+    sessionConnectionCreated(session: any, connection: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'connectionCreated',
+                object: new Observable({
+                    session: session,
+                    connection: connection
+                })
+            });
+        }
+    }
+
+    sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'archiveStartedWithId',
+                object: new Observable({
+                    session: session,
+                    archiveId: archiveId,
+                    name: name
+                })
+            });
+        }
+    }
+
+    sessionArchiveStoppedWithId(session: any, archiveId: string) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'archiveStoppedWithId',
+                object: new Observable({
+                    session: session,
+                    archiveId: archiveId
+                })
+            });
+        }
+    }
+
+    get sessionEvents(): Observable {
+        return this._sessionEvents;
+    }
+
+    get subscriber(): TNSOTSubscriber {
+        return this._subscriber;
     }
 
 }
