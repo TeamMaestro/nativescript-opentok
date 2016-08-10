@@ -1,5 +1,8 @@
 # Nativescript OpenTok
 
+[![npm](https://img.shields.io/npm/v/nativescript-opentok.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/nativescript-opentok) 
+[![npm](https://img.shields.io/npm/dt/nativescript-opentok.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/nativescript-opentok)
+
 A Nativescript plugin for the OpenTok iOS and (coming soon Android) SDK.
 
 OpenTok: https://tokbox.com/developer/
