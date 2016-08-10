@@ -1,14 +1,12 @@
 import {Observable} from 'data/observable';
 import {topmost} from 'ui/frame';
-import {TNSOTPublisherI} from '../common';
+import {TNSOTSubscriberI} from '../common';
 
 declare var OTSubscriber: any,
             CGRectMake: any,
-            OTSubscriberKitDelegate: any,
-            AVCaptureDevicePositionBack: any,
-            AVCaptureDevicePositionFront: any;
+            OTSubscriberKitDelegate: any;
 
-export class TNSOTSubscriber  {
+export class TNSOTSubscriber implements TNSOTSubscriberI {
 
     private _subscriberKitDelegate: TNSSubscriberKitDelegate;
     private _nativeSubscriber: any;

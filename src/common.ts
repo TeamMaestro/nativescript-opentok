@@ -65,5 +65,13 @@ export interface TNSOTPublisherI {
      */
     toggleCameraPosition();
 
+    publisherEvents: Observable;
+
+
+}
+
+export interface TNSOTSubscriberI {
+
+    subscriberEvents: Observable;
 
 }

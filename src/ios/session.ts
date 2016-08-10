@@ -6,12 +6,7 @@ import {TNSOTSubscriber} from './subscriber';
 
 declare var OTSession: any,
             OTSessionDelegate: any,
-            OTPublisher: any,
-            OTSubscriber: any,
-            CGRectMake: any,
             interop: any,
-            OTSubscriberKitDelegate: any,
-            OTPublisherKitDelegate: any,
             OTSessionErrorCode: any;
 
 export class TNSOTSession implements TNSOTSessionI {
