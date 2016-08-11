@@ -21,7 +21,7 @@ Node Package Manager (NPM)
 `npm install nativescript-opentok --save`
 
 ### Integration
-The OpenTok integration leverages the following model to successfully integrated paired sessions.
+The OpenTok integration leverages the following model to successfully integrate paired sessions.
 # <img src="https://tokbox.com/developer/img/docs/publish_v2.jpeg" />
 
 
