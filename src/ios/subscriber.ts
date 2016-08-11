@@ -11,9 +11,9 @@ export class TNSOTSubscriber implements TNSOTSubscriberI {
     private _subscriberKitDelegate: TNSSubscriberKitDelegate;
     private _nativeSubscriber: any;
 
-    constructor() {
+    constructor(config?: any) {
         this._subscriberKitDelegate = new TNSSubscriberKitDelegate();
-        this._subscriberKitDelegate.initSubscriberEvents();
+        this._subscriberKitDelegate.initSubscriberEvents(true, config);
     }
 
     subscribe(session: any, stream: any) {
@@ -58,6 +58,30 @@ export class TNSOTSubscriber implements TNSOTSubscriberI {
         }
     }
 
+    toggleVideo() {
+        if(this._nativeSubscriber) {
+            this._nativeSubscriber.subscribeToVideo = !this._nativeSubscriber.subscribeToVideo;
+        }
+    }
+
+    setVideoActive(state: boolean) {
+        if(this._nativeSubscriber) {
+            this._nativeSubscriber.subscribeToVideo = state;
+        }
+    }
+
+    toggleAudio() {
+        if(this._nativeSubscriber) {
+            this._nativeSubscriber.subscribeToAudio = !this._nativeSubscriber.subscribeToAudio;
+        }
+    }
+
+    setAudioActive(state: boolean) {
+        if(this._nativeSubscriber) {
+            this._nativeSubscriber.subscribeToAudio = state;
+        }
+    }
+
     get subscriberEvents(): Observable {
         return this._subscriberKitDelegate.subscriberEvents;
     }
@@ -69,11 +93,17 @@ class TNSSubscriberKitDelegate extends NSObject {
     public static ObjCProtocols = [OTSubscriberKitDelegate];
 
     private _subscriberEvents: Observable;
+    private _config: any;
+    private _defaultVideoLocationX: number = 0;
+    private _defaultVideoLocationY: number = 0;
+    private _defaultVideoWidth: number = 150;
+    private _defaultVideoHeight: number = 150;
 
-    initSubscriberEvents(emitEvents: boolean = true) {
+    initSubscriberEvents(emitEvents: boolean = true, config?: any) {
         if(emitEvents) {
             this._subscriberEvents = new Observable();
         }
+        this._config = config;
     }
 
     subscriberDidFailWithError(subscriber: any, error: any) {
@@ -97,8 +127,7 @@ class TNSSubscriberKitDelegate extends NSObject {
                 })
             });
         }
-        subscriber.view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-        topmost().currentPage.ios.view.addSubview(subscriber.view);
+        this.registerSubscriberToView(subscriber);
     }
 
     subscriberDidDisconnectFromStream(subscriber: any) {
@@ -133,6 +162,17 @@ class TNSSubscriberKitDelegate extends NSObject {
 
     subscriberVideoEnabledReason(subscriber, reason) {
 
+    }
+
+    private registerSubscriberToView(subscriber: any) {
+        if(this._config && this._config.subscriber) {
+            let config = this._config.subscriber;
+            subscriber.view.frame = CGRectMake(config.videoLocationX, config.videoLocationY, config.videoWidth, config.videoHeight);
+        }
+        else {
+            subscriber.view.frame = CGRectMake(this._defaultVideoLocationX, this._defaultVideoLocationY, this._defaultVideoWidth, this._defaultVideoHeight);
+        }
+        topmost().currentPage.ios.view.addSubview(subscriber.view);
     }
 
     get subscriberEvents(): Observable {

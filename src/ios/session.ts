@@ -22,7 +22,7 @@ export class TNSOTSession implements TNSOTSessionI {
         this._apiKey = apiKey;
         this._config = config;
         this._sessionDelegate = new TNSSessionDelegate();
-        this._sessionDelegate.initSessionEvents();
+        this._sessionDelegate.initSessionEvents(true, config);
     }
 
     /**
@@ -105,6 +105,13 @@ export class TNSOTSession implements TNSOTSessionI {
         }
     }
 
+    /**
+     * Converts the OTSessionErrorCode values into meaningful error messages for debugging purposes
+     *
+     * @private
+     * @param {number} code The OpenTok error code reference number
+     * @returns Debug error message
+     */
     private getOTSessionErrorCodeMessage(code: number) {
         switch(code) {
             case OTSessionErrorCode.OTSessionIllegalState:
@@ -152,11 +159,13 @@ class TNSSessionDelegate extends NSObject {
 
     private _sessionEvents: Observable
     private _subscriber: TNSOTSubscriber;
+    private _config: any;
 
-    initSessionEvents(emitEvents: boolean = true) {
+    initSessionEvents(emitEvents: boolean = true, config?: any) {
         if(emitEvents) {
             this._sessionEvents = new Observable();
         }
+        this._config = config;
     }
 
     sessionDidConnect(session: any) {
@@ -169,7 +178,6 @@ class TNSSessionDelegate extends NSObject {
                 })
             });
         }
-
     }
 
     sessionDidDisconnect(session: any) {
@@ -209,8 +217,7 @@ class TNSSessionDelegate extends NSObject {
                 })
             });
         }
-        console.log('session stream created');
-        this._subscriber = new TNSOTSubscriber();
+        this._subscriber = new TNSOTSubscriber(this._config);
         this._subscriber.subscribe(session, stream);
     }
 
