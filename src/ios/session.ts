@@ -1,24 +1,28 @@
-import * as app from 'application';
-import {topmost} from 'ui/frame';
+import {Observable} from 'data/observable';
 
 import {TNSOTSessionI} from '../common';
-import {TNSOTSessionDelegate} from './session-delegate';
 import {TNSOTPublisher} from './publisher';
+import {TNSOTSubscriber} from './subscriber';
 
-declare var OTSession: any, OTSessionDelegate: any, OTPublisher, OTSubscriber, CGRectMake, interop;
+declare var OTSession: any,
+            OTSessionDelegate: any,
+            interop: any,
+            OTSessionErrorCode: any;
 
 export class TNSOTSession implements TNSOTSessionI {
 
     private _apiKey: string;
+
     private _session: any;
     private _publisher: TNSOTPublisher;
-    private _subscriber: any;
-    private _delegate: TNSOTSessionDelegate;
+    private _sessionDelegate: TNSSessionDelegate;
+    private _config: any;
 
-    constructor(apiKey: string) {
+    constructor(apiKey: string, config?: any) {
         this._apiKey = apiKey;
-        this.bindSessionEvents(true);
-        this.bindPublisherEvents(true);
+        this._config = config;
+        this._sessionDelegate = new TNSSessionDelegate();
+        this._sessionDelegate.initSessionEvents(true, config);
     }
 
     /**
@@ -26,13 +30,13 @@ export class TNSOTSession implements TNSOTSessionI {
      *
      * @param {string} sessionId The generated OpenTok session id
      */
-    create(sessionId: string): Promise<any> {
+    initSession(sessionId: string): Promise<any> {
         return new Promise((resolve, reject) => {
             if(!this._apiKey) {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this._session = new OTSession(this._apiKey, sessionId, this._delegate);
+            this._session = new OTSession(this._apiKey, sessionId, this._sessionDelegate);
             if(this._session) {
                 resolve();
             }
@@ -47,22 +51,19 @@ export class TNSOTSession implements TNSOTSessionI {
      * expect a delegate method to call us back with the results of this action.
      *
      * @param {string} token The OpenTok token to join an existing session
-     * @returns {Promise<any>}
+     *
      */
-    connect(token: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
-                var errorRef = new interop.Reference();
-                session.connectWithTokenError(token, errorRef);
-                if(errorRef.value) {
-                    reject(errorRef.value);
-                }
-                else {
-                    resolve();
-                }
+    connect(token: string) {
+        if(this._session) {
+            var errorRef = new interop.Reference();
+            this._session.connectWithTokenError(token, errorRef);
+            if(errorRef.value) {
+               return {
+                    code: errorRef.value.code,
+                    message: this.getOTSessionErrorCodeMessage(errorRef.value.code)
+                };
             }
-        });
+        }
     }
 
     /**
@@ -74,10 +75,9 @@ export class TNSOTSession implements TNSOTSessionI {
      */
     disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
+            if(this._session) {
                 try {
-                    session.disconnect();
+                    this._session.disconnect();
                     resolve();
                 } catch(error) {
                     console.log(error);
@@ -92,148 +92,202 @@ export class TNSOTSession implements TNSOTSessionI {
      * binds to the device camera and microphone, and will provide A/V streams
      * to the OpenTok session.
      *
-     * @param {number} videoLocationX The X-coordinate position of the video frame
-     * @param {number} videoLocationY The Y-coordinate position of the video frame
-     * @param {number} videoWidth The width of the video frame (pixels)
-     * @param {number} videoHeight The height of the video frame (pixels)
      * @returns {Promise<any>}
      */
-    publish(videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            let session = this._session;
-            if(session) {
-                this._publisher.init(session, videoLocationX, videoLocationY, videoWidth, videoHeight).then((result) => {
-                    resolve(result);
-                }, (error) => {
-                    reject(error);
-                });
-            }
-        });
-    }
-
-    /**
-     * Instantiates a subscriber for the given stream and asynchronously begins the
-     * process to begin receiving A/V content for this stream. Unlike doPublish,
-     * this method does not add the subscriber to the view hierarchy. Instead, we
-     * add the subscriber only after it has connected and begins receiving data.
-     *
-     * @param {any} stream The OTSession stream to subscribe to
-     * @returns {Promise<any>}
-     */
-	subscribe(stream: any): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let session = this._session;
-            if(session) {
-                this._subscriber = new OTSubscriber(stream, topmost().currentPage.ios);
-                try {
-                    session.subscribe(this._subscriber);
-                    resolve(true);
-                } catch(error) {
-                    console.log('Failed to subscribe to session: ' + error);
-                    reject(error);
-                }
-            }
-        });
-    }
-
-    /**
-     * Cleans the subscriber from the view hierarchy, if any.
-     * @returns {Promise<any>}
-     */
-	unsubscribe(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let subscriber = this._subscriber;
-            if(subscriber) {
-                if(this._session) {
-                    try {
-                        this._session.unsubscribe(subscriber);
-                        resolve(true);
-                    } catch(error) {
-                        console.log('Failed to unsubscribe from session: ' + error);
-                        reject(error);
-                    }
-                    subscriber.view.removeFromSuperview();
-                    this._subscriber = null;
-                }
-            }
-        });
-    }
-
-    /**
-     * Cleans up the publisher and its view. At this point, the publisher should not
-     * be attached to the session any more.
-     */
-	cleanupPublisher() {
-        let publisher = this._publisher.nativePublisher;
-        if(publisher) {
-            publisher.view.removeFromSuperview();
-            publisher = null;
-            // this is a good place to notify the end-user that publishing has stopped.
+    publish() {
+        this._publisher = new TNSOTPublisher();
+        let config = this._config;
+        if(config.publisher) {
+            this._publisher.publish(this._session, config.videoLocationX, config.videoLocationY, config.videoWidth, config.videoHeight);
+        }
+        else {
+            this._publisher.publish(this._session);
         }
     }
 
     /**
-     * Cleans the subscriber from the view hierarchy, if any.
-     * NB: You do *not* have to call unsubscribe in your controller in response to
-     * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
-     * be automatically removed from the session during cleanup of the stream.
+     * Converts the OTSessionErrorCode values into meaningful error messages for debugging purposes
+     *
+     * @private
+     * @param {number} code The OpenTok error code reference number
+     * @returns Debug error message
      */
-	cleanupSubscriber() {
-        let subscriber = this._subscriber;
-        if(subscriber) {
-            subscriber.view.removeFromSuperview();
-            subscriber = null;
+    private getOTSessionErrorCodeMessage(code: number) {
+        switch(code) {
+            case OTSessionErrorCode.OTSessionIllegalState:
+                return 'A method has been invoked at an illegal or inappropriate time for this session. For example, attempting to connect an already connected session will return this error.';
+            case OTSessionErrorCode.OTAuthorizationFailure:
+                return 'An invalid API key or token was provided';
+            case OTSessionErrorCode.OTErrorInvalidSession:
+                return 'An invalid session ID was provided';
+            case OTSessionErrorCode.OTSessionConnectionTimeout:
+                return 'The connection timed out while attempting to connect to the session.';
+            default:
+                return 'No message';
         }
     }
 
-    // OTSubscriber delegate callbacks
-
-	subscriberDidConnectToStream(subscriberKit: any) {
-        if(this._subscriber) {
-            console.log('subscriberDidConnectToStream: ' + subscriberKit);
-            let view = this._subscriber.view;
-            if(view) {
-                view.frame = CGRectMake(0, 100, 100, 100);// Todo - allow for custom positioning?
-                topmost().currentPage.ios.addSubview(view);
-            }
-        }
+    get session(): any {
+        return this._session;
     }
 
-    /**
-     * Binds the custom session delegate for registering to existing events
-     *
-     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
-     */
-    private bindSessionEvents(emitEvents:boolean = true) {
-        this._delegate = new TNSOTSessionDelegate();
-        this._delegate.initSession(emitEvents);
-    }
-
-    /**
-     * Binds the custom publisher delegate for registering to existing events
-     *
-     * @param {boolean} [emitEvents=true] Whether to attach a custom event listener
-     */
-    private bindPublisherEvents(emitEvents: boolean = true) {
-        this._publisher = new TNSOTPublisher(emitEvents);
-    }
-
-    /**
-     * Returns the custom session delegate instance
-     *
-     * @returns {TNSOTSessionDelegate} Custom implementation of OTSessionDelegate
-     */
-    instance(): TNSOTSessionDelegate {
-        return this._delegate;
-    }
-
-    /**
-     * Returns the custom publisher delegate instance
-     *
-     * @returns {TNSOTPublisher} Custom implementation of OTPublisherKitDelegate
-     */
-    publisher(): TNSOTPublisher {
+    get publisher(): TNSOTPublisher {
         return this._publisher;
+    }
+
+    get subscriber(): TNSOTSubscriber {
+        return this._sessionDelegate.subscriber;
+    }
+
+    get sessionEvents(): Observable {
+        return this._sessionDelegate.sessionEvents;
+    }
+
+    get publisherEvents(): Observable {
+        return this._publisher.publisherEvents;
+    }
+
+    get subscriberEvents(): Observable {
+        return this._sessionDelegate.subscriber.subscriberEvents;
+    }
+
+}
+
+class TNSSessionDelegate extends NSObject {
+
+    public static ObjCProtocols = [OTSessionDelegate];
+
+    private _sessionEvents: Observable
+    private _subscriber: TNSOTSubscriber;
+    private _config: any;
+
+    initSessionEvents(emitEvents: boolean = true, config?: any) {
+        if(emitEvents) {
+            this._sessionEvents = new Observable();
+        }
+        this._config = config;
+    }
+
+    sessionDidConnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidConnect',
+                object: new Observable({
+                    sessionId: session.sessionId,
+                    sessionConnectionStatus: session.sessionConnectionStatus
+                })
+            });
+        }
+    }
+
+    sessionDidDisconnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidDisconnect',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionDidReconnect(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidReconnect',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionDidBeginReconnecting(session: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'sessionDidBeginReconnecting',
+                object: new Observable(session)
+            });
+        }
+    }
+
+    sessionStreamCreated(session: any, stream: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'streamCreated',
+                object: new Observable({
+                    session: session,
+                    stream: stream
+                })
+            });
+        }
+        this._subscriber = new TNSOTSubscriber(this._config);
+        this._subscriber.subscribe(session, stream);
+    }
+
+    sessionDidFailWithError(session: any, error: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'didFailWithError',
+                object: new Observable({
+                    session: session,
+                    error: error
+                })
+            });
+        }
+    }
+
+    sessionConnectionDestroyed(session: any, connection: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'connectionDestroyed',
+                object: new Observable({
+                    session: session,
+                    connection: connection
+                })
+            });
+        }
+    }
+
+    sessionConnectionCreated(session: any, connection: any) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'connectionCreated',
+                object: new Observable({
+                    session: session,
+                    connection: connection
+                })
+            });
+        }
+    }
+
+    sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'archiveStartedWithId',
+                object: new Observable({
+                    session: session,
+                    archiveId: archiveId,
+                    name: name
+                })
+            });
+        }
+    }
+
+    sessionArchiveStoppedWithId(session: any, archiveId: string) {
+        if(this._sessionEvents) {
+            this._sessionEvents.notify({
+                eventName: 'archiveStoppedWithId',
+                object: new Observable({
+                    session: session,
+                    archiveId: archiveId
+                })
+            });
+        }
+    }
+
+    get sessionEvents(): Observable {
+        return this._sessionEvents;
+    }
+
+    get subscriber(): TNSOTSubscriber {
+        return this._subscriber;
     }
 
 }

@@ -1,3 +1,5 @@
+import {Observable} from 'data/observable';
+
 export interface TNSOTSessionI {
     /**
      * Creates the OTSession object, which represents an existing OpenTok Session
@@ -5,15 +7,16 @@ export interface TNSOTSessionI {
      * @param {string} sessionId The generated OpenTok session id
      * @returns {Promise<any>}
      */
-    create(sessionId: string): Promise<any>;
+    initSession(sessionId: string): Promise<any>;
     /**
      * Asynchronously begins the session connect process. Some time later, we will
      * expect a delegate method to call us back with the results of this action.
      *
      * @param {string} token The OpenTok token to join an existing session
+     * @param {any} config The configurable options when connecting to a session
      * @returns {Promise<any>}
      */
-    connect(token: string): Promise<any>;
+    connect(token: string, config?: any);
     /**
      * Disconnect from an active OpenTok session.
      * This method tears down all OTPublisher and OTSubscriber objects that have been initialized.
@@ -22,26 +25,13 @@ export interface TNSOTSessionI {
      * @returns {Promise<any>}
      */
     disconnect(): Promise<any>;
-    /**
-     * Instantiates a subscriber for the given stream and asynchronously begins the
-     * process to begin receiving A/V content for this stream. Unlike doPublish,
-     * this method does not add the subscriber to the view hierarchy. Instead, we
-     * add the subscriber only after it has connected and begins receiving data.
-     *
-     * @param {any} stream The OTSession stream to subscribe to
-     * @returns {Promise<any>}
-     */
-    subscribe(stream: any): Promise<any>;
-    /**
-     * Cleans the subscriber from the view hierarchy, if any.
-     * @returns {Promise<any>}
-     */
-    unsubscribe(): Promise<any>;
 
-    instance(): any;
+    sessionEvents: Observable;
+    publisherEvents: Observable;
+    subscriberEvents: Observable;
 
-    publisher(): any;
-
+    publisher: any;
+    subscriber: any;
 
 }
 
@@ -51,13 +41,13 @@ export interface TNSOTPublisherI {
      *
      * @returns {Promise<any>}
      */
-    toggleVideo(): Promise<any>;
+    toggleVideo();
     /**
      * Toggles the mute state of the publisher audio stream
      *
      * @returns {Promise<any>}
      */
-    toggleAudio(): Promise<any>;
+    toggleAudio();
     /**
      * Sets the visibility state of the publisher video stream
      *
@@ -75,7 +65,13 @@ export interface TNSOTPublisherI {
      */
     toggleCameraPosition();
 
-    instance(): any;
+    publisherEvents: Observable;
 
+
+}
+
+export interface TNSOTSubscriberI {
+
+    subscriberEvents: Observable;
 
 }

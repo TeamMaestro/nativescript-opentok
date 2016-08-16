@@ -1,6 +1,6 @@
 {
   "nativescript": {
-    "id": "org.nativescript.demo",
+    "id": "com.mobileagility.test",
     "tns-ios": {
       "version": "2.1.1"
     },
