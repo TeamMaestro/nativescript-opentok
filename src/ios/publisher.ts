@@ -100,7 +100,7 @@ export class TNSOTPublisher implements TNSOTPublisherI {
     /**
      * Toggles the camera used to publish the video stream
      */
-    toggleCameraPosition() {
+    cycleCamera() {
         let publisher = this.nativePublisher;
         if(publisher) {
             if(publisher.cameraPosition === AVCaptureDevicePositionBack) {

@@ -67,7 +67,7 @@ export class OpenTokDemo extends Observable {
     }
 
     togglePublisherCamera() {
-        this._session.publisher.toggleCameraPosition();
+        this._session.publisher.cycleCamera();
     }
 
     private get sessionId(): string {
