@@ -31,6 +31,7 @@ export class OpenTokDemo extends Observable {
     initPublisher() {
         this._session.connect(this.publisherToken);
 
+        this._session.publish();
         this._session.sessionEvents.on('sessionDidConnect', (result) => {
             console.log('sessionConnected event');
         });
