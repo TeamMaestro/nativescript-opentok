@@ -2,16 +2,16 @@
 
 import {Observable} from 'data/observable';
 
-import { TNSOTSession} from 'nativescript-opentok';
+import * as opentok from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
-    private _apiKey: string = '45628212';
+    private _apiKey: string = '45638092';
     private _session: any;
 
     constructor() {
         super();
-        this._session = new TNSOTSession(this._apiKey, {
+        this._session = new opentok.TNSOTSession(this._apiKey, {
             publisher: {
                 videoLocationX: 240,
                 videoLocationY: 200,
@@ -25,16 +25,36 @@ export class OpenTokDemo extends Observable {
                 videoHeight: 120
             }
         });
-        this._session.initSession(this.sessionId);
+    this._session.initSession(this.sessionId);
     }
 
     initPublisher() {
-        this._session.connect(this.publisherToken);
+        this._session.connect(this.publisherToken)
+            .then((cb) => {
+                console.log(cb)
+            }, (e) => {
+                console.dump(e)
+            });
 
+        this._session.publisherEvents.on('didFailWithError', (data) => {
+            console.dump(data.error)
+        })
+
+        this._session.sessionEvents.on('sessionDidDisconnect', (result) => {
+            console.log('sessionDidDisconnect event');
+        });
         this._session.sessionEvents.on('sessionDidConnect', (result) => {
             console.log('sessionConnected event');
         });
 
+        this._session.sessionEvents.on('sessionDidBeginReconnecting', (result) => {
+            console.log('sessionDidBeginReconnecting event');
+        });
+
+
+        this._session.sessionEvents.on('sessionDidReconnect', (result) => {
+            console.log('sessionDidReconnect event');
+        });
         this._session.sessionEvents.on('connectionCreated', () => {
             console.log('connectionCreated Event');
         });
@@ -42,6 +62,10 @@ export class OpenTokDemo extends Observable {
         this._session.sessionEvents.on('streamCreated', () => {
             console.log('streamCreated event on session object');
         });
+
+        this._session.sessionEvents.on('didFailWithError', (session, error) => {
+            console.dump(error)
+        })
     }
 
     initSubscriber() {
@@ -70,15 +94,15 @@ export class OpenTokDemo extends Observable {
     }
 
     private get sessionId(): string {
-        return '1_MX40NTYyODIxMn5-MTQ3MDI1MjI2MDEzNH5oMUo4VlliUWpQYTFLSVJZV0ZPN0RESGh-UH4';
+        return '2_MX40NTYzODA5Mn5-MTQ3MTM4NDg4NDIzNH5uTXFlTHhnWGRSRFE2WTRjMkxMN3BHcG9-fg';
     }
 
     private get publisherToken(): string {
-        return  'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9ZDI1ZjRmNmViNDZjYmFiYzc5YTIwYTcxYjA2NzJhNDllNmZhMmJkYzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDI1MjI4OCZub25jZT0wLjUzNjkzMjI0Njc1OTUzMzkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3Mjg0NDI4Nw==';
+        return 'T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9ZWZmYTU2NjdmOGQ0YzdlOWNlZWFkY2Y1MjkxMzJiNGExMzAxOTEzOTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjAwJm5vbmNlPTAuMTY4NDU0NDczODM4MjEwMSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0MDgzMTk1';
     }
 
     private get subscriberToken(): string {
-        return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
+        return 'T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9YjZjM2JiMTMzNTI0ZDFhMTY5MWNjZmZmYjQ4ZWU0MjcxNDM5ZmMzYTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjE4Jm5vbmNlPTAuOTgxNTUwMjM1NTM0MDg2OCZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ3NDA4MzIxNA==';
     }
 
 }

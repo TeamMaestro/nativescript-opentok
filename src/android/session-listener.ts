@@ -1,132 +1,201 @@
-// import {Observable, EventData} from 'data/observable';
-// import * as app from 'application';
+import {Observable, EventData} from 'data/observable';
+import * as app from 'application';
 
-// declare var com: any;
+declare var com: any;
 
-// const SessionListener = com.opentok.android.Session.SessionListener;
+const SessionListener = com.opentok.android.Session.SessionListener;
+const ReconnectionListener = com.opentok.android.Session.ReconnectionListener;
+const ConnectionListener = com.opentok.android.Session.ConnectionListener;
+const ArchiveListener = com.opentok.android.Session.ArchiveListener;
+export class TNSSessionListener {
 
-// export class TNSSessionListener {
+    public sessionEvents: Observable;
+    private _sListener: any;
+    private _rListener: any;
+    private _cListener: any;
+    private _aListener: any;
+    private sessionDidConnectEvent: EventData;
+    constructor(emitEvents?: boolean) {
+        if (emitEvents) {
+            this.setupEvents();
+        }
+    }
 
-//     public sessionEvents: Observable;
+    get sListener() {
+        return this._sListener;
+    }
+    get rListener() {
+        return this._rListener;
+    }
+    get cListener() {
+        return this._cListener;
+    }
+    get aListener() {
+        return this._aListener;
+    }
 
-//     private listener: any;
-//     private sessionDidConnectEvent: EventData;
+    private setupEvents() {
+        this.sessionEvents = new Observable();
+        const that = new WeakRef(this);
+        this._sListener = new com.opentok.android.Session.SessionListener({
+            owner: that.get(),
+            /**
+             * Invoked when the client connects to the OpenTok session.
+             *
+             * @param {*} session The session your client connected to.
+             */
+            onConnected(session: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'sessionDidConnect',
+                        object: new Observable({
+                            sessionId: session.getSessionId(),
+                            sessionConnectionStatus: null
+                        })
+                    });
+                }
+            },
+            /**
+             * Invoked when the client is no longer connected to the OpenTok session.
+             *
+             * @param {*} session The session your client disconnected from.
+             */
+            onDisconnected(session: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'sessionDidDisconnect',
+                        object: new Observable(session)
+                    });
+                }
+            },
+            /**
+             * Invoked when something goes wrong when connecting or connected to the session.
+             * After this method is invoked, the Session should be treated as dead and unavailable.
+             * Do not attempt to reconnect or to call other methods of the Session object.
+             *
+             * @param {*} session The session in which the error occured.
+             * @param {*} error An error describing the cause for error.
+             */
+            onError(session: any, error: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'didFailWithError',
+                        object: new Observable({
+                            session: session,
+                            error: error
+                        })
+                    });
+                }
+            },
+            /**
+             * Invoked when another client stops publishing a stream to this OpenTok session.
+             *
+             * @param {*} session The session from which the stream was removed.
+             * @param {*} stream A Stream object representing the dropped stream, which can be used to identify a Subscriber.
+             */
+            onStreamDropped(session: any, stream: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'streamDestroyed',
+                        object: new Observable({
+                            session: session,
+                            stream: stream
+                        })
+                    })
+                }
+            },
+            /**
+             * Invoked when a there is a new stream published by another client in this OpenTok session.
+             *
+             * @param {*} session The session in which the stream was added.
+             * @param {*} stream A Stream object representing the new stream, which can be used to create a Subscriber.
+             */
+            onStreamReceived(session: any, stream: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'streamCreated',
+                        object: new Observable({
+                            session: session,
+                            stream: stream
+                        })
+                    })
 
-//     constructor(emitEvents?: boolean) {
-//         if(emitEvents) {
-//             this.setupEvents();
-//         }
-//         this.listener = new com.opentok.android.Session.SessionListener({
-//             /**
-//              * Invoked when the client connects to the OpenTok session.
-//              *
-//              * @param {*} session The session your client connected to.
-//              */
-//             onConnected(session: any) {
-//                 console.log('CONNECTED **********');
-//                 if(this.sessionEvents) {
-//                     this.sessionEvents.notify(this.sessionDidConnectEvent);
-//                 }
-//             },
-//             /**
-//              * Invoked when the client is no longer connected to the OpenTok session.
-//              *
-//              * @param {*} session The session your client disconnected from.
-//              */
-//             onDisconnected(session: any) {
+                    // this._subscriber = new TNSOTSubscriber(this._config);
+                    // this._subscriber.subscribe(session, stream);
+                }
+            }
+        });
 
-//             },
-//             /**
-//              * Invoked when something goes wrong when connecting or connected to the session.
-//              * After this method is invoked, the Session should be treated as dead and unavailable.
-//              * Do not attempt to reconnect or to call other methods of the Session object.
-//              *
-//              * @param {*} session The session in which the error occured.
-//              * @param {*} error An error describing the cause for error.
-//              */
-//             onError(session: any, error: any) {
+        this._rListener = new ReconnectionListener({
+            owner: that.get(),
+            onReconnected(session) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'sessionDidReconnect',
+                        object: new Observable(session)
+                    })
+                }
+            }, onReconnecting(session) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'sessionDidBeginReconnecting',
+                        object: new Observable(session)
+                    })
+                }
+            }
+        });
 
-//             },
-//             /**
-//              * Invoked when another client stops publishing a stream to this OpenTok session.
-//              *
-//              * @param {*} session The session from which the stream was removed.
-//              * @param {*} stream A Stream object representing the dropped stream, which can be used to identify a Subscriber.
-//              */
-//             onStreamDropped(session: any, stream: any) {
+        this._cListener = new ConnectionListener({
+            owner: that.get(),
+            onConnectionCreated(session: any, connection: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'connectionCreated',
+                        object: new Observable({
+                            session: session,
+                            connection: connection
+                        })
+                    })
+                }
+            },
+            onConnectionDestroyed(session: any, connection: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'connectionDestroyed',
+                        object: new Observable({
+                            session: session,
+                            connection: connection
+                        })
+                    })
+                }
+            }
+        });
 
-//             },
-//            /**
-//             * Invoked when a there is a new stream published by another client in this OpenTok session.
-//             *
-//             * @param {*} session The session in which the stream was added.
-//             * @param {*} stream A Stream object representing the new stream, which can be used to create a Subscriber.
-//             */
-//             onStreamReceived(session: any, stream: any) {
+        this._aListener = new ArchiveListener({
+            owner: that.get(),
+            onArchiveStarted(session: any, id: any, name: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'archiveStartedWithId',
+                        object: new Observable({
+                            session: session,
+                            archiveId: id,
+                            name: name
+                        })
+                    });
+                }
+            }, onArchiveStopped(session: any, id: any) {
+                if (this.owner.sessionEvents) {
+                    this.owner.sessionEvents.notify({
+                        eventName: 'archiveStoppedWithId',
+                        object: new Observable({
+                            session: session,
+                            archiveId: id
+                        })
+                    });
+                }
+            }
+        });
+    }
 
-//             }
-//         });
-
-//         console.log('SessionEvents ---- ' + this.sessionEvents);
-
-//         return this.listener;
-//     }
-
-
-//     // private _sessionDidDisconnectEvent: EventData;
-//     // private _sessionDidReconnectEvent: EventData;
-//     // private _sessionDidBeginReconnectingEvent: EventData;
-//     // private _streamCreatedEvent: EventData;
-//     // private _didFailWithErrorEvent: EventData;
-//     // private _connectionDestroyedEvent: EventData;
-//     // private _connectionCreatedEvent: EventData;
-//     // private _archiveStartedWithId: EventData;
-//     // private _archiveStoppedWithId: EventData;
-
-
-//     private setupEvents() {
-//         this.sessionEvents = new Observable();
-//         this.sessionDidConnectEvent = {
-//             eventName: 'sessionDidConnect',
-//             object: app.android.context
-//         };
-//     }
-//     //      this._sessionDidDisconnectEvent = {
-//     //         eventName: 'sessionDidDisconnect',
-//     //         object: app.android.context
-//     //     };
-//     //     this._sessionDidReconnectEvent = {
-//     //         eventName: 'sessionDidReconnect',
-//     //         object: app.android.context
-//     //     };
-//     //     this._sessionDidBeginReconnectingEvent = {
-//     //         eventName: 'sessionDidBeginReconnecting',
-//     //         object: app.android.context
-//     //     };
-//     //     this._streamCreatedEvent = {
-//     //         eventName: 'streamCreated',
-//     //         object: app.android.context
-//     //     };
-//     //     this._didFailWithErrorEvent = {
-//     //         eventName: 'didFailWithError',
-//     //         object: app.android.context
-//     //     };
-//     //     this._connectionDestroyedEvent = {
-//     //         eventName: 'connectionDestroyed',
-//     //         object: app.android.context
-//     //     };
-//     //     this._connectionCreatedEvent = {
-//     //         eventName: 'connectionCreated',
-//     //         object: app.android.context
-//     //     };
-//     //     this._archiveStartedWithId = {
-//     //         eventName: 'archiveStartedWithId',
-//     //         object: app.android.context
-//     //     };
-//     //     this._archiveStoppedWithId = {
-//     //         eventName: 'archiveStoppedWithId',
-//     //         object: app.android.context
-//     //     };
-//     // }
-
-// }
+}
