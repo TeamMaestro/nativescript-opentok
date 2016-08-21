@@ -1,18 +1,24 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded">
-    <GridLayout columns="*,*, auto" rows="auto, *">
-        <StackLayout id="publisherContainer" orientation="vertical" col="0">
-            <Label text="OpenTok Publisher" class="message" textWrap="true"/>
-             <Button text="Init Publisher" tap="{{ initPublisher }}" />
-            <Button text="Toggle Publisher Video" tap="{{ togglePublisherVideo }}" />
-            <Button text="Toggle Publisher Audio" tap="{{ togglePublisherAudio }}" />
-            <Button text="Toggle Publisher Camera" tap="{{ togglePublisherCamera }}" />
-        </StackLayout>
-        <StackLayout id="subscriberContainer" orientation="vertical" col="1">
-            <Label text="OpenTok Subscriber" class="message" textWrap="true"/>
-            <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
-            <Button text="Toggle Subscriber Video" tap="{{ togglePublisherVideo }}" />
-            <Button text="Toggle Subscriber Audio" tap="{{ togglePublisherAudio }}" />
-            <Button text="Toggle Subscriber Camera" tap="{{ togglePublisherCamera }}" />
-        </StackLayout>
-    </GridLayout>
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:ot="./opentok/opentok" actionBarHidden="true">
+    <StackLayout id="sl">
+    <ot:TNSOTPublisher height="300"  session="{{session}}" id="otPub"></ot:TNSOTPublisher>
+    <Button text="Init Publisher" tap="{{ initPublisher }}" />
+        <ot:TNSOTSubscriber height="300"  session="{{session}}" id="otSub"></ot:TNSOTSubscriber>
+
+        <!--<GridLayout columns="*,*, auto" rows="auto, *">
+            <StackLayout id="publisherContainer" orientation="vertical" col="0">
+                <Label text="OpenTok Publisher" class="message" textWrap="true"/>
+                <Button text="Init Publisher" tap="{{ initPublisher }}" />
+                <Button text="Toggle Publisher Video" tap="{{ togglePublisherVideo }}" />
+                <Button text="Toggle Publisher Audio" tap="{{ togglePublisherAudio }}" />
+                <Button text="Toggle Publisher Camera" tap="{{ togglePublisherCamera }}" />
+            </StackLayout>
+            <StackLayout id="subscriberContainer" orientation="vertical" col="1">
+                <Label text="OpenTok Subscriber" class="message" textWrap="true"/>
+                <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
+                <Button text="Toggle Subscriber Video" tap="{{ togglePublisherVideo }}" />
+                <Button text="Toggle Subscriber Audio" tap="{{ togglePublisherAudio }}" />
+                <Button text="Toggle Subscriber Camera" tap="{{ togglePublisherCamera }}" />
+            </StackLayout>
+        </GridLayout>-->
+    </StackLayout>
 </Page>

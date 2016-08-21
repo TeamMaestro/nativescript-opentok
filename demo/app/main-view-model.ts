@@ -1,44 +1,27 @@
 ///<reference path="../node_modules/nativescript-opentok/opentok.ios.d.ts"/>
 
 import {Observable} from 'data/observable';
-
-import * as opentok from 'nativescript-opentok';
+import * as opentok from './opentok/opentok';
 
 export class OpenTokDemo extends Observable {
 
     private _apiKey: string = '45638092';
     private _session: any;
+    session;
 
     constructor() {
         super();
-        this._session = new opentok.TNSOTSession(this._apiKey, {
-            publisher: {
-                videoLocationX: 240,
-                videoLocationY: 200,
-                videoWidth: 250,
-                videoHeight: 250
-            },
-            subscriber: {
-                videoLocationX: 800,
-                videoLocationY: 200,
-                videoWidth: 120,
-                videoHeight: 120
-            }
-        });
-    this._session.initSession(this.sessionId);
+        this._session = new opentok.TNSOTSession(this._apiKey);
+        this._session.initSession(this.sessionId);
     }
 
     initPublisher() {
         this._session.connect(this.publisherToken)
             .then((cb) => {
-                console.log(cb)
+
             }, (e) => {
                 console.dump(e)
             });
-
-        this._session.publisherEvents.on('didFailWithError', (data) => {
-            console.dump(data.error)
-        })
 
         this._session.sessionEvents.on('sessionDidDisconnect', (result) => {
             console.log('sessionDidDisconnect event');

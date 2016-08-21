@@ -1,6 +1,7 @@
 *.js
 *.js.map
 *.log
+.idea
 demo/app/*.js
 demo/*.d.ts
 demo/platforms

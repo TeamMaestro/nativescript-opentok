@@ -83,7 +83,7 @@ export class TNSOTSession {
 
     public publish(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
         if (this.session) {
-            this.publisher(this.session);
+            this.publisher.init(this.session);
         }
     }
 
