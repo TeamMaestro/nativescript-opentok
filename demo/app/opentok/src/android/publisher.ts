@@ -11,7 +11,7 @@ const RelativeLayout = android.widget.RelativeLayout;
 
 export class TNSOTPublisher extends View {
     private _android: any;
-    private _publisher:any;
+    private _publisher: any;
     public static toggleVideoEvent = "toggleVideo";
     public static toggleAudioEvent = "toggleAudio";
     public static cycleCameraEvent;
@@ -22,9 +22,19 @@ export class TNSOTPublisher extends View {
         super();
     }
 
+    get android() {
+        return this._android;
+    }
+
+    get _nativeView() {
+        return this._android;
+    }
+
     _createUI() {
         const that = new WeakRef(this);
         this._publisher = new com.opentok.android.Publisher(app.android.foregroundActivity);
+        this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE,
+            com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL);
         this._publisher.setPublisherListener(new PublisherListener({
             owner: that.get(),
             onError(publisher: any, error: any) {
@@ -48,6 +58,7 @@ export class TNSOTPublisher extends View {
                         })
                     });
                 }
+
             },
             onStreamDestroyed(publisher: any, stream: any) {
                 if (this.owner) {
@@ -61,20 +72,34 @@ export class TNSOTPublisher extends View {
                 }
             }
         }));
-
         this._publisher.setCameraListener(new CameraListener({
             owner: that.get(),
             onCameraChanged(publisher, newCameraId) {
-                //   this.owner._publishEvents.notify();
-                console.log("CameraChanged");
-                console.dump(newCameraId);
+                if (this.owner) {
+                    this.owner.notify({
+                        eventName: 'cameraChanged',
+                        object: new Observable({
+                            publisher: publisher,
+                            cameraId: newCameraId
+                        })
+                    });
+                }
             }, onCameraError(publisher, error) {
-                //  this.owner._publishEvents.notify();
-                console.log("CameraError");
-                console.dump(error)
+                if (this.owner) {
+                    this.owner.notify({
+                        eventName: 'cameraError',
+                        object: new Observable({
+                            publisher: publisher,
+                            error: error
+                        })
+                    });
+                }
             }
         }));
-        this._android = this._publisher.getView();
+
+        let pub = this._publisher.getView();
+        this._android = new android.widget.LinearLayout(this._context);
+        this._android.addView(pub);
     }
 
     get render_style() {
@@ -95,10 +120,16 @@ export class TNSOTPublisher extends View {
         }
     }
 
+    get publisher() {
+        return this._publisher;
+    }
+
     toggleVideo() {
+        this._publisher.setPublishVideo();
     }
 
     toggleAudio() {
+        this._publisher.setPublishAudio();
     }
 
     setVideoActive(state: boolean) {
@@ -107,7 +138,8 @@ export class TNSOTPublisher extends View {
     setAudioActive(state: boolean) {
     }
 
-    toggleCameraPosition() {
+    cycleCamera() {
+        this._publisher.cycleCamera();
     }
 
     instance() {
