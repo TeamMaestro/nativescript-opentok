@@ -1,4 +1,3 @@
-import {TNSOTSessionI} from '../common';
 import {TNSSessionListener} from './session-listener';
 import {TNSOTPublisher} from './publisher';
 import * as app from 'application';

@@ -1,6 +1,5 @@
 import {Observable} from 'data/observable';
 
-import {TNSOTSessionI} from '../common';
 import {TNSOTPublisher} from './publisher';
 import {TNSOTSubscriber} from './subscriber';
 
@@ -9,20 +8,17 @@ declare var OTSession: any,
             interop: any,
             OTSessionErrorCode: any;
 
-export class TNSOTSession implements TNSOTSessionI {
+export class TNSOTSession {
 
     private _apiKey: string;
 
     private _session: any;
     private _publisher: TNSOTPublisher;
     private _sessionDelegate: TNSSessionDelegate;
-    private _config: any;
 
-    constructor(apiKey: string, config?: any) {
+    constructor(apiKey: string) {
         this._apiKey = apiKey;
-        this._config = config;
         this._sessionDelegate = new TNSSessionDelegate();
-        this._sessionDelegate.initSessionEvents(true, config);
     }
 
     /**
@@ -53,26 +49,24 @@ export class TNSOTSession implements TNSOTSessionI {
      * @param {string} token The OpenTok token to join an existing session
      *
      */
-    connect(token: string) {
-        if(this._session) {
-            var errorRef = new interop.Reference();
-            this._session.connectWithTokenError(token, errorRef);
-            if(errorRef.value) {
-               return {
-                    code: errorRef.value.code,
-                    message: this.getOTSessionErrorCodeMessage(errorRef.value.code)
-                };
+    connect(token: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            if(this._session) {
+                var errorRef = new interop.Reference();
+                this._session.connectWithTokenError(token, errorRef);
+                if(errorRef.value) {
+                    reject({
+                        code: errorRef.value.code,
+                        message: this.getOTSessionErrorCodeMessage(errorRef.value.code)
+                    });
+                }
+                else {
+                    resolve(this._session);
+                }
             }
-        }
+        });
     }
 
-    /**
-     * Disconnect from an active OpenTok session.
-     * This method tears down all OTPublisher and OTSubscriber objects that have been initialized.
-     * When the session disconnects, the [OTSessionDelegate sessionDidDisconnect:] message is sent to the session’s delegate.
-     *
-     * @returns {Promise<any>}
-     */
     disconnect(): Promise<any> {
         return new Promise((resolve, reject) => {
             if(this._session) {
@@ -87,22 +81,9 @@ export class TNSOTSession implements TNSOTSessionI {
         });
     }
 
-    /**
-     * Sets up an instance of OTPublisher to use with this session. OTPubilsher
-     * binds to the device camera and microphone, and will provide A/V streams
-     * to the OpenTok session.
-     *
-     * @returns {Promise<any>}
-     */
     publish() {
         this._publisher = new TNSOTPublisher();
-        let config = this._config;
-        if(config.publisher) {
-            this._publisher.publish(this._session, config.videoLocationX, config.videoLocationY, config.videoWidth, config.videoHeight);
-        }
-        else {
-            this._publisher.publish(this._session);
-        }
+        this._publisher.publish(this._session);
     }
 
     /**
@@ -131,25 +112,13 @@ export class TNSOTSession implements TNSOTSessionI {
         return this._session;
     }
 
-    get publisher(): TNSOTPublisher {
-        return this._publisher;
-    }
+    // get subscriber(): TNSOTSubscriber {
+    //     return this._sessionDelegate.subscriber;
+    // }
 
-    get subscriber(): TNSOTSubscriber {
-        return this._sessionDelegate.subscriber;
-    }
-
-    get sessionEvents(): Observable {
-        return this._sessionDelegate.sessionEvents;
-    }
-
-    get publisherEvents(): Observable {
-        return this._publisher.publisherEvents;
-    }
-
-    get subscriberEvents(): Observable {
-        return this._sessionDelegate.subscriber.subscriberEvents;
-    }
+    // get sessionEvents(): Observable {
+    //     return this._sessionDelegate.sessionEvents;
+    // }
 
 }
 
@@ -159,14 +128,11 @@ class TNSSessionDelegate extends NSObject {
 
     private _sessionEvents: Observable
     private _subscriber: TNSOTSubscriber;
-    private _config: any;
 
-    initSessionEvents(emitEvents: boolean = true, config?: any) {
-        if(emitEvents) {
-            this._sessionEvents = new Observable();
-        }
-        this._config = config;
-    }
+    // constructor() {
+    //     super();
+    //     this._sessionEvents = new Observable();
+    // }
 
     sessionDidConnect(session: any) {
         if(this._sessionEvents) {
@@ -217,7 +183,7 @@ class TNSSessionDelegate extends NSObject {
                 })
             });
         }
-        this._subscriber = new TNSOTSubscriber(this._config);
+        this._subscriber = new TNSOTSubscriber();
         this._subscriber.subscribe(session, stream);
     }
 

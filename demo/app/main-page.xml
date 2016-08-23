@@ -1,8 +1,11 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:ot="./opentok/opentok" actionBarHidden="true">
-    <StackLayout id="sl">
-    <ot:TNSOTPublisher height="300"  session="{{session}}" id="otPub"></ot:TNSOTPublisher>
-    <Button text="Init Publisher" tap="{{ initPublisher }}" />
-        <ot:TNSOTSubscriber height="300"  session="{{session}}" id="otSub"></ot:TNSOTSubscriber>
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+      xmlns:OT="nativescript-opentok" loaded="pageLoaded">
+
+    <StackLayout>
+        <Label text="OpenTok Demo"></Label>
+        <Label text="{{ 'API Key: ' + api }}"></Label>
+        <OT:TNSOTPublisher loaded="publisherLoaded" session="{{ session }}" api="{{ api }}" token="{{ token }}"></OT:TNSOTPublisher>
+        <!--<OT:TNSOTSubscriber loaded="subscriberLoaded" id="otSubscriber"></OT:TNSOTSubscriber>-->
 
         <!--<GridLayout columns="*,*, auto" rows="auto, *">
             <StackLayout id="publisherContainer" orientation="vertical" col="0">

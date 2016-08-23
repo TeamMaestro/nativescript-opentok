@@ -95,6 +95,14 @@ export class TNSOTPublisher extends View {
         }
     }
 
+    get android(): any {
+        return this._android;
+    }
+
+    get _nativeView(): any {
+        return this._android;
+    }
+
     toggleVideo() {
     }
 

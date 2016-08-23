@@ -1,23 +1,21 @@
 import {Observable} from 'data/observable';
 import {topmost} from 'ui/frame';
-import {TNSOTSubscriberI} from '../common';
 
 declare var OTSubscriber: any,
             CGRectMake: any,
             OTSubscriberKitDelegate: any;
 
-export class TNSOTSubscriber implements TNSOTSubscriberI {
+export class TNSOTSubscriber {
 
-    private _subscriberKitDelegate: TNSSubscriberKitDelegate;
+    // private _subscriberKitDelegate: TNSSubscriberKitDelegate;
     private _nativeSubscriber: any;
 
-    constructor(config?: any) {
-        this._subscriberKitDelegate = new TNSSubscriberKitDelegate();
-        this._subscriberKitDelegate.initSubscriberEvents(true, config);
+    constructor() {
+        // this._subscriberKitDelegate = new TNSSubscriberKitDelegate();
     }
 
     subscribe(session: any, stream: any) {
-        this._nativeSubscriber = new OTSubscriber(stream, this._subscriberKitDelegate);
+        this._nativeSubscriber = new OTSubscriber(stream);//, this._subscriberKitDelegate);
         session.subscribe(this._nativeSubscriber);
     }
 
@@ -51,10 +49,10 @@ export class TNSOTSubscriber implements TNSOTSubscriberI {
         if(subscriber) {
             subscriber.view.removeFromSuperview();
             subscriber = null;
-            this._subscriberKitDelegate.subscriberEvents.notify({
-                eventName: 'didStopSubscribing',
-                object: null
-            });
+            // this._subscriberKitDelegate.subscriberEvents.notify({
+            //     eventName: 'didStopSubscribing',
+            //     object: null
+            // });
         }
     }
 
@@ -82,9 +80,9 @@ export class TNSOTSubscriber implements TNSOTSubscriberI {
         }
     }
 
-    get subscriberEvents(): Observable {
-        return this._subscriberKitDelegate.subscriberEvents;
-    }
+    // get subscriberEvents(): Observable {
+    //     return this._subscriberKitDelegate.subscriberEvents;
+    // }
 
 }
 
@@ -99,53 +97,43 @@ class TNSSubscriberKitDelegate extends NSObject {
     private _defaultVideoWidth: number = 150;
     private _defaultVideoHeight: number = 150;
 
-    initSubscriberEvents(emitEvents: boolean = true, config?: any) {
-        if(emitEvents) {
-            this._subscriberEvents = new Observable();
-        }
-        this._config = config;
-    }
+    // constructor() {
+    //     super();
+    //     this._subscriberEvents = new Observable();
+    // }
 
     subscriberDidFailWithError(subscriber: any, error: any) {
-        if(this._subscriberEvents) {
-            this._subscriberEvents.notify({
-                eventName: 'didFailWithError',
-                object: new Observable({
-                    subscriber: subscriber,
-                    error: error
-                })
-            });
-        }
+        this._subscriberEvents.notify({
+            eventName: 'didFailWithError',
+            object: new Observable({
+                subscriber: subscriber,
+                error: error
+            })
+        });
     }
 
     subscriberDidConnectToStream(subscriber) {
-         if(this._subscriberEvents) {
-            this._subscriberEvents.notify({
-                eventName: 'subscriberDidConnectToStream',
-                object: new Observable({
-                    subscriber: subscriber
-                })
-            });
-        }
+        this._subscriberEvents.notify({
+            eventName: 'subscriberDidConnectToStream',
+            object: new Observable({
+                subscriber: subscriber
+            })
+        });
         this.registerSubscriberToView(subscriber);
     }
 
     subscriberDidDisconnectFromStream(subscriber: any) {
-        if(this._subscriberEvents) {
-            this._subscriberEvents.notify({
-                eventName: 'didDisconnectFromStream',
-                object: subscriber
-            });
-        }
+        this._subscriberEvents.notify({
+            eventName: 'didDisconnectFromStream',
+            object: subscriber
+        });
     }
 
     subscriberDidReconnectToStream(subscriber: any) {
-         if(this._subscriberEvents) {
-            this._subscriberEvents.notify({
-                eventName: 'didReconnectToStream',
-                object: subscriber
-            });
-        }
+        this._subscriberEvents.notify({
+            eventName: 'didReconnectToStream',
+            object: subscriber
+        });
     }
 
     subscriberVideoDisableWarning(subscriber: any) {
@@ -165,13 +153,7 @@ class TNSSubscriberKitDelegate extends NSObject {
     }
 
     private registerSubscriberToView(subscriber: any) {
-        if(this._config && this._config.subscriber) {
-            let config = this._config.subscriber;
-            subscriber.view.frame = CGRectMake(config.videoLocationX, config.videoLocationY, config.videoWidth, config.videoHeight);
-        }
-        else {
-            subscriber.view.frame = CGRectMake(this._defaultVideoLocationX, this._defaultVideoLocationY, this._defaultVideoWidth, this._defaultVideoHeight);
-        }
+        subscriber.view.frame = CGRectMake(this._defaultVideoLocationX, this._defaultVideoLocationY, this._defaultVideoWidth, this._defaultVideoHeight);
         topmost().currentPage.ios.view.addSubview(subscriber.view);
     }
 
