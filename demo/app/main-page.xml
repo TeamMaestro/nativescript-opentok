@@ -5,8 +5,7 @@
         <Label text="OpenTok Demo"></Label>
         <Label text="{{ 'API Key: ' + api }}"></Label>
         <OT:TNSOTPublisher loaded="publisherLoaded" session="{{ session }}" api="{{ api }}" token="{{ token }}"></OT:TNSOTPublisher>
-        <!--<OT:TNSOTSubscriber loaded="subscriberLoaded" id="otSubscriber"></OT:TNSOTSubscriber>-->
-
+        <!--<OT:TNSOTSubscriber loaded="subscriberLoaded" session="{{ session }}" api="{{ api }}" token="{{ subscriberToken }}"></OT:TNSOTSubscriber>-->
         <!--<GridLayout columns="*,*, auto" rows="auto, *">
             <StackLayout id="publisherContainer" orientation="vertical" col="0">
                 <Label text="OpenTok Publisher" class="message" textWrap="true"/>

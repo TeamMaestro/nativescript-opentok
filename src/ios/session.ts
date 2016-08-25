@@ -112,6 +112,10 @@ export class TNSOTSession {
         return this._session;
     }
 
+    get events(): Observable {
+        return this._sessionDelegate.sessionEvents;
+    }
+
     // get subscriber(): TNSOTSubscriber {
     //     return this._sessionDelegate.subscriber;
     // }
@@ -183,8 +187,9 @@ class TNSSessionDelegate extends NSObject {
                 })
             });
         }
-        this._subscriber = new TNSOTSubscriber();
-        this._subscriber.subscribe(session, stream);
+
+        // this._subscriber = new TNSOTSubscriber();
+        // this._subscriber.subscribe(session, stream);
     }
 
     sessionDidFailWithError(session: any, error: any) {

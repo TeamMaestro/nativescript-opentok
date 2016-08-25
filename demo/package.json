@@ -1,6 +1,6 @@
 {
   "nativescript": {
-    "id": "com.mobileagility.test",
+    "id": "com.mobileagility.opentok",
     "tns-android": {
       "version": "2.2.0"
     },

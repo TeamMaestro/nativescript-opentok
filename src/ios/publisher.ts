@@ -20,12 +20,11 @@ export class TNSOTPublisher extends ContentView {
 
     constructor() {
         super();
+        this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
+        this._ios = new OTPublisher(this._publisherKitDelegate);
     }
 
     _createUI() {
-        this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
-        this._ios = new OTPublisher(this._publisherKitDelegate);
-
         this.onLoaded = () => {
             console.log('loaded successfully!');
             this.connect();
@@ -41,8 +40,6 @@ export class TNSOTPublisher extends ContentView {
             session.initSession(this._sessionId).then((result) => {
                 session.connect(this._token).then((result) => {
                     console.log('this was called...' + result);
-                    // this.publish(result);
-
                     this.publish(result);
                 }, (error) => {
                     console.log('Failed to connect to session: ' + error);
@@ -54,6 +51,7 @@ export class TNSOTPublisher extends ContentView {
     }
 
     publish(session: any) {
+        console.log('here....');
         this._ios.publishAudio = true;
         console.log('getting ready to publish!');
         try {
@@ -63,6 +61,11 @@ export class TNSOTPublisher extends ContentView {
         }
         if (this._ios) {
             this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
+
+            let button:UIButton = UIButton.buttonWithType(UIButtonType.UIButtonTypeRoundedRect);
+            button.frame = CGRectMake(100, 15, 100, 20);
+            button.setTitleForState('Hello', UIControlState.UIControlStateNormal);
+            this._ios.view.addSubview(button);
         }
     }
 

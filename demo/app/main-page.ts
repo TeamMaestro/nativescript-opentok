@@ -3,7 +3,7 @@ import {Page} from 'ui/page';
 import {isAndroid, isIOS} from 'platform';
 
 import {Demo} from './main-view-model';
-import {TNSOTPublisher, TNSOTSession} from 'nativescript-opentok';
+import {TNSOTPublisher, TNSOTSubscriber, TNSOTSession} from 'nativescript-opentok';
 
 export function pageLoaded(args: EventData) {
     var page = <Page>args.object;
@@ -19,6 +19,16 @@ export function publisherLoaded(args: EventData) {
         console.log('OpenTok Publisher Native iOS: ' + publisher.ios);
     }
     // connectToSession(_publisherToken);
+}
+
+export function subscriberLoaded(args: EventData) {
+    let subscriber = <TNSOTSubscriber> args.object;
+    if(isAndroid) {
+        console.log('OpenTok SubScriber Native Android: ' + subscriber.android);
+    }
+    else if(isIOS) {
+        console.log('Opentok Subscriber Native iOS: ' + subscriber.ios);
+    }
 }
 
 
