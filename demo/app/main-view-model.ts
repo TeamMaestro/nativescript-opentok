@@ -7,13 +7,11 @@ import {TNSOTPublisher} from 'nativescript-opentok';
 
 export class Demo extends Observable {
 
-    // private _apiKey: string = '45628212';
-    // private _OTSession: any;
-
-    public api:string = '45628212';
-    public session: string = '1_MX40NTYyODIxMn5-MTQ3MTkwNTg1OTQ3MH5WMHk3QlljcE1IVjJ6a1FXRVpWenRoa1p-fg';
-    public token: string = 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9MWNiMWM0N2Q4ZTkyY2IyY2Y5MDU2YzRiMTk5NzcxN2E1NjczYmM4NzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNVGt3TlRnMU9UUTNNSDVXTUhrM1FsbGpjRTFJVmpKNmExRlhSVnBXZW5Sb2ExcC1mZyZjcmVhdGVfdGltZT0xNDcxOTA1ODc4Jm5vbmNlPTAuODc4ODQ5Nzg2MDA3Nzc2OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0NDk3ODc4';
-    public subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
+    public api:string = '45644202';
+    public session: string = '1_MX40NTY0NDIwMn5-MTQ3MjIyNzU3NTAwM35FczFWMHdVekNxeXNabWRSTUdIUkpjRmR-fg';
+    public publisherToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9NTkwNmVhZWZjNDMzNWRlNDY5ZTZmZTkwMjg0Yjk0ODJlZmE4NjFjODpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjI3NTg4Jm5vbmNlPTAuNzY3MTczMTA0Njg2NjYyNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODE5NTg3';
+    public subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9YTM5NTVmODVmYWU0NjkwNThiN2YzMjU3YzM0ZmI4YTYwNTg2YjU0MjpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjQyNDgwJm5vbmNlPTAuMjU5ODA5NDU5MzI2Nzg4OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODM0NDgw';
+    // public subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9MjlhYTNlMGMzMjU1MjU0NzI5ODM3ZmU3ZTkzMDgxNGEyOWE1YzQ1NzpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjI3NTk4Jm5vbmNlPTAuODU0NjIzNTQ4NDUzNjczNyZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ3NDgxOTU5OA==';
 
     private publisher: any;
 
@@ -21,53 +19,6 @@ export class Demo extends Observable {
     constructor(private page: Page) {
         super();
         this.publisher = this.page.getViewById('publisher');
-        // this._OTSession = new TNSOTSession(this._apiKey);
-        // this._OTSession.initSession(this.sessionId);
-    }
-
-    initPublisher() {
-        // let page = frame.topmost().currentPage;
-        // let publisher = <TNSOTPublisher> page.getViewById('otPublisher');
-
-        // this._session.sessionEvents.on('sessionDidConnect', (result) => {
-        //     console.log('[demo] sessionConnected event');
-        // });
-
-        // this._session.sessionEvents.on('sessionDidBeginReconnecting', (result) => {
-        //     console.log('[demo] sessionDidBeginReconnecting event');
-        // });
-
-        // this._session.sessionEvents.on('sessionDidReconnect', (result) => {
-        //     console.log('[demo] sessionDidReconnect event');
-        // });
-        // this._session.sessionEvents.on('connectionCreated', () => {
-        //     console.log('[demo] connectionCreated Event');
-        // });
-
-        // this._session.sessionEvents.on('streamCreated', () => {
-        //     console.log('[demo] streamCreated event on session object');
-        // });
-
-        // this._session.sessionEvents.on('didFailWithError', (session, error) => {
-        //     console.dump(error)
-        // })
-    }
-
-    initSubscriber() {
-        // this._OTSession.connect(this.subscriberToken);
-
-        // this._OTSession.sessionEvents.on('sessionDidConnect', (result) => {
-        //     console.log('[demo] sessionConnected event');
-        //     this._OTSession.publish();
-        //     this._OTSession.publisherEvents.on('streamCreated', () => {
-        //         console.log('[demo] streamCreated event on publisher object');
-        //     });
-        // });
-
-    }
-
-    publisherLoaded() {
-        console.log('publisherLoaded fired');
     }
 
     switchCamera() {
@@ -81,17 +32,5 @@ export class Demo extends Observable {
     toggleMute() {
         this.publisher.ios.publishAudio = !this.publisher.ios.publishAudio;
     }
-
-    private get sessionId(): string {
-        return '1_MX40NTYyODIxMn5-MTQ3MDI1MjI2MDEzNH5oMUo4VlliUWpQYTFLSVJZV0ZPN0RESGh-UH4';
-    }
-
-    private get publisherToken(): string {
-        return  'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9ZDI1ZjRmNmViNDZjYmFiYzc5YTIwYTcxYjA2NzJhNDllNmZhMmJkYzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDI1MjI4OCZub25jZT0wLjUzNjkzMjI0Njc1OTUzMzkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3Mjg0NDI4Nw==';
-    }
-
-    // private get subscriberToken(): string {
-    //     return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
-    // }
 
 }

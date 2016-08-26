@@ -35,7 +35,7 @@ export class TNSOTPublisher extends ContentView {
             let session = new TNSOTSession(this._apiKey);
             session.initSession(this._sessionId).then((result) => {
                 session.connect(this._token).then((result) => {
-                    this.publish(result);
+                    this.publishStream(result);
                 }, (error) => {
                     console.log('Failed to connect to session: ' + error);
                 });
@@ -45,7 +45,7 @@ export class TNSOTPublisher extends ContentView {
         }
     }
 
-    publish(session: any): void {
+    private publishStream(session: any): void {
         this._ios.publishAudio = true;
         try {
             session.publish(this._ios);
@@ -116,6 +116,8 @@ class TNSPublisherKitDelegateImpl extends NSObject {
         let publisherKitDelegate = new TNSPublisherKitDelegateImpl();
         publisherKitDelegate._events = new Observable();
         publisherKitDelegate._owner = owner;
+
+        console.log('init publisher kit delegate');
         return publisherKitDelegate;
     }
 
@@ -141,6 +143,7 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
+        console.log('stream created for publisher delegate!');
     }
 
     streamDestroyed(publisher: any, stream: any) {

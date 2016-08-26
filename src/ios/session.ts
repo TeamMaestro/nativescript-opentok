@@ -146,12 +146,8 @@ class TNSSessionDelegateImpl extends NSObject {
         if(this._events) {
             this._events.notify({
                 eventName: 'sessionDidConnect',
-                object: new Observable({
-                    sessionId: session.sessionId,
-                    sessionConnectionStatus: session.sessionConnectionStatus
-                })
+                object: new Observable(session)
             });
-            console.log('sessionDidConnect (from session delegate...)');
         }
     }
 
@@ -192,7 +188,7 @@ class TNSSessionDelegateImpl extends NSObject {
                 })
             });
         }
-        console.log('sessionStreamCreated....');
+        console.log('!!!!!!!!!!!!!!!!!sessionStreamCreated....');
         // this._subscriber = new TNSOTSubscriber();
         // this._subscriber.subscribe(session, stream);
     }

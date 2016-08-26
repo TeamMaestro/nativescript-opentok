@@ -3,6 +3,7 @@ import {topmost} from 'ui/frame';
 import {screen} from 'platform';
 import {ContentView} from 'ui/content-view';
 import {TNSOTSession} from './session';
+import {TNSOTPublisher} from './publisher';
 
 declare var OTSubscriber: any,
             OTSubscriberKitDelegate: any;
@@ -23,17 +24,20 @@ export class TNSOTSubscriber extends ContentView {
     private connect() {
         if(this._apiKey && this._sessionId && this._token) {
             let session = new TNSOTSession(this._apiKey);
-            session.events.on('sessionDidConnect', result => {
-                console.log('sessionDidConnect - subscriber');
-                // Todo publish;
-            });
             session.initSession(this._sessionId).then(() => {
-                session.connect(this._token).then(() => {
+                session.connect(this._token).then((session) => {
+                    console.log('Subscriber connected successfully...');
                 }, error => {
                     console.log('Failed to connect to session: ' + error);
                 });
             }, error => {
                 console.log('Failed to intialize session: ' +  error);
+            });
+
+            session.events.on('sessionDidConnect', (session) => {
+                console.log('session did connect!' + session);
+                // let publisher = new TNSOTPublisher();
+                // publisher.publish(session);
             });
 
             console.log('TNSOTSession - ' + session);
@@ -117,10 +121,12 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
         let subscriberKiDelegate = new TNSSubscriberKitDelegateImpl();
         subscriberKiDelegate._events = new Observable();
         subscriberKiDelegate._owner = owner;
+        console.log('init subscriber kit delegate');
         return subscriberKiDelegate;
     }
 
     subscriberDidFailWithError(subscriber: any, error: any) {
+        console.log('subscriberDidFailWithError');
         if(this._events) {
             this._events.notify({
                 eventName: 'didFailWithError',
@@ -133,6 +139,7 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
     }
 
     subscriberDidConnectToStream(subscriber) {
+        console.log('subscriberDidConnectToStream');
         if(this._events) {
             this._events.notify({
                 eventName: 'subscriberDidConnectToStream',

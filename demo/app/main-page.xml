@@ -3,8 +3,8 @@
     xmlns:OT="nativescript-opentok" loaded="pageLoaded">
     <GridLayout rows="*,auto,auto">
         <GridLayout>
-            <OT:TNSOTPublisher id="publisher" loaded="publisherLoaded" session="{{ session }}" api="{{ api }}" token="{{ token }}"></OT:TNSOTPublisher>
-            <OT:TNSOTSubscriber loaded="subscriberLoaded" session="{{ session }}" api="{{ api }}" token="{{ subscriberToken }}" verticalAlignment="top" horizontalAlignment="right" margin="30" width="150" height="200"></OT:TNSOTSubscriber>
+            <OT:TNSOTPublisher id="publisher" loaded="publisherLoaded" session="{{ session }}" api="{{ api }}" token="{{ publisherToken }}"></OT:TNSOTPublisher>
+            <!--<OT:TNSOTSubscriber loaded="subscriberLoaded" session="{{ session }}" api="{{ api }}" token="{{ subscriberToken }}" verticalAlignment="top" horizontalAlignment="right" margin="30" width="150" height="200"></OT:TNSOTSubscriber>-->
         </GridLayout>
 
         <StackLayout backgroundColor="white" height="50">
