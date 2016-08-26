@@ -26,20 +26,15 @@ export class TNSOTPublisher extends ContentView {
 
     _createUI() {
         this.onLoaded = () => {
-            console.log('loaded successfully!');
             this.connect();
         };
-
-        console.log('created publisher...' + this._ios);
     }
 
-    private connect() {
+    private connect(): void {
         if(this._apiKey && this._sessionId && this._token) {
-            console.log('here...' + this._apiKey);
             let session = new TNSOTSession(this._apiKey);
             session.initSession(this._sessionId).then((result) => {
                 session.connect(this._token).then((result) => {
-                    console.log('this was called...' + result);
                     this.publish(result);
                 }, (error) => {
                     console.log('Failed to connect to session: ' + error);
@@ -50,10 +45,8 @@ export class TNSOTPublisher extends ContentView {
         }
     }
 
-    publish(session: any) {
-        console.log('here....');
+    publish(session: any): void {
         this._ios.publishAudio = true;
-        console.log('getting ready to publish!');
         try {
             session.publish(this._ios);
         } catch (error) {
@@ -61,11 +54,6 @@ export class TNSOTPublisher extends ContentView {
         }
         if (this._ios) {
             this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
-
-            let button:UIButton = UIButton.buttonWithType(UIButtonType.UIButtonTypeRoundedRect);
-            button.frame = CGRectMake(100, 15, 100, 20);
-            button.setTitleForState('Hello', UIControlState.UIControlStateNormal);
-            this._ios.view.addSubview(button);
         }
     }
 
@@ -84,13 +72,35 @@ export class TNSOTPublisher extends ContentView {
 
     set api(apiKey: string) {
         this._apiKey = apiKey;
-        console.log('set api key - ' + apiKey);
         this.connect();
     }
 
     set token(token: string) {
         this._token = token;
         this.connect();
+    }
+
+    cycleCamera(): void {
+        if(this._ios) {
+            if(this._ios.cameraPosition === AVCaptureDevicePositionBack) {
+                this._ios.cameraPosition = AVCaptureDevicePositionFront;
+            }
+            else {
+                this._ios.cameraPosition = AVCaptureDevicePositionBack;
+            }
+        }
+    }
+
+    toggleCamera() {
+        if(this._ios) {
+            this._ios.publishVideo = !this._ios.publishVideo;
+        }
+    }
+
+    toggleMute() {
+        if(this._ios) {
+            this._ios.publishAudio = !this._ios.publishAudio;
+        }
     }
 
 }

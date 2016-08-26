@@ -14,11 +14,11 @@ export class TNSOTSession {
 
     private _session: any;
     private _publisher: TNSOTPublisher;
-    private _sessionDelegate: TNSSessionDelegate;
+    private _sessionDelegate: TNSSessionDelegateImpl;
 
     constructor(apiKey: string) {
         this._apiKey = apiKey;
-        this._sessionDelegate = new TNSSessionDelegate();
+        this._sessionDelegate = TNSSessionDelegateImpl.initWithOwner(new WeakRef(this));
     }
 
     /**
@@ -113,46 +113,51 @@ export class TNSOTSession {
     }
 
     get events(): Observable {
-        return this._sessionDelegate.sessionEvents;
+        return this._sessionDelegate.events;
     }
 
     // get subscriber(): TNSOTSubscriber {
     //     return this._sessionDelegate.subscriber;
     // }
 
-    // get sessionEvents(): Observable {
-    //     return this._sessionDelegate.sessionEvents;
-    // }
-
 }
 
-class TNSSessionDelegate extends NSObject {
+class TNSSessionDelegateImpl extends NSObject {
 
     public static ObjCProtocols = [OTSessionDelegate];
 
-    private _sessionEvents: Observable
+    private _events: Observable
     private _subscriber: TNSOTSubscriber;
+    private _owner: WeakRef<any>;
 
-    // constructor() {
-    //     super();
-    //     this._sessionEvents = new Observable();
-    // }
+    public static initWithOwner(owner: WeakRef<any>): TNSSessionDelegateImpl {
+        let subscriberKiDelegate = new TNSSessionDelegateImpl();
+        subscriberKiDelegate._events = new Observable();
+        subscriberKiDelegate._owner = owner;
+        return subscriberKiDelegate;
+    }
 
+    /**
+     * Sent when the client connects to the session.
+     *
+     * @param {*} session The OTSession instance that sent this message
+     */
     sessionDidConnect(session: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'sessionDidConnect',
                 object: new Observable({
                     sessionId: session.sessionId,
                     sessionConnectionStatus: session.sessionConnectionStatus
                 })
             });
+            console.log('sessionDidConnect (from session delegate...)');
         }
     }
 
     sessionDidDisconnect(session: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'sessionDidDisconnect',
                 object: new Observable(session)
             });
@@ -160,8 +165,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionDidReconnect(session: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'sessionDidReconnect',
                 object: new Observable(session)
             });
@@ -169,8 +174,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionDidBeginReconnecting(session: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'sessionDidBeginReconnecting',
                 object: new Observable(session)
             });
@@ -178,8 +183,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionStreamCreated(session: any, stream: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'streamCreated',
                 object: new Observable({
                     session: session,
@@ -187,14 +192,14 @@ class TNSSessionDelegate extends NSObject {
                 })
             });
         }
-
+        console.log('sessionStreamCreated....');
         // this._subscriber = new TNSOTSubscriber();
         // this._subscriber.subscribe(session, stream);
     }
 
     sessionDidFailWithError(session: any, error: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'didFailWithError',
                 object: new Observable({
                     session: session,
@@ -205,8 +210,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionConnectionDestroyed(session: any, connection: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'connectionDestroyed',
                 object: new Observable({
                     session: session,
@@ -217,8 +222,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionConnectionCreated(session: any, connection: any) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'connectionCreated',
                 object: new Observable({
                     session: session,
@@ -229,8 +234,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'archiveStartedWithId',
                 object: new Observable({
                     session: session,
@@ -242,8 +247,8 @@ class TNSSessionDelegate extends NSObject {
     }
 
     sessionArchiveStoppedWithId(session: any, archiveId: string) {
-        if(this._sessionEvents) {
-            this._sessionEvents.notify({
+        if(this._events) {
+            this._events.notify({
                 eventName: 'archiveStoppedWithId',
                 object: new Observable({
                     session: session,
@@ -253,8 +258,8 @@ class TNSSessionDelegate extends NSObject {
         }
     }
 
-    get sessionEvents(): Observable {
-        return this._sessionEvents;
+    get events(): Observable {
+        return this._events;
     }
 
     get subscriber(): TNSOTSubscriber {

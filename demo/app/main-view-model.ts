@@ -1,6 +1,7 @@
 import * as frame from 'ui/frame';
 import {Observable, EventData} from 'data/observable';
 import {isAndroid, isIOS} from 'platform';
+import {Page} from 'ui/page';
 
 import {TNSOTPublisher} from 'nativescript-opentok';
 
@@ -14,9 +15,12 @@ export class Demo extends Observable {
     public token: string = 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9MWNiMWM0N2Q4ZTkyY2IyY2Y5MDU2YzRiMTk5NzcxN2E1NjczYmM4NzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNVGt3TlRnMU9UUTNNSDVXTUhrM1FsbGpjRTFJVmpKNmExRlhSVnBXZW5Sb2ExcC1mZyZjcmVhdGVfdGltZT0xNDcxOTA1ODc4Jm5vbmNlPTAuODc4ODQ5Nzg2MDA3Nzc2OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0NDk3ODc4';
     public subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
 
+    private publisher: any;
 
-    constructor() {
+
+    constructor(private page: Page) {
         super();
+        this.publisher = this.page.getViewById('publisher');
         // this._OTSession = new TNSOTSession(this._apiKey);
         // this._OTSession.initSession(this.sessionId);
     }
@@ -60,6 +64,22 @@ export class Demo extends Observable {
         //     });
         // });
 
+    }
+
+    publisherLoaded() {
+        console.log('publisherLoaded fired');
+    }
+
+    switchCamera() {
+        this.publisher.cycleCamera();
+    }
+
+    toggleVideo() {
+        this.publisher.ios.publishVideo = !this.publisher.ios.publishVideo;
+    }
+
+    toggleMute() {
+        this.publisher.ios.publishAudio = !this.publisher.ios.publishAudio;
     }
 
     private get sessionId(): string {

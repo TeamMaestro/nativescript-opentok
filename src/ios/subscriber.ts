@@ -17,26 +17,26 @@ export class TNSOTSubscriber extends ContentView {
 
     constructor() {
         super();
-
         this._subscriberKitDelegate = TNSSubscriberKitDelegateImpl.initWithOwner(new WeakRef(this));
-
-        // this._subscriberKitDelegate = new TNSSubscriberKitDelegate();
     }
 
     private connect() {
         if(this._apiKey && this._sessionId && this._token) {
             let session = new TNSOTSession(this._apiKey);
+            session.events.on('sessionDidConnect', result => {
+                console.log('sessionDidConnect - subscriber');
+                // Todo publish;
+            });
             session.initSession(this._sessionId).then(() => {
-                session.connect(this._token).then(() => {}, error => {
+                session.connect(this._token).then(() => {
+                }, error => {
                     console.log('Failed to connect to session: ' + error);
                 });
             }, error => {
                 console.log('Failed to intialize session: ' +  error);
             });
-            session.events.on('sessionDidConnect', result => {
-                console.log('sessionDidConnect - subscriber');
-                // Todo publish;
-            });
+
+            console.log('TNSOTSession - ' + session);
         }
     }
 
@@ -67,8 +67,9 @@ export class TNSOTSubscriber extends ContentView {
     addSubscriberToView(subscriber: any) {
         // subscriber.view.frame = CGRectMake(this._defaultVideoLocationX, this._defaultVideoLocationY, this._defaultVideoWidth, this._defaultVideoHeight);
         // topmost().currentPage.ios.view.addSubview(subscriber.view);
-
-        subscriber.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
+        console.log('called addSubscriberToView');
+        this._ios = subscriber;
+        this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
 
     }
 
@@ -77,7 +78,9 @@ export class TNSOTSubscriber extends ContentView {
     }
 
     get _nativeView(): any {
-        return this._ios.view;
+        if(this._ios) {
+            return this._ios.view;
+        }
     }
 
     set session(sessionId: string) {
@@ -95,7 +98,6 @@ export class TNSOTSubscriber extends ContentView {
         this.connect();
     }
 
-
 }
 
 class TNSSubscriberKitDelegateImpl extends NSObject {
@@ -105,11 +107,11 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
     private _events: Observable;
     private _owner: WeakRef<any>;
 
-    private _config: any;
-    private _defaultVideoLocationX: number = 0;
-    private _defaultVideoLocationY: number = 0;
-    private _defaultVideoWidth: number = 150;
-    private _defaultVideoHeight: number = 150;
+    // private _config: any;
+    // private _defaultVideoLocationX: number = 0;
+    // private _defaultVideoLocationY: number = 0;
+    // private _defaultVideoWidth: number = 150;
+    // private _defaultVideoHeight: number = 150;
 
     public static initWithOwner(owner: WeakRef<any>): TNSSubscriberKitDelegateImpl {
         let subscriberKiDelegate = new TNSSubscriberKitDelegateImpl();
