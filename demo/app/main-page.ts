@@ -18,7 +18,7 @@ export function pageLoaded(args: observable.EventData) {
     page.bindingContext._session.sessionEvents.on('sessionDidConnect', (result) => {
         console.log('sessionConnected event');
         //   ot.publisher;
-        page.bindingContext._session.session.publish(ot.publisher);
+        page.bindingContext._session.publish(ot.publisher);
 
         ot.on('didFailWithError', (data) => {
             console.log('error');

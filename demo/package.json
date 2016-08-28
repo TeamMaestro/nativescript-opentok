@@ -2,7 +2,7 @@
   "nativescript": {
     "id": "com.mobileagility.test",
     "tns-ios": {
-      "version": "2.1.1"
+      "version": "2.2.1"
     },
     "tns-android": {
       "version": "2.2.0"
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "nativescript-opentok": "file:..",
-    "tns-core-modules": "^2.1.0"
+    "tns-core-modules": "2.2.0"
   },
   "devDependencies": {
     "babel-traverse": "6.7.6",

@@ -1,7 +1,7 @@
 ///<reference path="../node_modules/nativescript-opentok/opentok.ios.d.ts"/>
 
 import {Observable} from 'data/observable';
-import * as opentok from './opentok/opentok';
+import {TNSOTSession} from 'nativescript-opentok';
 
 export class OpenTokDemo extends Observable {
 
@@ -11,7 +11,7 @@ export class OpenTokDemo extends Observable {
 
     constructor() {
         super();
-        this._session = new opentok.TNSOTSession(this._apiKey);
+        this._session = new TNSOTSession(this._apiKey);
         this._session.initSession(this.sessionId);
     }
 
@@ -22,7 +22,6 @@ export class OpenTokDemo extends Observable {
             }, (e) => {
                 console.dump(e)
             });
-
         this._session.sessionEvents.on('sessionDidDisconnect', (result) => {
             console.log('sessionDidDisconnect event');
         });
@@ -53,15 +52,16 @@ export class OpenTokDemo extends Observable {
 
     initSubscriber() {
         this._session.connect(this.subscriberToken);
-
         this._session.sessionEvents.on('sessionDidConnect', (result) => {
             console.log('sessionConnected event');
-            this._session.publish();
-            this._session.publisherEvents.on('streamCreated', () => {
-                console.log('streamCreated event on publisher object');
-            });
         });
-
+        this._session.sessionEvents.on('streamCreated', (data) => {
+            console.log('streamCreated event on session object');
+            this._session.subscribe(data.object.session,data.object.stream);
+        });
+        this._session.sessionEvents.on('streamDestroyed', () => {
+            console.log('streamCreated event on session object');
+        });
     }
 
     togglePublisherVideo() {

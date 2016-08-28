@@ -3,7 +3,7 @@
     <ot:TNSOTPublisher height="300"  session="{{session}}" id="otPub"></ot:TNSOTPublisher>
     <Button text="Init Publisher" tap="{{ initPublisher }}" />
         <ot:TNSOTSubscriber height="300"  session="{{session}}" id="otSub"></ot:TNSOTSubscriber>
-
+        <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
         <!--<GridLayout columns="*,*, auto" rows="auto, *">
             <StackLayout id="publisherContainer" orientation="vertical" col="0">
                 <Label text="OpenTok Publisher" class="message" textWrap="true"/>
