@@ -33,8 +33,9 @@ The basic integration example would include the following declarations for publi
  ```
 
 ### Images
-
-![Image](http://i.imgur.com/2okX9Sb.png)
+|iPhone|iPad|
+|---|---|
+|![iPhone Image](http://i.imgur.com/tjnfeQ7.png)|![iPad Image](http://i.imgur.com/2Ubjw0W.png)|
 
 ### Notes
 - Publishing is not supported in the Simulator because it does not have access to your webcam. You may see a yellow tea-kettle instead.
