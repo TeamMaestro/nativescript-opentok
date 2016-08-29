@@ -1,5 +1,5 @@
 import {Observable} from 'data/observable';
-
+import {topmost} from 'ui/frame';
 import {TNSOTPublisher} from './publisher';
 import {TNSOTSubscriber} from './subscriber';
 
@@ -69,18 +69,43 @@ export class TNSOTSession {
         });
     }
 
-    disconnect(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            if(this._session) {
-                try {
-                    this._session.disconnect();
-                    resolve();
-                } catch(error) {
-                    console.log(error);
-                    reject(error);
-                }
+    disconnect(): void {
+        let session = this._session;
+        if(session) {
+            try {
+                session.disconnect();
+            } catch(error) {
+                console.log(error);
             }
-        });
+        }
+    }
+
+    unpublish(): void {
+        let session = this._session;
+        try {
+            if(session) {
+                session.unpublish(this._publisher);
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+    unsubscribe(): void {
+        let session = this._session;
+        try {
+            if(session) {
+                session.unsubscribe();
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+    set publisher(publisher) {
+        this._publisher = publisher;
     }
 
     /**
@@ -185,7 +210,7 @@ class TNSSessionDelegateImpl extends NSObject {
         owner.subscriber.subscribe(session, stream);
     }
 
-    sessionStreamDestoryed(session: any, stream: any) {
+    sessionStreamDestroyed(session: any, stream: any) {
         if(this._events) {
             this._events.notify({
                 eventName: 'streamDestroyed',
@@ -194,6 +219,10 @@ class TNSSessionDelegateImpl extends NSObject {
                     stream: stream
                 })
             });
+        }
+        let view = topmost().currentPage.getViewById('subscriber');
+        if(view) {
+            view.ios.removeFromSuperview();
         }
     }
 

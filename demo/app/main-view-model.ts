@@ -31,4 +31,9 @@ export class Demo extends Observable {
         this.publisher.ios.publishAudio = !this.publisher.ios.publishAudio;
     }
 
+    unpublish() {
+        this.publisher.session.unpublish();
+        console.log('unpublish');
+    }
+
 }
