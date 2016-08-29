@@ -1,6 +1,6 @@
 # Nativescript OpenTok
 
-[![npm](https://img.shields.io/npm/v/nativescript-opentok.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/nativescript-opentok) 
+[![npm](https://img.shields.io/npm/v/nativescript-opentok.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/nativescript-opentok)
 [![npm](https://img.shields.io/npm/dt/nativescript-opentok.svg?maxAge=2592000?style=plastic)](https://www.npmjs.com/package/nativescript-opentok)
 
 A Nativescript plugin for the OpenTok iOS and (coming soon Android) SDK.
@@ -22,22 +22,23 @@ Node Package Manager (NPM)
 
 ### Integration
 
-#### Routed Sessions 
+#### Routed Sessions
 ##### View
-You will first need to import the custom element into the {N} xml view. This can be accomplished by adding this snippet: `xmlns:OT="nativescript-opentok"` to your existing `Page` element tag. 
+You will first need to import the custom element into the {N} xml view. This can be accomplished by adding this snippet: `xmlns:OT="nativescript-opentok"` to your existing `Page` element tag.
 
-The basic integration example would include the following declarations for publisher and subscriber. Notice subscriber is any element with `id="subscriber"`. You will need to provide a valid sessionId, api (key) and token to the publisher element. 
+The basic integration example would include the following declarations for publisher and subscriber. Notice subscriber is any element with `id="subscriber"`. You will need to provide a valid sessionId, api (key) and token to the publisher element.
 ```
-<OT:TNSOTPublisher sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken }}"></OT:TNSOTPublisher>
-<StackLayout id="subscriber" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></StackLayout>
+<StackLayout id="subscriber" width="100%" height="100%"></StackLayout>
+<OT:TNSOTPublisher id="publisher" sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken }}" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></OT:TNSOTPublisher>
  ```
 
 ### Special Articles
 - [Overlay UI on the Video Stream](https://github.com/sean-perkins/nativescript-opentok/wiki/Overlay-UI-on-Video-Stream)
 
 ### Images
-
-![Image](http://i.imgur.com/2okX9Sb.png)
+|iPhone|iPad|
+|---|---|
+|![iPhone Image](http://i.imgur.com/tjnfeQ7.png)|![iPad Image](http://i.imgur.com/2Ubjw0W.png)|
 
 ### Notes
 - Publishing is not supported in the Simulator because it does not have access to your webcam. You may see a yellow tea-kettle instead.
