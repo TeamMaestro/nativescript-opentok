@@ -10,19 +10,15 @@ export function pageLoaded(args: EventData) {
     page.bindingContext = new Demo(page);
 }
 
-// export function publisherLoaded(args: EventData) {
-//     let publisher = <TNSOTPublisher> args.object;
-//     if(isAndroid) {
-//         console.log('OpenTok Publisher Native Android: ' + publisher.android);
-//     }
-//     else if(isIOS) {
-//         console.log('OpenTok Publisher Native iOS: ' + publisher.ios);
-//     }
-
-//     page.bindingContext.message = 'Hello from the otherside';
-
-//     // connectToSession(_publisherToken);
-// }
+export function publisherLoaded(args: EventData) {
+    let publisher = <TNSOTPublisher> args.object;
+    if(isAndroid) {
+        console.log('OpenTok Publisher Native Android: ' + publisher.android);
+    }
+    else if(isIOS) {
+        console.log('OpenTok Publisher Native iOS: ' + publisher.ios);
+    }
+}
 
 export function subscriberLoaded(args: EventData) {
     let subscriber = <TNSOTSubscriber> args.object;

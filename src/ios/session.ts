@@ -83,10 +83,6 @@ export class TNSOTSession {
         });
     }
 
-    // subscribe(stream: any) {
-    //     this._session.subscribe(stream);
-    // }
-
     /**
      * Converts the OTSessionErrorCode values into meaningful error messages for debugging purposes
      *
@@ -117,10 +113,6 @@ export class TNSOTSession {
         return this._sessionDelegate.events;
     }
 
-    // get subscriber(): TNSOTSubscriber {
-    //     return this._sessionDelegate.subscriber;
-    // }
-
 }
 
 class TNSSessionDelegateImpl extends NSObject {
@@ -128,7 +120,6 @@ class TNSSessionDelegateImpl extends NSObject {
     public static ObjCProtocols = [OTSessionDelegate];
 
     private _events: Observable
-    // private _subscriber: TNSOTSubscriber;
     private _owner: WeakRef<any>;
 
     public static initWithOwner(owner: WeakRef<any>): TNSSessionDelegateImpl {
@@ -240,7 +231,6 @@ class TNSSessionDelegateImpl extends NSObject {
                 })
             });
         }
-        console.log('connection created!!');
     }
 
     sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
@@ -271,9 +261,5 @@ class TNSSessionDelegateImpl extends NSObject {
     get events(): Observable {
         return this._events;
     }
-
-    // get subscriber(): TNSOTSubscriber {
-    //     return this._subscriber;
-    // }
 
 }

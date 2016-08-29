@@ -66,7 +66,7 @@ export class TNSOTPublisher extends ContentView {
         return this._ios.view;
     }
 
-    set session(sessionId: string) {
+    set sessionId(sessionId: string) {
         this._sessionId = sessionId;
         this.connect();
     }
@@ -158,7 +158,6 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
-        console.log('publisher did fail with error!');
     }
 
     get events(): Observable {
