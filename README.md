@@ -28,10 +28,9 @@ You will first need to import the custom element into the {N} xml view. This can
 
 The basic integration example would include the following declarations for publisher and subscriber. Notice subscriber is any element with `id="subscriber"`. You will need to provide a valid sessionId, api (key) and token to the publisher element. 
 ```
-<OT:TNSOTPublisher sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken }}"></OT:TNSOTPublisher>
-<StackLayout id="subscriber" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></StackLayout>
+<StackLayout id="subscriber" width="100%" height="100%"></StackLayout>
+<OT:TNSOTPublisher id="publisher" sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken }}" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></OT:TNSOTPublisher>
  ```
-
 
 ### Images
 
