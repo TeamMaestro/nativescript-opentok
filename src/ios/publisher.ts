@@ -34,13 +34,14 @@ export class TNSOTPublisher extends ContentView {
         if(this._apiKey && this._sessionId && this._token) {
             let session = new TNSOTSession(this._apiKey);
             session.initSession(this._sessionId).then((result) => {
-                session.connect(this._token).then((result) => {
-                    this.publishStream(result);
-                }, (error) => {
+                session.connect(this._token).then(() => {}, (error) => {
                     console.log('Failed to connect to session: ' + error);
                 });
             }, (error) => {
                 console.log('Failed to initialize session: ' + error);
+            });
+            session.events.on('sessionDidConnect', (result) => {
+                this.publishStream(result.object);
             });
         }
     }
@@ -103,6 +104,10 @@ export class TNSOTPublisher extends ContentView {
         }
     }
 
+    get events(): Observable {
+        return this._publisherKitDelegate.events;
+    }
+
 }
 
 class TNSPublisherKitDelegateImpl extends NSObject {
@@ -121,19 +126,8 @@ class TNSPublisherKitDelegateImpl extends NSObject {
         return publisherKitDelegate;
     }
 
-    didChangeCameraPosition(publisher: any, position: any) {
-        if(this._events) {
-            this._events.notify({
-                eventName: 'didChangeCameraPosition',
-                object: new Observable({
-                    publisher: publisher,
-                    position: position
-                })
-            });
-        }
-    }
-
-    streamCreated(publisher: any, stream: any) {
+    public publisherStreamCreated(publisher: any, stream: any) {
+        console.log('Your own published stream was created!');
         if(this._events) {
             this._events.notify({
                 eventName: 'streamCreated',
@@ -143,10 +137,9 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
-        console.log('stream created for publisher delegate!');
     }
 
-    streamDestroyed(publisher: any, stream: any) {
+    public publisherStreamDestroyed(publisher: any, stream: any) {
         if(this._events) {
             this._events.notify({
                 eventName: 'streamDestroyed',
@@ -158,7 +151,7 @@ class TNSPublisherKitDelegateImpl extends NSObject {
         }
     }
 
-    didFailWithError(publisher: any, error: any) {
+    public publisherDidFailWithError(publisher: any, error: any) {
         if(this._events) {
             this._events.notify({
                 eventName: 'didFailWithError',
@@ -168,6 +161,7 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
+        console.log('publisher did fail with error!');
     }
 
     get events(): Observable {

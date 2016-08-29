@@ -81,11 +81,6 @@ export class TNSOTSession {
         });
     }
 
-    publish() {
-        this._publisher = new TNSOTPublisher();
-        this._publisher.publish(this._session);
-    }
-
     /**
      * Converts the OTSessionErrorCode values into meaningful error messages for debugging purposes
      *
@@ -146,7 +141,7 @@ class TNSSessionDelegateImpl extends NSObject {
         if(this._events) {
             this._events.notify({
                 eventName: 'sessionDidConnect',
-                object: new Observable(session)
+                object: session
             });
         }
     }
@@ -227,6 +222,7 @@ class TNSSessionDelegateImpl extends NSObject {
                 })
             });
         }
+        console.log('connection created!!');
     }
 
     sessionArchiveStartedWithId(session:any, archiveId: string, name?: string) {
