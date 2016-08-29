@@ -32,6 +32,8 @@ The basic integration example would include the following declarations for publi
 <StackLayout id="subscriber" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></StackLayout>
  ```
 
+### Special Articles
+- [Overlay UI on the Video Stream](https://github.com/sean-perkins/nativescript-opentok/wiki/Overlay-UI-on-Video-Stream)
 
 ### Images
 
