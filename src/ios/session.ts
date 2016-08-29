@@ -222,7 +222,7 @@ class TNSSessionDelegateImpl extends NSObject {
         }
         let view = topmost().currentPage.getViewById('subscriber');
         if(view) {
-            view.ios.removeFromSuperview();
+            // view.ios.removeFromSuperview();
         }
     }
 

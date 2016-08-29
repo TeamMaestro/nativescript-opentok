@@ -55,9 +55,6 @@ export class TNSOTPublisher extends ContentView {
         } catch (error) {
             console.log(error);
         }
-        if (this._ios) {
-            this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
-        }
     }
 
     get ios(): any {

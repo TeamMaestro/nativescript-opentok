@@ -27,7 +27,7 @@ export class TNSOTSubscriber  {
     addSubscriberToView(subscriber: any) {
         let view = topmost().currentPage.getViewById('subscriber');
         if(view) {
-            this._subscriber.view.frame = CGRectMake(view.originX, view.originY, view.width, view.height);
+            this._subscriber.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
             view.ios.addSubview(this._subscriber.view);
         }
     }
