@@ -1,84 +1,34 @@
-///<reference path="../node_modules/nativescript-opentok/opentok.ios.d.ts"/>
+import * as frame from 'ui/frame';
+import {Observable, EventData} from 'data/observable';
+import {isAndroid, isIOS} from 'platform';
+import {Page} from 'ui/page';
 
-import {Observable} from 'data/observable';
+import {TNSOTPublisher} from 'nativescript-opentok';
 
-import { TNSOTSession} from 'nativescript-opentok';
+export class Demo extends Observable {
 
-export class OpenTokDemo extends Observable {
+    public api:string = '45644202';
+    public sessionId: string = '1_MX40NTY0NDIwMn5-MTQ3MjIyNzU3NTAwM35FczFWMHdVekNxeXNabWRSTUdIUkpjRmR-fg';
+    public publisherToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9NTkwNmVhZWZjNDMzNWRlNDY5ZTZmZTkwMjg0Yjk0ODJlZmE4NjFjODpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjI3NTg4Jm5vbmNlPTAuNzY3MTczMTA0Njg2NjYyNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODE5NTg3';
+    public publisherToken2: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9YTM5NTVmODVmYWU0NjkwNThiN2YzMjU3YzM0ZmI4YTYwNTg2YjU0MjpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjQyNDgwJm5vbmNlPTAuMjU5ODA5NDU5MzI2Nzg4OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODM0NDgw';
 
-    private _apiKey: string = '45628212';
-    private _session: any;
+    private publisher: any;
 
-    constructor() {
+    constructor(private page: Page) {
         super();
-        this._session = new TNSOTSession(this._apiKey, {
-            publisher: {
-                videoLocationX: 240,
-                videoLocationY: 200,
-                videoWidth: 250,
-                videoHeight: 250
-            },
-            subscriber: {
-                videoLocationX: 800,
-                videoLocationY: 200,
-                videoWidth: 120,
-                videoHeight: 120
-            }
-        });
-        this._session.initSession(this.sessionId);
+        this.publisher = this.page.getViewById('publisher');
     }
 
-    initPublisher() {
-        this._session.connect(this.publisherToken);
-
-        this._session.sessionEvents.on('sessionDidConnect', (result) => {
-            console.log('sessionConnected event');
-        });
-
-        this._session.sessionEvents.on('connectionCreated', () => {
-            console.log('connectionCreated Event');
-        });
-
-        this._session.sessionEvents.on('streamCreated', () => {
-            console.log('streamCreated event on session object');
-        });
+    switchCamera() {
+        this.publisher.cycleCamera();
     }
 
-    initSubscriber() {
-        this._session.connect(this.subscriberToken);
-
-        this._session.sessionEvents.on('sessionDidConnect', (result) => {
-            console.log('sessionConnected event');
-            this._session.publish();
-            this._session.publisherEvents.on('streamCreated', () => {
-                console.log('streamCreated event on publisher object');
-            });
-        });
-
+    toggleVideo() {
+        this.publisher.ios.publishVideo = !this.publisher.ios.publishVideo;
     }
 
-    togglePublisherVideo() {
-        this._session.publisher.toggleVideo();
-    }
-
-    togglePublisherAudio() {
-        this._session.publisher.toggleAudio();
-    }
-
-    togglePublisherCamera() {
-        this._session.publisher.toggleCameraPosition();
-    }
-
-    private get sessionId(): string {
-        return '1_MX40NTYyODIxMn5-MTQ3MDI1MjI2MDEzNH5oMUo4VlliUWpQYTFLSVJZV0ZPN0RESGh-UH4';
-    }
-
-    private get publisherToken(): string {
-        return  'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9ZDI1ZjRmNmViNDZjYmFiYzc5YTIwYTcxYjA2NzJhNDllNmZhMmJkYzpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDI1MjI4OCZub25jZT0wLjUzNjkzMjI0Njc1OTUzMzkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3Mjg0NDI4Nw==';
-    }
-
-    private get subscriberToken(): string {
-        return 'T1==cGFydG5lcl9pZD00NTYyODIxMiZzaWc9OWJlZTkzNDZlMmU1ZjhiMDk5OTM5NzgzMWZmNTIzYjUxNjY0N2NiMDpzZXNzaW9uX2lkPTFfTVg0ME5UWXlPREl4TW41LU1UUTNNREkxTWpJMk1ERXpOSDVvTVVvNFZsbGlVV3BRWVRGTFNWSlpWMFpQTjBSRVNHaC1VSDQmY3JlYXRlX3RpbWU9MTQ3MDg1NTk2OCZub25jZT0wLjgwMTA4ODI2MTg4MzcwNTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ3MzQ0Nzk2OA==';
+    toggleMute() {
+        this.publisher.ios.publishAudio = !this.publisher.ios.publishAudio;
     }
 
 }

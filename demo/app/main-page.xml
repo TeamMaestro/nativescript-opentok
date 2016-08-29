@@ -1,18 +1,18 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded">
-    <GridLayout columns="*,*, auto" rows="auto, *">
-        <StackLayout id="publisherContainer" orientation="vertical" col="0">
-            <Label text="OpenTok Publisher" class="message" textWrap="true"/>
-             <Button text="Init Publisher" tap="{{ initPublisher }}" />
-            <Button text="Toggle Publisher Video" tap="{{ togglePublisherVideo }}" />
-            <Button text="Toggle Publisher Audio" tap="{{ togglePublisherAudio }}" />
-            <Button text="Toggle Publisher Camera" tap="{{ togglePublisherCamera }}" />
-        </StackLayout>
-        <StackLayout id="subscriberContainer" orientation="vertical" col="1">
-            <Label text="OpenTok Subscriber" class="message" textWrap="true"/>
-            <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
-            <Button text="Toggle Subscriber Video" tap="{{ togglePublisherVideo }}" />
-            <Button text="Toggle Subscriber Audio" tap="{{ togglePublisherAudio }}" />
-            <Button text="Toggle Subscriber Camera" tap="{{ togglePublisherCamera }}" />
+<Page
+    xmlns="http://schemas.nativescript.org/tns.xsd"
+    xmlns:OT="nativescript-opentok" loaded="pageLoaded">
+    <GridLayout rows="*,auto,auto">
+        <GridLayout>
+            <OT:TNSOTPublisher id="publisher" loaded="publisherLoaded" sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken2 }}"></OT:TNSOTPublisher>
+            <StackLayout id="subscriber" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></StackLayout>
+        </GridLayout>
+
+        <StackLayout backgroundColor="white" height="50">
+            <StackLayout orientation="horizontal">
+                <Button text="Switch Camera" tap="{{ switchCamera }}" />
+                <Button text="Toggle Camera" tap="{{ toggleVideo }}" />
+                <Button text="Toggle Mute" tap="{{ toggleMute }}" />
+            </StackLayout>
         </StackLayout>
     </GridLayout>
 </Page>

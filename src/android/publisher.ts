@@ -1,102 +1,124 @@
-// import * as app from 'application';
+import * as app from 'application';
+import {View} from 'ui/core/view'
+import {Observable} from "data/observable";
+declare var com: any, android: any;
+const CameraListener = com.opentok.android.Publisher.CameraListener;
+const PublisherListener = com.opentok.android.PublisherKit.PublisherListener;
+const Publisher = com.opentok.android.Publisher;
+const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
+const AbsoluteLayout = android.widget.AbsoluteLayout;
+const RelativeLayout = android.widget.RelativeLayout;
 
-// import {TNSOTPublisherI} from '../common';
+export class TNSOTPublisher extends View {
+    private _android: any;
+    private _publisher:any;
+    public static toggleVideoEvent = "toggleVideo";
+    public static toggleAudioEvent = "toggleAudio";
+    public static cycleCameraEvent;
+    private _publisherEvents;
+    _render_style: any;
 
-// declare var com: any, android: any;
+    constructor() {
+        super();
+    }
 
-// const Publisher = com.opentok.android.Publisher;
-// const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
-// const AbsoluteLayout = android.widget.AbsoluteLayout;
-// const RelativeLayout = android.widget.RelativeLayout;
+    _createUI() {
+        const that = new WeakRef(this);
+        this._publisher = new com.opentok.android.Publisher(app.android.foregroundActivity);
+        this._publisher.setPublisherListener(new PublisherListener({
+            owner: that.get(),
+            onError(publisher: any, error: any) {
+                if (this.owner) {
+                    this.owner.notify({
+                        eventName: 'didFailWithError',
+                        object: new Observable({
+                            publisher: publisher,
+                            error: error
+                        })
+                    });
+                }
+            },
+            onStreamCreated(publisher: any, stream: any) {
+                if (this.owner) {
+                    this.owner.notify({
+                        eventName: 'streamCreated',
+                        object: new Observable({
+                            publisher: publisher,
+                            stream: stream
+                        })
+                    });
+                }
+            },
+            onStreamDestroyed(publisher: any, stream: any) {
+                if (this.owner) {
+                    this.owner.notify({
+                        eventName: 'streamDestroyed',
+                        object: new Observable({
+                            publisher: publisher,
+                            stream: stream
+                        })
+                    });
+                }
+            }
+        }));
 
-// export class TNSOTPublisher implements TNSOTPublisherI {
+        this._publisher.setCameraListener(new CameraListener({
+            owner: that.get(),
+            onCameraChanged(publisher, newCameraId) {
+                //   this.owner._publishEvents.notify();
+                console.log("CameraChanged");
+                console.dump(newCameraId);
+            }, onCameraError(publisher, error) {
+                //  this.owner._publishEvents.notify();
+                console.log("CameraError");
+                console.dump(error)
+            }
+        }));
+        this._android = this._publisher.getView();
+    }
 
-//     public nativePublisher: any;
+    get render_style() {
+        return this._render_style;
+    }
 
-//     constructor(emitEvents?: boolean) {
-//         // this._delegate = new TNSOTPublisherDelegate();
-//         // this._delegate.initPublisher(emitEvents);
-//     }
+    set render_style(value: any) {
+        switch (value) {
+            case 'scale':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
+                break;
+            case 'fit':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
+                break;
+            case 'fill':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
+                break;
+        }
+    }
 
-//     init(session: any, videoLocationX?: number, videoLocationY?: number, videoWidth?: number, videoHeight?: number): Promise<any> {
-//         return new Promise((resolve, reject) => {
-//             this.nativePublisher = new Publisher(app.android.context);
-//             // this.nativePublisher.setPublisherListener(app.android.context);
-//             // this.nativePublisher.setPublisherListener(session.StreamPropertiesListener);
-//             console.log('Init publisher: ' + this.nativePublisher);
-//             this.attachPublisherView(videoLocationX, videoLocationY, videoWidth, videoHeight);
-//             this.nativePublisher.setPublishVideo(true);
-//             this.nativePublisher.startPreview();
-//             try {
-//                 session.publish(this.nativePublisher);
-//                 this.nativePublisher.getCapturer().init();
-//                 resolve();
-//             }
-//             catch(error) {
-//                 reject(error);
-//             }
-//         });
-//     }
+    get android(): any {
+        return this._android;
+    }
 
-//     private attachPublisherView(videoLocationX: number, videoLocationY: number, videoWidth: number, videoHeight: number) {
-//         // this._publisher.setCameraListener(this._session.StreamPropertiesListener);
-//         this.nativePublisher.setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE, BaseVideoRenderer.STYLE_VIDEO_FILL);
-//         if(!videoWidth || videoWidth === -1) {
-//             videoWidth = app.android.foregroundActivity.getResources().getDisplayMetrics().widthPixels;
-//         }
-//         if(!videoHeight || videoHeight === -1) {
-//             videoHeight = app.android.foregroundActivity.getResources().getDisplayMetrics().heightPixels;
-//         }
-//         var layoutParams = new AbsoluteLayout.LayoutParams(300, 300, 120, 120);
-//         app.android.foregroundActivity.addContentView(this.nativePublisher.getView(), layoutParams);
-//     }
+    get _nativeView(): any {
+        return this._android;
+    }
 
-//     toggleVideo(): Promise<any> {
-//         return new Promise((resolve, reject) => {
-//             let publisher = this.nativePublisher;
-//             if(publisher) {
-//                 publisher.setPublishVideo(!publisher.getPublishVideo());
-//                 resolve(publisher.getPublishVideo());
-//             }
-//             else {
-//                 reject('Publisher not defined');
-//             }
-//         });
-//     }
+    toggleVideo() {
+    }
 
-//     toggleAudio(): Promise<any> {
-//         return new Promise((resolve, reject) => {
-//             let publisher = this.nativePublisher;
-//             if(publisher) {
-//                 publisher.setPublishAudio(!publisher.getPublishAudio());
-//                 resolve(publisher.getPublishAudio());
-//             }
-//             else {
-//                 reject('Publisher not defined');
-//             }
-//         });
-//     }
+    toggleAudio() {
+    }
 
-//     setVideoActive(state: boolean) {
-//         let publisher = this.nativePublisher;
-//         if(publisher) {
-//             publisher.setPublishVideo(state);
-//         }
-//     }
+    setVideoActive(state: boolean) {
+    }
 
-//     setAudioActive(state: boolean) {
-//         let publisher = this.nativePublisher;
-//         if(publisher) {
-//             publisher.setPublishAudio(state);
-//         }
-//     }
+    setAudioActive(state: boolean) {
+    }
 
-//     toggleCameraPosition() {
+    toggleCameraPosition() {
+    }
 
-//     }
+    instance() {
+    }
 
-//     instance() {
-
-//     }
-
-// }
+}

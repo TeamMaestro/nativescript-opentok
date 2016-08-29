@@ -1,16 +1,34 @@
-import * as observable from 'data/observable';
-import * as pages from 'ui/page';
+import {EventData} from 'data/observable';
+import {Page} from 'ui/page';
+import {isAndroid, isIOS} from 'platform';
 
-import app = require("application");
-import view = require("ui/core/view");
+import {Demo} from './main-view-model';
+import {TNSOTPublisher, TNSOTSubscriber, TNSOTSession} from 'nativescript-opentok';
 
-import {OpenTokDemo} from './main-view-model';
-
-// Event handler for Page "loaded" event attached in main-page.xml
-export function pageLoaded(args: observable.EventData) {
-
-    // Get the event sender
-    var page = <pages.Page>args.object;
-    page.bindingContext = new OpenTokDemo();
-
+export function pageLoaded(args: EventData) {
+    var page = <Page>args.object;
+    page.bindingContext = new Demo(page);
 }
+
+export function publisherLoaded(args: EventData) {
+    let publisher = <TNSOTPublisher> args.object;
+    if(isAndroid) {
+        console.log('OpenTok Publisher Native Android: ' + publisher.android);
+    }
+    else if(isIOS) {
+        console.log('OpenTok Publisher Native iOS: ' + publisher.ios);
+    }
+}
+
+export function subscriberLoaded(args: EventData) {
+    let subscriber = <TNSOTSubscriber> args.object;
+    if(isAndroid) {
+        console.log('OpenTok SubScriber Native Android: ' + subscriber.android);
+    }
+    else if(isIOS) {
+        console.log('Opentok Subscriber Native iOS: ' + subscriber.ios);
+    }
+}
+
+
+exports.pageLoaded = pageLoaded;
