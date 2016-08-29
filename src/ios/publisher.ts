@@ -12,8 +12,10 @@ declare var OTPublisher: any,
 
 export class TNSOTPublisher extends ContentView {
 
-    private _publisherKitDelegate: any;
     private _ios: any;
+    private _publisherKitDelegate: any;
+    private _session: TNSOTSession;
+
     private _sessionId: any;
     private _apiKey: string;
     private _token: string;
@@ -32,15 +34,15 @@ export class TNSOTPublisher extends ContentView {
 
     private connect(): void {
         if(this._apiKey && this._sessionId && this._token) {
-            let session = new TNSOTSession(this._apiKey);
-            session.initSession(this._sessionId).then((result) => {
-                session.connect(this._token).then(() => {}, (error) => {
+            this._session = new TNSOTSession(this._apiKey);
+            this._session.initSession(this._sessionId).then((result) => {
+                this._session.connect(this._token).then(() => {}, (error) => {
                     console.log('Failed to connect to session: ' + error);
                 });
             }, (error) => {
                 console.log('Failed to initialize session: ' + error);
             });
-            session.events.on('sessionDidConnect', (result) => {
+            this._session.events.on('sessionDidConnect', (result) => {
                 this.publishStream(result.object);
             });
         }
@@ -52,9 +54,6 @@ export class TNSOTPublisher extends ContentView {
             session.publish(this._ios);
         } catch (error) {
             console.log(error);
-        }
-        if (this._ios) {
-            this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
         }
     }
 
@@ -92,16 +91,23 @@ export class TNSOTPublisher extends ContentView {
         }
     }
 
-    toggleCamera() {
+    toggleCamera(): void {
         if(this._ios) {
             this._ios.publishVideo = !this._ios.publishVideo;
         }
     }
 
-    toggleMute() {
+    toggleMute():void  {
         if(this._ios) {
             this._ios.publishAudio = !this._ios.publishAudio;
         }
+    }
+
+    get session(): TNSOTSession {
+        if(this._session) {
+            this._session.publisher = this._ios;
+        }
+        return this._session;
     }
 
     get events(): Observable {
@@ -146,6 +152,7 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
+        topmost().currentPage.ios.view.removeFromSuperview(publisher.view);
     }
 
     public publisherDidFailWithError(publisher: any, error: any) {
