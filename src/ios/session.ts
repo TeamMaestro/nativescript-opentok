@@ -34,7 +34,7 @@ export class TNSOTSession {
                 console.log('API key not set. Please use the constructor to set the API key');
                 reject('API Key Set');
             }
-            this._session = new OTSession(this._apiKey, sessionId, this._sessionDelegate);
+            this._session = OTSession.alloc().initWithApiKeySessionIdDelegate(this._apiKey, sessionId, this._sessionDelegate);
             if(this._session) {
                 resolve();
             }
