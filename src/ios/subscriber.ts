@@ -44,10 +44,10 @@ export class TNSOTSubscriber extends ContentView {
         }
     }
 
-    // subscribe(session: any, stream: any) {
-    //     this._nativeSubscriber = new OTSubscriber(stream);//, this._subscriberKitDelegate);
-    //     session.subscribe(this._nativeSubscriber);
-    // }
+    subscribe(session: any, stream: any) {
+        this._ios = new OTSubscriber(stream, this._subscriberKitDelegate);
+        session.subscribe(this._ios);
+    }
 
     /**
      * Cleans the subscriber from the view hierarchy, if any.
@@ -72,8 +72,8 @@ export class TNSOTSubscriber extends ContentView {
         // subscriber.view.frame = CGRectMake(this._defaultVideoLocationX, this._defaultVideoLocationY, this._defaultVideoWidth, this._defaultVideoHeight);
         // topmost().currentPage.ios.view.addSubview(subscriber.view);
         console.log('called addSubscriberToView');
-        this._ios = subscriber;
-        this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
+        this._ios.view.frame = CGRectMake(0, 0, 150, 200);
+        topmost().currentPage.ios.view.addSubview(this._ios.view);
 
     }
 
@@ -82,9 +82,7 @@ export class TNSOTSubscriber extends ContentView {
     }
 
     get _nativeView(): any {
-        if(this._ios) {
-            return this._ios.view;
-        }
+        return this._ios.view;
     }
 
     set session(sessionId: string) {
@@ -121,7 +119,6 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
         let subscriberKiDelegate = new TNSSubscriberKitDelegateImpl();
         subscriberKiDelegate._events = new Observable();
         subscriberKiDelegate._owner = owner;
-        console.log('init subscriber kit delegate');
         return subscriberKiDelegate;
     }
 

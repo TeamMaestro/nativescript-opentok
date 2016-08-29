@@ -16,6 +16,8 @@ export class TNSOTSession {
     private _publisher: TNSOTPublisher;
     private _sessionDelegate: TNSSessionDelegateImpl;
 
+    public subscriber: TNSOTSubscriber;
+
     constructor(apiKey: string) {
         this._apiKey = apiKey;
         this._sessionDelegate = TNSSessionDelegateImpl.initWithOwner(new WeakRef(this));
@@ -81,6 +83,10 @@ export class TNSOTSession {
         });
     }
 
+    // subscribe(stream: any) {
+    //     this._session.subscribe(stream);
+    // }
+
     /**
      * Converts the OTSessionErrorCode values into meaningful error messages for debugging purposes
      *
@@ -122,7 +128,7 @@ class TNSSessionDelegateImpl extends NSObject {
     public static ObjCProtocols = [OTSessionDelegate];
 
     private _events: Observable
-    private _subscriber: TNSOTSubscriber;
+    // private _subscriber: TNSOTSubscriber;
     private _owner: WeakRef<any>;
 
     public static initWithOwner(owner: WeakRef<any>): TNSSessionDelegateImpl {
@@ -183,9 +189,21 @@ class TNSSessionDelegateImpl extends NSObject {
                 })
             });
         }
-        console.log('!!!!!!!!!!!!!!!!!sessionStreamCreated....');
-        // this._subscriber = new TNSOTSubscriber();
-        // this._subscriber.subscribe(session, stream);
+        let owner = this._owner.get();
+        owner.subscriber = new TNSOTSubscriber();
+        owner.subscriber.subscribe(session, stream);
+    }
+
+    sessionStreamDestoryed(session: any, stream: any) {
+        if(this._events) {
+            this._events.notify({
+                eventName: 'streamDestroyed',
+                object: new Observable({
+                    session: session,
+                    stream: stream
+                })
+            });
+        }
     }
 
     sessionDidFailWithError(session: any, error: any) {
@@ -254,8 +272,8 @@ class TNSSessionDelegateImpl extends NSObject {
         return this._events;
     }
 
-    get subscriber(): TNSOTSubscriber {
-        return this._subscriber;
-    }
+    // get subscriber(): TNSOTSubscriber {
+    //     return this._subscriber;
+    // }
 
 }

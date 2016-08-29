@@ -121,13 +121,10 @@ class TNSPublisherKitDelegateImpl extends NSObject {
         let publisherKitDelegate = new TNSPublisherKitDelegateImpl();
         publisherKitDelegate._events = new Observable();
         publisherKitDelegate._owner = owner;
-
-        console.log('init publisher kit delegate');
         return publisherKitDelegate;
     }
 
     public publisherStreamCreated(publisher: any, stream: any) {
-        console.log('Your own published stream was created!');
         if(this._events) {
             this._events.notify({
                 eventName: 'streamCreated',
