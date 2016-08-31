@@ -20,6 +20,10 @@ Node Package Manager (NPM)
 
 `npm install nativescript-opentok --save`
 
+###Android
+After adding the platform `tns platform add android` create a file name `gradle.properties` located in `(your_app_root)/platforms/android` then insert `android.useDeprecatedNdk=true` and save the file
+
+
 ### Integration
 The OpenTok integration leverages the following model to successfully integrate paired sessions.
 # <img src="https://tokbox.com/developer/img/docs/publish_v2.jpeg" />

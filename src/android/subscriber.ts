@@ -3,6 +3,7 @@ import {ContentView} from 'ui/content-view';
 declare var com: any, android: any;
 const StreamListener = com.opentok.android.SubscriberKit.StreamListener;
 const SubscriberListener = com.opentok.android.SubscriberKit.SubscriberListener;
+const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
 export class TNSOTSubscriber extends ContentView {
     private _android: any;
     private _subscriber: any;
@@ -20,17 +21,22 @@ export class TNSOTSubscriber extends ContentView {
     }
 
     _createUI() {
+        this._android = new android.widget.LinearLayout(this._context);
+    }
+
+    subscribe(session: any, stream: any) {
         const that = new WeakRef(this);
-        this._subscriber = new com.opentok.android.Subscriber(this._context);
+        this._subscriber = new com.opentok.android.Subscriber(this._context, stream);
+        this._subscriber.getRenderer().setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
+            BaseVideoRenderer.STYLE_VIDEO_FILL);
         this._subscriber.setSubscriberListener(new SubscriberListener({
             owner: that.get(),
             onConnected(subscriber){
                 if (this.owner) {
                     this.owner.notify({
                         eventName: 'subscriberDidConnectToStream',
-                        object: new Observable({
-                            subscriber: subscriber
-                        })
+                        object: this.owner,
+                        subscriber:subscriber
                     });
                 }
             },
@@ -38,7 +44,8 @@ export class TNSOTSubscriber extends ContentView {
                 if (this.owner) {
                     this.owner.notify({
                         eventName: 'subscriberDidDisconnect',
-                        object: new Observable(subscriber)
+                        object: this.owner,
+                        subscriber:subscriber
                     });
                 }
             },
@@ -46,10 +53,9 @@ export class TNSOTSubscriber extends ContentView {
                 if (this.owner) {
                     this.owner.notify({
                         eventName: 'didFailWithError',
-                        object: new Observable({
-                            subscriber: subscriber,
-                            error: error
-                        })
+                        object: this.owner,
+                        subscriber: subscriber,
+                        error: error
                     });
                 }
             },
@@ -60,7 +66,8 @@ export class TNSOTSubscriber extends ContentView {
                 if (this.owner) {
                     this.owner.notify({
                         eventName: 'didDisconnectFromStream',
-                        object: subscriber
+                        object: this.owner,
+                        subscriber:subscriber
                     });
                 }
             },
@@ -68,16 +75,12 @@ export class TNSOTSubscriber extends ContentView {
                 if (this.owner) {
                     this.owner.notify({
                         eventName: 'didReconnectToStream',
-                        object: subscriber
+                        object: this.owner,
+                        subscriber:subscriber
                     });
                 }
             }
         }));
-        this._android = new android.widget.LinearLayout(this._context);
-    }
-
-    subscribe(session: any, stream: any) {
-        this._subscriber.subscribe(session, stream);
         let sub = this._subscriber.getView();
         this.android.addView(sub);
     }
@@ -107,7 +110,6 @@ export class TNSOTSubscriber extends ContentView {
     setAudioActive(state: boolean) {
         this._subscriber.setSubscribeToAudio(state);
     }
-
 
 
 }

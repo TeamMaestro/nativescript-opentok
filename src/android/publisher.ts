@@ -8,7 +8,6 @@
         const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
         const AbsoluteLayout = android.widget.AbsoluteLayout;
         const RelativeLayout = android.widget.RelativeLayout;
-
         export class TNSOTPublisher extends ContentView {
             private _android: any;
             private _publisher: any;
@@ -20,6 +19,7 @@
 
             constructor() {
                 super();
+
             }
 
             get android() {
@@ -40,10 +40,9 @@
                         if (this.owner) {
                             this.owner.notify({
                                 eventName: 'didFailWithError',
-                                object: new Observable({
-                                    publisher: publisher,
-                                    error: error
-                                })
+                                object: this.owner,
+                                publisher: publisher,
+                                error: error
                             });
                         }
                     },
@@ -51,10 +50,9 @@
                         if (this.owner) {
                             this.owner.notify({
                                 eventName: 'streamCreated',
-                                object: new Observable({
-                                    publisher: publisher,
-                                    stream: stream
-                                })
+                                object: this.owner,
+                                publisher: publisher,
+                                stream: stream
                             });
                         }
 
@@ -63,10 +61,9 @@
                         if (this.owner) {
                             this.owner.notify({
                                 eventName: 'streamDestroyed',
-                                object: new Observable({
-                                    publisher: publisher,
-                                    stream: stream
-                                })
+                                object: this.owner,
+                                publisher: publisher,
+                                stream: stream
                             });
                         }
                     }
@@ -77,25 +74,22 @@
                         if (this.owner) {
                             this.owner.notify({
                                 eventName: 'cameraChanged',
-                                object: new Observable({
-                                    publisher: publisher,
-                                    cameraId: newCameraId
-                                })
+                                object: this.owner,
+                                publisher: publisher,
+                                cameraId: newCameraId
                             });
                         }
                     }, onCameraError(publisher, error) {
                         if (this.owner) {
                             this.owner.notify({
                                 eventName: 'cameraError',
-                                object: new Observable({
-                                    publisher: publisher,
-                                    error: error
-                                })
+                                object: this.owner,
+                                publisher: publisher,
+                                error: error
                             });
                         }
                     }
                 }));
-
                 let pub = this._publisher.getView();
                 this._android = new android.widget.LinearLayout(this._context);
                 this._android.addView(pub);

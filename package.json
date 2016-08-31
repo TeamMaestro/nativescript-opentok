@@ -49,6 +49,7 @@
     "typescript": "^1.8.10"
   },
   "dependencies": {
-    "@types/es6-promise": "0.0.28"
+    "@types/es6-promise": "0.0.28",
+    "nativescript-permissions": "latest"
   }
 }

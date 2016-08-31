@@ -1,24 +1,22 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:ot="./opentok/opentok" actionBarHidden="true">
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:ot="nativescript-opentok" actionBarHidden="true">
     <StackLayout id="sl">
-    <ot:TNSOTPublisher height="300"  session="{{session}}" id="otPub"></ot:TNSOTPublisher>
-    <Button text="Init Publisher" tap="{{ initPublisher }}" />
-        <ot:TNSOTSubscriber height="300"  session="{{session}}" id="otSub"></ot:TNSOTSubscriber>
-        <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
-        <!--<GridLayout columns="*,*, auto" rows="auto, *">
+        <GridLayout columns="*,*, auto" rows="auto, *">
             <StackLayout id="publisherContainer" orientation="vertical" col="0">
                 <Label text="OpenTok Publisher" class="message" textWrap="true"/>
+                <ot:TNSOTPublisher height="300"  session="{{session}}" id="otPub"></ot:TNSOTPublisher>
                 <Button text="Init Publisher" tap="{{ initPublisher }}" />
-                <Button text="Toggle Publisher Video" tap="{{ togglePublisherVideo }}" />
-                <Button text="Toggle Publisher Audio" tap="{{ togglePublisherAudio }}" />
-                <Button text="Toggle Publisher Camera" tap="{{ togglePublisherCamera }}" />
+                <Button text="Toggle Publisher Video" tap="togglePublisherVideo" />
+                <Button text="Toggle Publisher Audio" tap="togglePublisherAudio" />
+                <Button text="Cycle Publisher Camera" tap="cyclePublisherCamera" />
             </StackLayout>
             <StackLayout id="subscriberContainer" orientation="vertical" col="1">
                 <Label text="OpenTok Subscriber" class="message" textWrap="true"/>
+                <ot:TNSOTSubscriber height="300"  session="{{session}}" id="otSub"></ot:TNSOTSubscriber>
                 <Button text="Init Subscriber" tap="{{ initSubscriber }}" />
-                <Button text="Toggle Subscriber Video" tap="{{ togglePublisherVideo }}" />
-                <Button text="Toggle Subscriber Audio" tap="{{ togglePublisherAudio }}" />
-                <Button text="Toggle Subscriber Camera" tap="{{ togglePublisherCamera }}" />
+                <Button text="Toggle Subscriber Video" tap="toggleSubscriberVideo" />
+                <Button text="Toggle Subscriber Audio" tap="toggleSubscriberAudio" />
+                <Button text="Cycle Subscriber Camera" tap="cycleSubscriberCamera" />
             </StackLayout>
-        </GridLayout>-->
+        </GridLayout>
     </StackLayout>
 </Page>

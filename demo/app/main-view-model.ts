@@ -8,11 +8,14 @@ export class OpenTokDemo extends Observable {
     private _apiKey: string = '45638092';
     private _session: any;
     session;
+    private sessionId =  '2_MX40NTYzODA5Mn5-MTQ3MTM4NDg4NDIzNH5uTXFlTHhnWGRSRFE2WTRjMkxMN3BHcG9-fg';
+    private publisherToken = 'T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9ZWZmYTU2NjdmOGQ0YzdlOWNlZWFkY2Y1MjkxMzJiNGExMzAxOTEzOTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjAwJm5vbmNlPTAuMTY4NDU0NDczODM4MjEwMSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0MDgzMTk1';
+    private subscriberToken ='T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9YjZjM2JiMTMzNTI0ZDFhMTY5MWNjZmZmYjQ4ZWU0MjcxNDM5ZmMzYTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjE4Jm5vbmNlPTAuOTgxNTUwMjM1NTM0MDg2OCZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ3NDA4MzIxNA==';
 
     constructor() {
         super();
-        this._session = new TNSOTSession(this._apiKey);
-        this._session.initSession(this.sessionId);
+       this._session = new TNSOTSession(this._apiKey);
+      this._session.initSession(this.sessionId);
     }
 
     initPublisher() {
@@ -52,40 +55,7 @@ export class OpenTokDemo extends Observable {
 
     initSubscriber() {
         this._session.connect(this.subscriberToken);
-        this._session.sessionEvents.on('sessionDidConnect', (result) => {
-            console.log('sessionConnected event');
-        });
-        this._session.sessionEvents.on('streamCreated', (data) => {
-            console.log('streamCreated event on session object');
-            this._session.subscribe(data.object.session,data.object.stream);
-        });
-        this._session.sessionEvents.on('streamDestroyed', () => {
-            console.log('streamCreated event on session object');
-        });
     }
 
-    togglePublisherVideo() {
-        this._session.publisher.toggleVideo();
-    }
-
-    togglePublisherAudio() {
-        this._session.publisher.toggleAudio();
-    }
-
-    togglePublisherCamera() {
-        this._session.publisher.toggleCameraPosition();
-    }
-
-    private get sessionId(): string {
-        return '2_MX40NTYzODA5Mn5-MTQ3MTM4NDg4NDIzNH5uTXFlTHhnWGRSRFE2WTRjMkxMN3BHcG9-fg';
-    }
-
-    private get publisherToken(): string {
-        return 'T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9ZWZmYTU2NjdmOGQ0YzdlOWNlZWFkY2Y1MjkxMzJiNGExMzAxOTEzOTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjAwJm5vbmNlPTAuMTY4NDU0NDczODM4MjEwMSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0MDgzMTk1';
-    }
-
-    private get subscriberToken(): string {
-        return 'T1==cGFydG5lcl9pZD00NTYzODA5MiZzaWc9YjZjM2JiMTMzNTI0ZDFhMTY5MWNjZmZmYjQ4ZWU0MjcxNDM5ZmMzYTpzZXNzaW9uX2lkPTJfTVg0ME5UWXpPREE1TW41LU1UUTNNVE00TkRnNE5ESXpOSDV1VFhGbFRIaG5XR1JTUkZFMldUUmpNa3hNTjNCSGNHOS1mZyZjcmVhdGVfdGltZT0xNDcxNDkxMjE4Jm5vbmNlPTAuOTgxNTUwMjM1NTM0MDg2OCZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ3NDA4MzIxNA==';
-    }
 
 }
