@@ -21,7 +21,7 @@ export class TNSOTSession extends NSObject {
     public static initWithApiKeySessionIdToken(apiKey: string, sessionId: string, token:string): TNSOTSession {
         let instance = <TNSOTSession>TNSOTSession.new();
         instance.events = new Observable();
-        instance.session = OTSession.alloc().initWithApiKeySessionIdDelegate(apiKey, sessionId, instance);
+        instance.session = OTSession.alloc().initWithApiKeySessionIdDelegate(apiKey.toString(), sessionId.toString(), instance);
         let errorRef = new interop.Reference();
         instance.session.connectWithTokenError(token, errorRef);
         if(errorRef.value) {
@@ -30,37 +30,37 @@ export class TNSOTSession extends NSObject {
         return instance;
     }
 
-    // disconnect(): void {
-    //     if(this.session) {
-    //         try {
-    //             this.session.disconnect();
-    //         } catch(error) {
-    //             console.log(error);
-    //         }
-    //     }
-    // }
+    disconnect(): void {
+        if(this.session) {
+            try {
+                this.session.disconnect();
+            } catch(error) {
+                console.log(error);
+            }
+        }
+    }
 
-    // unpublish(): void {
-    //     try {
-    //         if(this.session) {
-    //             this.session.unpublish(this._publisher);
-    //         }
-    //     }
-    //     catch(error) {
-    //         console.log(error);
-    //     }
-    // }
+    unpublish(): void {
+        try {
+            if(this.session) {
+                this.session.unpublish(this._publisher);
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
 
-    // unsubscribe(): void {
-    //     try {
-    //         if(this.session) {
-    //             this.session.unsubscribe();
-    //         }
-    //     }
-    //     catch(error) {
-    //         console.log(error);
-    //     }
-    // }
+    unsubscribe(): void {
+        try {
+            if(this.session) {
+                this.session.unsubscribe();
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
 
     set publisher(publisher) {
         this._publisher = publisher;
