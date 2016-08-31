@@ -26,22 +26,9 @@ export class TNSOTPublisher extends ContentView {
         this._ios = new OTPublisher(this._publisherKitDelegate);
     }
 
-    _createUI() {
-        this.onLoaded = () => {
-            this.connect();
-        };
-    }
-
     private connect(): void {
         if(this._apiKey && this._sessionId && this._token) {
-            this._session = new TNSOTSession(this._apiKey);
-            this._session.initSession(this._sessionId).then((result) => {
-                this._session.connect(this._token).then(() => {}, (error) => {
-                    console.log('Failed to connect to session: ' + error);
-                });
-            }, (error) => {
-                console.log('Failed to initialize session: ' + error);
-            });
+            this._session = TNSOTSession.initWithApiKeySessionIdToken(this._apiKey, this._sessionId, this._token);
             this._session.events.on('sessionDidConnect', (result) => {
                 this.publishStream(result.object);
             });
