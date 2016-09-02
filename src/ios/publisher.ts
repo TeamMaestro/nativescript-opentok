@@ -7,18 +7,15 @@ import {TNSOTSession} from './session';
 declare var OTPublisher: any,
             CGRectMake: any,
             OTPublisherKitDelegate: any,
+            OTCameraCaptureResolution: any,
+            OTCameraCaptureFrameRate: any,
             AVCaptureDevicePositionBack: any,
             AVCaptureDevicePositionFront: any;
 
 export class TNSOTPublisher extends ContentView {
 
-    private _ios: any;
+    private _ios: any = {};
     private _publisherKitDelegate: any;
-    private _session: TNSOTSession;
-
-    private _sessionId: any;
-    private _apiKey: string;
-    private _token: string;
 
     constructor() {
         super();
@@ -26,20 +23,32 @@ export class TNSOTPublisher extends ContentView {
         this._ios = new OTPublisher(this._publisherKitDelegate);
     }
 
-    private connect(): void {
-        if(this._apiKey && this._sessionId && this._token) {
-            this._session = TNSOTSession.initWithApiKeySessionIdToken(this._apiKey, this._sessionId, this._token);
-            this._session.events.on('sessionDidConnect', (result) => {
-                this.publishStream(result.object);
-            });
-        }
+    publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string): void {
+        this._ios = OTPublisher.alloc().initWithDelegateNameCameraResolutionCameraFrameRate(
+            this._publisherKitDelegate,
+            name ? name : '',
+            this.getCameraResolution(cameraResolution),
+            this.getCameraFrameRate(cameraFrameRate)
+        );
+
+        session.events.on('sessionDidConnect', (result) => {
+            this._ios.publishAudio = true;
+            try {
+                let stream: any = result.object;
+                stream.publish(this._ios);
+            } catch(error) {
+                console.log(error);
+            }
+        });
     }
 
-    private publishStream(session: any): void {
-        this._ios.publishAudio = true;
+    unpublish(session: TNSOTSession): void {
         try {
-            session.publish(this._ios);
-        } catch (error) {
+            if(session) {
+                session._ios.unpublish(this._ios);
+            }
+        }
+        catch(error) {
             console.log(error);
         }
     }
@@ -52,19 +61,34 @@ export class TNSOTPublisher extends ContentView {
         return this._ios.view;
     }
 
-    set sessionId(sessionId: string) {
-        this._sessionId = sessionId;
-        this.connect();
+    private getCameraResolution(cameraResolution: string): any {
+        if(cameraResolution) {
+            switch(cameraResolution.toString().toUpperCase()) {
+                case 'LOW':
+                    return OTCameraCaptureResolution.OTCameraCaptureResolutionLow;
+                case 'MEDIUM':
+                    return OTCameraCaptureResolution.OTCameraCaptureResolutionMedium;
+                case 'HIGH':
+                    return OTCameraCaptureResolution.OTCameraCaptureResolutionHigh;
+            }
+        }
+        return OTCameraCaptureResolution.OTCameraCaptureResolutionMedium;
     }
 
-    set api(apiKey: string) {
-        this._apiKey = apiKey;
-        this.connect();
-    }
-
-    set token(token: string) {
-        this._token = token;
-        this.connect();
+    private getCameraFrameRate(cameraFrameRate: string): any {
+        if(cameraFrameRate) {
+            switch(Number(cameraFrameRate)) {
+                case 30:
+                    return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate30FPS;
+                case 15:
+                    return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate15FPS;
+                case 7:
+                    return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate7FPS;
+                case 1:
+                    return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate1FPS;
+            }
+        }
+        return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate30FPS;
     }
 
     cycleCamera(): void {
@@ -88,13 +112,6 @@ export class TNSOTPublisher extends ContentView {
         if(this._ios) {
             this._ios.publishAudio = !this._ios.publishAudio;
         }
-    }
-
-    get session(): TNSOTSession {
-        if(this._session) {
-            this._session.publisher = this._ios;
-        }
-        return this._session;
     }
 
     get events(): Observable {
