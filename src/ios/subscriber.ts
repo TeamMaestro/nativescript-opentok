@@ -32,6 +32,10 @@ export class TNSOTSubscriber  {
         }
     }
 
+    get events(): Observable {
+        return this._subscriberKitDelegate.events;
+    }
+
 }
 
 class TNSSubscriberKitDelegateImpl extends NSObject {
