@@ -29,13 +29,6 @@ export class Demo extends Observable {
         });
     }
 
-    example() {
-        this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this._sessionId);
-        this.session.events.on('EVENT_NAME', (result) => {
-
-        });
-    }
-
     switchCamera() {
         this.publisher.cycleCamera();
     }
