@@ -15,12 +15,17 @@ declare var OTPublisher: any,
 export class TNSOTPublisher extends ContentView {
 
     private _ios: any = {};
+    private _view: UIView;
     private _publisherKitDelegate: any;
 
     constructor() {
         super();
         this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
-        this._ios = new OTPublisher(this._publisherKitDelegate);
+    }
+
+    onLoaded() {
+        super.onLoaded();
+        UIView.alloc().initWithFrame(CGRectMake(0, 0, this.width, this.height));
     }
 
     publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string): void {
@@ -30,6 +35,8 @@ export class TNSOTPublisher extends ContentView {
             this.getCameraResolution(cameraResolution),
             this.getCameraFrameRate(cameraFrameRate)
         );
+        this._ios.view.frame = CGRectMake(0, 0, this.width, this.height);
+        this._view.addSubview(this._ios.view);
 
         session.events.on('sessionDidConnect', (result) => {
             this._ios.publishAudio = true;
@@ -64,7 +71,7 @@ export class TNSOTPublisher extends ContentView {
     }
 
     get _nativeView(): any {
-        return this._ios.view;
+        return this._view;
     }
 
     private setIdleTimer(idleTimerDisabled: boolean) {
@@ -167,7 +174,6 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
-        topmost().currentPage.ios.view.removeFromSuperview(publisher.view);
     }
 
     public publisherDidFailWithError(publisher: any, error: any) {
