@@ -13,48 +13,40 @@ export class TNSOTSession extends NSObject {
     public static ObjCProtocols = [OTSessionDelegate];
 
     public subscriber: TNSOTSubscriber;
-    public events: Observable;
-    public session: any;
+    public _ios: any;
 
+    private _events: Observable;
     private _publisher: TNSOTPublisher;
 
-    public static initWithApiKeySessionIdToken(apiKey: string, sessionId: string, token:string): TNSOTSession {
+    public static initWithApiKeySessionId(apiKey: string, sessionId: string): TNSOTSession {
         let instance = <TNSOTSession>TNSOTSession.new();
-        instance.events = new Observable();
-        instance.session = OTSession.alloc().initWithApiKeySessionIdDelegate(apiKey.toString(), sessionId.toString(), instance);
-        let errorRef = new interop.Reference();
-        instance.session.connectWithTokenError(token, errorRef);
-        if(errorRef.value) {
-            console.log(errorRef.value);
-        }
+        instance._events = new Observable();
+        instance._ios = OTSession.alloc().initWithApiKeySessionIdDelegate(apiKey.toString(), sessionId.toString(), instance);
         return instance;
     }
 
+    connect(token: string): void {
+        let errorRef = new interop.Reference();
+        this._ios.connectWithTokenError(token, errorRef);
+        if(errorRef.value) {
+            console.log(errorRef.value);
+        }
+    }
+
     disconnect(): void {
-        if(this.session) {
+        if(this._ios) {
             try {
-                this.session.disconnect();
+                this._ios.disconnect();
             } catch(error) {
                 console.log(error);
             }
         }
     }
 
-    unpublish(): void {
-        try {
-            if(this.session) {
-                this.session.unpublish(this._publisher);
-            }
-        }
-        catch(error) {
-            console.log(error);
-        }
-    }
-
     unsubscribe(): void {
         try {
-            if(this.session) {
-                this.session.unsubscribe();
+            if(this._ios) {
+                this._ios.unsubscribe();
             }
         }
         catch(error) {
@@ -62,8 +54,8 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    set publisher(publisher) {
-        this._publisher = publisher;
+    get events(): Observable {
+        return this._events;
     }
 
     public sessionDidConnect(session: any) {

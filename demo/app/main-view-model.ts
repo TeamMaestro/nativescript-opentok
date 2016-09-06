@@ -3,20 +3,30 @@ import {Observable, EventData} from 'data/observable';
 import {isAndroid, isIOS} from 'platform';
 import {Page} from 'ui/page';
 
-import {TNSOTPublisher} from 'nativescript-opentok';
+import {TNSOTSession, TNSOTPublisher} from 'nativescript-opentok';
 
 export class Demo extends Observable {
 
-    public api:string = '45644202';
+    public _apiKey:string = '45644202';
     public sessionId: string = '1_MX40NTY0NDIwMn5-MTQ3MjIyNzU3NTAwM35FczFWMHdVekNxeXNabWRSTUdIUkpjRmR-fg';
-    public publisherToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9NTkwNmVhZWZjNDMzNWRlNDY5ZTZmZTkwMjg0Yjk0ODJlZmE4NjFjODpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjI3NTg4Jm5vbmNlPTAuNzY3MTczMTA0Njg2NjYyNiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODE5NTg3';
-    public publisherToken2: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9YTM5NTVmODVmYWU0NjkwNThiN2YzMjU3YzM0ZmI4YTYwNTg2YjU0MjpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyMjQyNDgwJm5vbmNlPTAuMjU5ODA5NDU5MzI2Nzg4OCZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDc0ODM0NDgw';
+    public publisherToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9ODMwYzUyMTEwMjk5ODQ1OGQ3YmJlOWY1MDFhOGU2MGQwZGQyMmQyYjpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyODQ4NDk1Jm5vbmNlPTAuNjYyMzAzOTA2MTY2OTI2JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE0NzU0NDA0OTU=';
 
-    private publisher: any;
+    private publisher: TNSOTPublisher;
+    private session:TNSOTSession;
 
     constructor(private page: Page) {
         super();
-        this.publisher = this.page.getViewById('publisher');
+        this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this.sessionId);
+        this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
+        this.initPublisher();
+    }
+
+    initPublisher() {
+        this.session.connect(this.publisherToken);
+        this.publisher.publish(this.session, '', 'HIGH', '30');
+        this.publisher.events.on('streamDestroyed', (result) => {
+            console.log('publisher stream destroyed');
+        });
     }
 
     switchCamera() {
@@ -32,8 +42,7 @@ export class Demo extends Observable {
     }
 
     unpublish() {
-        this.publisher.session.unpublish();
-        console.log('unpublish');
+        this.publisher.unpublish(this.session);
     }
 
 }
