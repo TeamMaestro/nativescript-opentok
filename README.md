@@ -61,6 +61,7 @@ initPublisher() {
 ### Special Articles
 - [Overlay UI on the Video Stream](https://github.com/sean-perkins/nativescript-opentok/wiki/Overlay-UI-on-Video-Stream)
 - [Angular 2 Integration Guide](https://github.com/sean-perkins/nativescript-opentok/wiki/Angular-2-Integration-Guide)
+- [Controlling Resolution and FPS](https://github.com/sean-perkins/nativescript-opentok/wiki/Controlling-Frame-Rate-and-Resolution)
 
 ### Images
 |iPhone|iPad|
