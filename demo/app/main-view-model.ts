@@ -24,6 +24,9 @@ export class Demo extends Observable {
     initPublisher() {
         this.session.connect(this.publisherToken);
         this.publisher.publish(this.session, '', 'HIGH', '30');
+        this.publisher.events.on('streamDestroyed', (result) => {
+            console.log('publisher stream destroyed');
+        });
     }
 
     switchCamera() {

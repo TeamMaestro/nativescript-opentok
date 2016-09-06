@@ -5,7 +5,7 @@ import {ContentView} from 'ui/content-view'
 import {TNSOTSession} from './session';
 
 declare var OTPublisher: any,
-            CGRectMake: any,
+            interop: any,
             OTPublisherKitDelegate: any,
             OTCameraCaptureResolution: any,
             OTCameraCaptureFrameRate: any,
@@ -35,6 +35,7 @@ export class TNSOTPublisher extends ContentView {
             this._ios.publishAudio = true;
             try {
                 let stream: any = result.object;
+                this.setIdleTimer(true);
                 stream.publish(this._ios);
             } catch(error) {
                 console.log(error);
@@ -45,7 +46,12 @@ export class TNSOTPublisher extends ContentView {
     unpublish(session: TNSOTSession): void {
         try {
             if(session) {
-                session._ios.unpublish(this._ios);
+                let errorRef = new interop.Reference();
+                this.setIdleTimer(false);
+                session._ios.unpublishError(this._ios, errorRef);
+                if(errorRef.value) {
+                    console.log(errorRef.value);
+                }
             }
         }
         catch(error) {
@@ -59,6 +65,11 @@ export class TNSOTPublisher extends ContentView {
 
     get _nativeView(): any {
         return this._ios.view;
+    }
+
+    private setIdleTimer(idleTimerDisabled: boolean) {
+        let app = UIApplication.sharedApplication();
+        app.idleTimerDisabled = idleTimerDisabled;
     }
 
     private getCameraResolution(cameraResolution: string): any {
