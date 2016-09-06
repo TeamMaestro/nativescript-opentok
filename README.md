@@ -26,11 +26,37 @@ Node Package Manager (NPM)
 ##### View
 You will first need to import the custom element into the {N} xml view. This can be accomplished by adding this snippet: `xmlns:OT="nativescript-opentok"` to your existing `Page` element tag.
 
-The basic integration example would include the following declarations for publisher and subscriber. Notice subscriber is any element with `id="subscriber"`. You will need to provide a valid sessionId, api (key) and token to the publisher element.
+The basic integration example would include the following declarations for publisher and subscriber. Notice subscriber is any element with `id="subscriber"`.
 ```
 <StackLayout id="subscriber" width="100%" height="100%"></StackLayout>
-<OT:TNSOTPublisher id="publisher" sessionId="{{ sessionId }}" api="{{ api }}" token="{{ publisherToken }}" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></OT:TNSOTPublisher>
+<OT:TNSOTPublisher id="publisher" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></OT:TNSOTPublisher>
  ```
+ 
+ Next in your page's binding context (a controller, view model, etc.), you will need to import and hook to the OpenTok implementation. 
+ 
+ ```
+import {TNSOTPublisher, TNSOTSession} from 'nativescript-opentok';
+ 
+public _apiKey:string = 'API_KEY';
+public sessionId: string = 'SESSION_ID';
+public publisherToken: string = 'TOKEN';
+
+private publisher: TNSOTPublisher;
+private session:TNSOTSession;
+ 
+constructor(private page: Page) {
+    super();
+    this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this.sessionId);
+    this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
+    this.initPublisher();
+}
+
+initPublisher() {
+    this.session.connect(this.publisherToken);
+    this.publisher.publish(this.session);
+}
+ ```
+ 
 
 ### Special Articles
 - [Overlay UI on the Video Stream](https://github.com/sean-perkins/nativescript-opentok/wiki/Overlay-UI-on-Video-Stream)
