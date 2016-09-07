@@ -2,5 +2,6 @@ demo/
 *.png
 *.log
 *.map
-*.ts
+/*.android.ts
+/*.ios.ts
 !.d.ts
