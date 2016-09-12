@@ -55,4 +55,12 @@ export class Demo extends Observable {
         this.publisher.unpublish(this.session);
     }
 
+    unsubscribe() {
+        this.subscriber.unsubscribe(this.session);
+    }
+
+    disconnect() {
+        this.session.disconnect();
+    }
+
 }

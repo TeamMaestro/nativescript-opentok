@@ -36,7 +36,7 @@ export class TNSOTSession extends NSObject {
         if(this._ios) {
             try {
                 let errorRef = new interop.Reference();
-                this._ios.disconnectError(errorRef);
+                this._ios.disconnect(errorRef);
                 if(errorRef.value) {
                     console.log(errorRef.value);
                 }
@@ -115,10 +115,7 @@ export class TNSOTSession extends NSObject {
                 })
             });
         }
-        console.log('set stream to: ' + this._stream);
         this._stream = stream;
-        // this.subscriber = new TNSOTSubscriber();
-        // this.subscriber.subscribe(session, stream);
     }
 
     public sessionStreamDestroyed(session: any, stream: any) {

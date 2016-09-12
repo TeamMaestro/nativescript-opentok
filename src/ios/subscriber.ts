@@ -35,6 +35,18 @@ export class TNSOTSubscriber extends ContentView {
         }
     }
 
+    unsubscribe(session: any) {
+        try {
+            let errorRef = new interop.Reference();
+            session._ios.unsubscribeError(this._ios, errorRef);
+            if(errorRef.value) {
+                console.log(errorRef.value);
+            }
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
     get events(): Observable {
         return this._subscriberKitDelegate.events;
     }
