@@ -3,7 +3,7 @@ import {Observable, EventData} from 'data/observable';
 import {isAndroid, isIOS} from 'platform';
 import {Page} from 'ui/page';
 
-import {TNSOTSession, TNSOTPublisher} from 'nativescript-opentok';
+import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opentok';
 
 export class Demo extends Observable {
 
