@@ -1,10 +1,12 @@
 *.js
 *.js.map
-*.log
+node_modules
 .idea
 demo/app/*.js
 demo/*.d.ts
 demo/platforms
 demo/node_modules
 demo/lib/ios
-node_modules
+*.log
+*.d.ts
+!opentok.d.ts

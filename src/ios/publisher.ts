@@ -21,11 +21,7 @@ export class TNSOTPublisher extends ContentView {
     constructor() {
         super();
         this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
-    }
-
-    onLoaded() {
-        super.onLoaded();
-        UIView.alloc().initWithFrame(CGRectMake(0, 0, this.width, this.height));
+        this._view = UIView.alloc().init();
     }
 
     publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string): void {
@@ -36,6 +32,7 @@ export class TNSOTPublisher extends ContentView {
             this.getCameraFrameRate(cameraFrameRate)
         );
         this._ios.view.frame = CGRectMake(0, 0, this.width, this.height);
+        // this._view.frame = CGRectMake(this.originX, this.originY, this.width, this.height);
         this._view.addSubview(this._ios.view);
 
         session.events.on('sessionDidConnect', (result) => {

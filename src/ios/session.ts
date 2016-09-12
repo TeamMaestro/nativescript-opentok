@@ -12,11 +12,10 @@ export class TNSOTSession extends NSObject {
 
     public static ObjCProtocols = [OTSessionDelegate];
 
-    public subscriber: TNSOTSubscriber;
     public _ios: any;
 
+    private _stream: any;
     private _events: Observable;
-    private _publisher: TNSOTPublisher;
 
     public static initWithApiKeySessionId(apiKey: string, sessionId: string): TNSOTSession {
         let instance = <TNSOTSession>TNSOTSession.new();
@@ -36,17 +35,25 @@ export class TNSOTSession extends NSObject {
     disconnect(): void {
         if(this._ios) {
             try {
-                this._ios.disconnect();
+                let errorRef = new interop.Reference();
+                this._ios.disconnectError(errorRef);
+                if(errorRef.value) {
+                    console.log(errorRef.value);
+                }
             } catch(error) {
                 console.log(error);
             }
         }
     }
 
-    unsubscribe(): void {
+    unsubscribe(subscriber: any): void {
         try {
             if(this._ios) {
-                this._ios.unsubscribe();
+                let errorRef = new interop.Reference();
+                this._ios.unsubscribe(subscriber, errorRef);
+                if(errorRef.value) {
+                    console.log(errorRef.value);
+                }
             }
         }
         catch(error) {
@@ -56,6 +63,10 @@ export class TNSOTSession extends NSObject {
 
     get events(): Observable {
         return this._events;
+    }
+
+    get stream(): any {
+        return this._stream;
     }
 
     public sessionDidConnect(session: any) {
@@ -104,8 +115,10 @@ export class TNSOTSession extends NSObject {
                 })
             });
         }
-        this.subscriber = new TNSOTSubscriber();
-        this.subscriber.subscribe(session, stream);
+        console.log('set stream to: ' + this._stream);
+        this._stream = stream;
+        // this.subscriber = new TNSOTSubscriber();
+        // this.subscriber.subscribe(session, stream);
     }
 
     public sessionStreamDestroyed(session: any, stream: any) {

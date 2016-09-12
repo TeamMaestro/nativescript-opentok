@@ -1,7 +1,6 @@
-demo/
+demo
 *.png
+*.jpg
 *.log
-*.map
-/*.android.ts
-/*.ios.ts
-!.d.ts
+*.ts
+!*.d.ts

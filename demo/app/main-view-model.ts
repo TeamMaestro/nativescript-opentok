@@ -12,13 +12,17 @@ export class Demo extends Observable {
     private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTY0NDIwMiZzaWc9ODMwYzUyMTEwMjk5ODQ1OGQ3YmJlOWY1MDFhOGU2MGQwZGQyMmQyYjpzZXNzaW9uX2lkPTFfTVg0ME5UWTBOREl3TW41LU1UUTNNakl5TnpVM05UQXdNMzVGY3pGV01IZFZla054ZVhOYWJXUlNUVWRJVWtwalJtUi1mZyZjcmVhdGVfdGltZT0xNDcyODQ4NDk1Jm5vbmNlPTAuNjYyMzAzOTA2MTY2OTI2JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE0NzU0NDA0OTU=';
 
     private publisher: TNSOTPublisher;
+    private subscriber: TNSOTSubscriber;
+
     private session: TNSOTSession;
 
     constructor(private page: Page) {
         super();
         this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this._sessionId);
         this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
+        this.subscriber = <TNSOTSubscriber> this.page.getViewById('subscriber');
         this.initPublisher();
+        this.initSubscriber();
     }
 
     initPublisher() {
@@ -26,6 +30,12 @@ export class Demo extends Observable {
         this.publisher.publish(this.session, '', 'HIGH', '30');
         this.publisher.events.on('streamDestroyed', (result) => {
             console.log('publisher stream destroyed');
+        });
+    }
+
+    initSubscriber() {
+        this.session.events.on('streamCreated', () => {
+            this.subscriber.subscribe(this.session);
         });
     }
 

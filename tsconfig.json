@@ -4,7 +4,11 @@
         "module": "commonjs",
         "removeComments": true,
         "experimentalDecorators": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "declaration": true,
+        "noEmitOnError": false,
+        "noEmitHelpers": true,
+        "noImplicitUseStrict": true
     },
     "files": [
       "node_modules/tns-core-modules/tns-core-modules.d.ts",
