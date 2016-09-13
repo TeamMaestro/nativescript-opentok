@@ -3,7 +3,7 @@
     xmlns:OT="nativescript-opentok" loaded="pageLoaded">
     <GridLayout rows="*,auto,auto">
         <GridLayout>
-            <StackLayout id="subscriber" width="100%" height="100%"></StackLayout>
+            <OT:TNSOTSubscriber id="subscriber" width="100%" height="100%"></OT:TNSOTSubscriber>
             <OT:TNSOTPublisher id="publisher" verticalAlignment="top" horizontalAlignment="right" margin="10" width="200" height="200"></OT:TNSOTPublisher>
         </GridLayout>
 
@@ -13,6 +13,8 @@
                 <Button text="Toggle Camera" tap="{{ toggleVideo }}" />
                 <Button text="Toggle Mute" tap="{{ toggleMute }}" />
                 <Button text="Stop Publishing" tap="{{ unpublish }}" />
+                <Button text="Stop Subscribing" tap="{{ unsubscribe }}" />
+                <Button text="Disconnect" tap="{{ disconnect }}" />
             </StackLayout>
         </StackLayout>
     </GridLayout>

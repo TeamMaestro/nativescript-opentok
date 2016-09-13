@@ -6,34 +6,57 @@ import {TNSOTSession} from './session';
 import {TNSOTPublisher} from './publisher';
 
 declare var OTSubscriber: any,
-            OTSubscriberKitDelegate: any;
+            OTStream: any,
+            OTSubscriberKitDelegate: any,
+            interop: any;
 
-export class TNSOTSubscriber  {
+export class TNSOTSubscriber extends ContentView {
 
     private _subscriberKitDelegate: any;
-    private _subscriber: any;
-
-    private _session: any;
+    private _ios: any;
+    private _view: UIView;
 
     constructor() {
+        super();
         this._subscriberKitDelegate = TNSSubscriberKitDelegateImpl.initWithOwner(new WeakRef(this));
+        this._view = UIView.alloc().init();
     }
 
-    subscribe(session: any, stream: any) {
-        this._subscriber = new OTSubscriber(stream, this._subscriberKitDelegate);
-        session.subscribe(this._subscriber);
+    subscribe(session: any) {
+        if(session.stream) {
+            this._ios = new OTSubscriber(session.stream, this._subscriberKitDelegate);
+            this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
+            this._view.addSubview(this._ios.view);
+            let errorRef = new interop.Reference();
+            session._ios.subscribeError(this._ios, errorRef);
+            if(errorRef.value) {
+                console.log(errorRef.value);
+            }
+        }
     }
 
-    addSubscriberToView(subscriber: any) {
-        let view = topmost().currentPage.getViewById('subscriber');
-        if(view) {
-            this._subscriber.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
-            view.ios.addSubview(this._subscriber.view);
+    unsubscribe(session: any) {
+        try {
+            let errorRef = new interop.Reference();
+            session._ios.unsubscribeError(this._ios, errorRef);
+            if(errorRef.value) {
+                console.log(errorRef.value);
+            }
+        } catch(error) {
+            console.log(error);
         }
     }
 
     get events(): Observable {
         return this._subscriberKitDelegate.events;
+    }
+
+    get ios(): any {
+        return this._ios;
+    }
+
+    get _nativeView(): any {
+        return this._view;
     }
 
 }
@@ -53,7 +76,6 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
     }
 
     subscriberDidFailWithError(subscriber: any, error: any) {
-        console.log('subscriberDidFailWithError');
         if(this._events) {
             this._events.notify({
                 eventName: 'didFailWithError',
@@ -63,6 +85,7 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
                 })
             });
         }
+        console.log(error);
     }
 
     subscriberDidConnectToStream(subscriber) {
@@ -75,8 +98,6 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
                 })
             });
         }
-        let owner = this._owner.get();
-        owner.addSubscriberToView(subscriber);
     }
 
     subscriberDidDisconnectFromStream(subscriber: any) {
