@@ -35,28 +35,41 @@ The basic integration example would include the following declarations for publi
  Next in your page's binding context (a controller, view model, etc.), you will need to import and hook to the OpenTok implementation. 
  
  ```
-import {TNSOTPublisher, TNSOTSession} from 'nativescript-opentok';
- 
-public _apiKey:string = 'API_KEY';
-public sessionId: string = 'SESSION_ID';
-public publisherToken: string = 'TOKEN';
+import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opentok';
+
+private _apiKey:string = 'API_KEY';
+private _sessionId: string = 'SESSION_ID';
+private _token: string = 'TOKEN';
 
 private publisher: TNSOTPublisher;
-private session:TNSOTSession;
- 
+private subscriber: TNSOTSubscriber;
+
+private session: TNSOTSession;
+
 constructor(private page: Page) {
     super();
-    this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this.sessionId);
+    this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this._sessionId);
     this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
+    this.subscriber = <TNSOTSubscriber> this.page.getViewById('subscriber');
     this.initPublisher();
+    this.initSubscriber();
 }
 
 initPublisher() {
-    this.session.connect(this.publisherToken);
-    this.publisher.publish(this.session);
+    this.session.connect(this._token);
+    this.publisher.publish(this.session, '', 'HIGH', '30');
+    this.publisher.events.on('streamDestroyed', (result) => {
+        console.log('publisher stream destroyed');
+    });
 }
- ```
- 
+
+initSubscriber() {
+    this.session.events.on('streamCreated', () => {
+        this.subscriber.subscribe(this.session);
+    });
+}
+```
+
 
 ### Special Articles
 - [Overlay UI on the Video Stream](https://github.com/sean-perkins/nativescript-opentok/wiki/Overlay-UI-on-Video-Stream)
