@@ -22,16 +22,14 @@ export class TNSOTSubscriber extends ContentView {
         this._view = UIView.alloc().init();
     }
 
-    subscribe(session: any) {
-        if(session.stream) {
-            this._ios = new OTSubscriber(session.stream, this._subscriberKitDelegate);
-            this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
-            this._view.addSubview(this._ios.view);
-            let errorRef = new interop.Reference();
-            session._ios.subscribeError(this._ios, errorRef);
-            if(errorRef.value) {
-                console.log(errorRef.value);
-            }
+    subscribe(session: any, stream: any) {
+        this._ios = new OTSubscriber(stream, this._subscriberKitDelegate);
+        this._ios.view.frame = CGRectMake(0, 0, screen.mainScreen.widthDIPs, screen.mainScreen.heightDIPs);
+        this._view.addSubview(this._ios.view);
+        let errorRef = new interop.Reference();
+        session.subscribeError(this._ios, errorRef);
+        if(errorRef.value) {
+            console.log(errorRef.value);
         }
     }
 

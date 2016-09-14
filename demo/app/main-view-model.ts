@@ -21,22 +21,12 @@ export class Demo extends Observable {
         this.session = TNSOTSession.initWithApiKeySessionId(this._apiKey, this._sessionId);
         this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
         this.subscriber = <TNSOTSubscriber> this.page.getViewById('subscriber');
-        this.initPublisher();
-        this.initSubscriber();
+        this.session.subscriber = this.subscriber;
     }
 
-    initPublisher() {
+    publish() {
         this.session.connect(this._publisherToken);
         this.publisher.publish(this.session, '', 'HIGH', '30');
-        this.publisher.events.on('streamDestroyed', (result) => {
-            console.log('publisher stream destroyed');
-        });
-    }
-
-    initSubscriber() {
-        this.session.events.on('streamCreated', () => {
-            this.subscriber.subscribe(this.session);
-        });
     }
 
     switchCamera() {

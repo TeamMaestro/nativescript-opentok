@@ -14,8 +14,8 @@ export class TNSOTSession extends NSObject {
 
     public _ios: any;
 
-    private _stream: any;
     private _events: Observable;
+    private _subscriber: TNSOTSubscriber;
 
     public static initWithApiKeySessionId(apiKey: string, sessionId: string): TNSOTSession {
         let instance = <TNSOTSession>TNSOTSession.new();
@@ -61,12 +61,12 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    get events(): Observable {
-        return this._events;
+    set subscriber(subscriber) {
+        this._subscriber = subscriber;
     }
 
-    get stream(): any {
-        return this._stream;
+    get events(): Observable {
+        return this._events;
     }
 
     public sessionDidConnect(session: any) {
@@ -115,7 +115,9 @@ export class TNSOTSession extends NSObject {
                 })
             });
         }
-        this._stream = stream;
+        if(this._subscriber) {
+            this._subscriber.subscribe(session, stream);
+        }
     }
 
     public sessionStreamDestroyed(session: any, stream: any) {
