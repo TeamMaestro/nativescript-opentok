@@ -1,7 +1,7 @@
 import * as  utils from "utils/utils";
 import * as app from 'application';
-import { ContentView } from 'ui/content-view'
-import { Observable } from "data/observable";
+import {ContentView} from 'ui/content-view'
+import {Observable} from "data/observable";
 import {TNSOTSession} from "./session";
 declare var com: any, android: any;
 const CameraListener = com.opentok.android.Publisher.CameraListener;
@@ -37,7 +37,7 @@ export class TNSOTPublisher extends ContentView {
         this._android = new android.widget.LinearLayout(this._context);
     }
 
-    publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string){
+    publish(session: TNSOTSession, name?: string, cameraResolution?: string, cameraFrameRate?: string) {
         const that = new WeakRef(this);
         this._publisher = new com.opentok.android.Publisher(
             utils.ad.getApplicationContext(),
@@ -108,16 +108,16 @@ export class TNSOTPublisher extends ContentView {
             try {
                 let stream: any = result.object;
                 session.session.publish(this._publisher);
-            } catch(error) {
+            } catch (error) {
                 console.log(error);
             }
         });
 
     }
 
-    getCameraResolution(cameraResolution){
-        if(cameraResolution) {
-            switch(cameraResolution.toString().toUpperCase()) {
+    getCameraResolution(cameraResolution) {
+        if (cameraResolution) {
+            switch (cameraResolution.toString().toUpperCase()) {
                 case 'LOW':
                     return com.opentok.android.Publisher.CameraCaptureResolution.LOW;
                 case 'MEDIUM':
@@ -128,10 +128,10 @@ export class TNSOTPublisher extends ContentView {
         }
         return com.opentok.android.Publisher.CameraCaptureResolution.MEDIUM;
     }
-    
-    getCameraFrameRate(cameraFrameRate){
-        if(cameraFrameRate) {
-            switch(Number(cameraFrameRate)) {
+
+    getCameraFrameRate(cameraFrameRate) {
+        if (cameraFrameRate) {
+            switch (Number(cameraFrameRate)) {
                 case 30:
                     return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_30;
                 case 15:
@@ -144,6 +144,7 @@ export class TNSOTPublisher extends ContentView {
         }
         return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_30;
     }
+
     get render_style() {
         return this._render_style;
     }
@@ -156,6 +157,9 @@ export class TNSOTPublisher extends ContentView {
             case 'fill':
                 this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
                 break;
+            case 'scale':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
+                break;
             default:
                 this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
                 break;
@@ -166,7 +170,7 @@ export class TNSOTPublisher extends ContentView {
         return this._publisher;
     }
 
-    toggleCamera(){
+    toggleCamera() {
         this.publishVideo = !this.publishVideo;
     }
 
@@ -178,17 +182,19 @@ export class TNSOTPublisher extends ContentView {
         this.publishAudio = !this.publishAudio;
     }
 
-    get publishVideo():boolean{
+    get publishVideo(): boolean {
         return this._publisher.getPublishVideo();
     }
-    set publishVideo(state:boolean){
+
+    set publishVideo(state: boolean) {
         this._publisher.setPublishVideo(state);
     }
 
-    get publishAudio():boolean{
+    get publishAudio(): boolean {
         return this._publisher.getPublishAudio();
     }
-    set publishAudio(state:boolean){
+
+    set publishAudio(state: boolean) {
         this._publisher.setPublishAudio(state);
     }
 
@@ -199,7 +205,8 @@ export class TNSOTPublisher extends ContentView {
     instance() {
         return this._publisher;
     }
-    unpublish(session: TNSOTSession){
+
+    unpublish(session: TNSOTSession) {
         session.session.unpublish(this._publisher);
     }
 
