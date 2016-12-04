@@ -34,11 +34,11 @@ export class Demo extends Observable {
     }
 
     toggleVideo() {
-        this.publisher.ios.publishVideo = !this.publisher.ios.publishVideo;
+        this.publisher.toggleCamera()
     }
 
     toggleMute() {
-        this.publisher.ios.publishAudio = !this.publisher.ios.publishAudio;
+        this.publisher.toggleMute();
     }
 
     unpublish() {
