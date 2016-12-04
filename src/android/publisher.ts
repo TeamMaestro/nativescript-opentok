@@ -1,7 +1,8 @@
-
+import * as  utils from "utils/utils";
 import * as app from 'application';
 import { ContentView } from 'ui/content-view'
 import { Observable } from "data/observable";
+import {TNSOTSession} from "./session";
 declare var com: any, android: any;
 const CameraListener = com.opentok.android.Publisher.CameraListener;
 const PublisherListener = com.opentok.android.PublisherKit.PublisherListener;
@@ -33,8 +34,17 @@ export class TNSOTPublisher extends ContentView {
     }
 
     _createUI() {
+        this._android = new android.widget.LinearLayout(this._context);
+    }
+
+    publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string){
         const that = new WeakRef(this);
-        this._publisher = new com.opentok.android.Publisher(app.android.foregroundActivity);
+        this._publisher = new com.opentok.android.Publisher(
+            utils.ad.getApplicationContext(),
+            name ? name : '',
+            this.getCameraResolution(cameraResolution),
+            this.getCameraFrameRate(cameraFrameRate)
+        );
         this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
         this._publisher.setPublisherListener(new PublisherListener({
             owner: that.get(),
@@ -93,11 +103,47 @@ export class TNSOTPublisher extends ContentView {
             }
         }));
         let pub = this._publisher.getView();
-        this._android = new android.widget.LinearLayout(this._context);
         this._android.addView(pub);
+        session.events.on('sessionDidConnect', (result) => {
+            try {
+                let stream: any = result.object;
+                session.session.publish(this._publisher);
+            } catch(error) {
+                console.log(error);
+            }
+        });
 
     }
 
+    getCameraResolution(cameraResolution){
+        if(cameraResolution) {
+            switch(cameraResolution.toString().toUpperCase()) {
+                case 'LOW':
+                    return com.opentok.android.Publisher.CameraCaptureResolution.LOW;
+                case 'MEDIUM':
+                    return com.opentok.android.Publisher.CameraCaptureResolution.MEDIUM;
+                case 'HIGH':
+                    return com.opentok.android.Publisher.CameraCaptureResolution.HIGH;
+            }
+        }
+        return com.opentok.android.Publisher.CameraCaptureResolution.MEDIUM;
+    }
+    
+    getCameraFrameRate(cameraFrameRate){
+        if(cameraFrameRate) {
+            switch(Number(cameraFrameRate)) {
+                case 30:
+                    return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_30;
+                case 15:
+                    return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_15;
+                case 7:
+                    return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_7;
+                case 1:
+                    return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_1;
+            }
+        }
+        return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_30;
+    }
     get render_style() {
         return this._render_style;
     }
@@ -120,29 +166,29 @@ export class TNSOTPublisher extends ContentView {
         return this._publisher;
     }
 
+    toggleCamera(){
+        this.publishVideo = !this.publishVideo;
+    }
+
     toggleVideo() {
-        let _isEnabled = this._publisher.getPublishVideo();
-        if (_isEnabled) {
-            this.setVideoActive(false);
-        } else {
-            this.setVideoActive(true);
-        }
+        this.publishVideo = !this.publishVideo;
     }
 
-    toggleAudio() {
-        let _isEnabled = this._publisher.getPublishAudio();
-        if (_isEnabled) {
-            this.setAudioActive(false);
-        } else {
-            this.setAudioActive(true);
-        }
+    toggleMute() {
+        this.publishAudio = !this.publishAudio;
     }
 
-    setVideoActive(state: boolean) {
+    get publishVideo():boolean{
+        return this._publisher.getPublishVideo();
+    }
+    set publishVideo(state:boolean){
         this._publisher.setPublishVideo(state);
     }
 
-    setAudioActive(state: boolean) {
+    get publishAudio():boolean{
+        return this._publisher.getPublishAudio();
+    }
+    set publishAudio(state:boolean){
         this._publisher.setPublishAudio(state);
     }
 
@@ -152,6 +198,9 @@ export class TNSOTPublisher extends ContentView {
 
     instance() {
         return this._publisher;
+    }
+    unpublish(session: TNSOTSession){
+        session.session.unpublish(this._publisher);
     }
 
 }
