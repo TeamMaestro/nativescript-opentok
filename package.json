@@ -6,8 +6,8 @@
   "typings": "./opentok.d.ts",
   "nativescript": {
     "platforms": {
-      "android": "2.1.1",
-      "ios": "2.1.1"
+      "android": "2.4.0",
+      "ios": "2.4.0"
     }
   },
   "scripts": {
@@ -45,9 +45,11 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "es6-promise": "^3.2.1",
-    "tns-core-modules": "^2.2.1",
-    "tns-platform-declarations": "^2.2.0",
-    "typescript": "^1.8.10",
+    "tns-core-modules": "^2.3.0",
+    "tns-platform-declarations": "^2.3.0",
+    "typescript": "^2.0.7",
+    "prompt": "^1.0.0",
+    "rimraf": "^2.5.0",
     "@types/es6-promise": "0.0.28"
   },
   "dependencies": {

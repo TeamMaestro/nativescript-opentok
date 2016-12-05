@@ -31,9 +31,9 @@ The basic integration example would include the following declarations for publi
 <StackLayout id="subscriber" width="100%" height="100%"></StackLayout>
 <OT:TNSOTPublisher id="publisher" verticalAlignment="top" horizontalAlignment="right" margin="10" width="100" height="100"></OT:TNSOTPublisher>
  ```
- 
- Next in your page's binding context (a controller, view model, etc.), you will need to import and hook to the OpenTok implementation. 
- 
+
+ Next in your page's binding context (a controller, view model, etc.), you will need to import and hook to the OpenTok implementation.
+
  ```
 import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opentok';
 
