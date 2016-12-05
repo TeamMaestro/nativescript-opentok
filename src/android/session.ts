@@ -230,17 +230,6 @@ export class TNSOTSession {
         this.session.subscribe(subInstance);
     }
 
-    public unsubscribe(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            try {
-                this.session.unsubscribe(this.subscriber);
-                resolve();
-            } catch (err) {
-                reject(err);
-            }
-        });
-    }
-
     get sessionEvents(): Observable {
         return this._sessionEvents;
     }

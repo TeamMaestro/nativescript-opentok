@@ -1,5 +1,6 @@
 import {Observable} from "data/observable";
 import {ContentView} from 'ui/content-view';
+import {TNSOTSession} from "./session";
 declare var com: any, android: any;
 const StreamListener = com.opentok.android.SubscriberKit.StreamListener;
 const SubscriberListener = com.opentok.android.SubscriberKit.SubscriberListener;
@@ -109,6 +110,12 @@ export class TNSOTSubscriber extends ContentView {
 
     setAudioActive(state: boolean) {
         this._subscriber.setSubscribeToAudio(state);
+    }
+
+    unsubscribe(session: TNSOTSession) {
+        if(this._subscriber) {
+            session.session.unsubscribe(this._subscriber);
+        }
     }
 
 

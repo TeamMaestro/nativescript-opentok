@@ -1,11 +1,11 @@
 {
   "nativescript": {
     "id": "com.mobileagility.opentok",
-    "tns-android": {
-      "version": "2.4.1"
-    },
     "tns-ios": {
       "version": "2.4.0"
+    },
+    "tns-android": {
+      "version": "2.4.1"
     }
   },
   "dependencies": {
