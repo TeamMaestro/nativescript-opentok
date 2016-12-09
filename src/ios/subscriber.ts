@@ -8,7 +8,8 @@ import {TNSOTPublisher} from './publisher';
 declare var OTSubscriber: any,
             OTStream: any,
             OTSubscriberKitDelegate: any,
-            interop: any;
+            interop: any,
+            CGRectMake: any;
 
 export class TNSOTSubscriber extends ContentView {
 
