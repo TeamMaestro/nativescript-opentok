@@ -30,37 +30,20 @@ export class TNSOTSession {
     private _sessionEvents: Observable;
     private options: any;
 
-    /*
-     constructor(apiKey: string, config: any, options?: any) {
-     this.apiKey = apiKey;
-     this.config = config;
-     this._sessionEvents = new Observable();
-     this.options = options;
-     /*if (currentapiVersion >= MARSHMALLOW) {
 
-     const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.MODIFY_AUDIO_SETTINGS, android.Manifest.permission.BLUETOOTH, android.Manifest.permission.BROADCAST_STICKY];
-     if (options && options.explanation) {
-     permissions.requestPermission(perms, this.options.explanation)
-     .then(function () {
+    constructor() {
+        if (currentapiVersion >= MARSHMALLOW) {
+            const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.MODIFY_AUDIO_SETTINGS, android.Manifest.permission.BLUETOOTH, android.Manifest.permission.BROADCAST_STICKY];
+            permissions.requestPermission(perms)
+            .then(function () {
 
-     })
-     .catch(function (ex) {
+            })
+            .catch(function (ex) {
 
-     });
-     } else {
-     permissions.requestPermission(perms)
-     .then(function () {
+            });
+        }
+    }
 
-     })
-     .catch(function (ex) {
-
-     });
-     }
-     }
-     else {}
-     }
-
-     */
     public static initWithApiKeySessionId(apiKey: string, sessionId: string) {
         let tnsSession = new TNSOTSession();
         tnsSession._sessionEvents = new Observable();
