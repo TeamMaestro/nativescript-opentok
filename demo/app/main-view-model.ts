@@ -7,9 +7,9 @@ import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opento
 
 export class Demo extends Observable {
 
-    public _apiKey:string = '45720082';
-    private _sessionId: string = '1_MX40NTcyMDA4Mn5-MTQ3OTQwMDk0NDcyN35XdmdkZjlnazN2UytPYk1mNW1aWVZSZmh-fg';
-    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTcyMDA4MiZzaWc9YjUxN2NlZmU0MjEyYjU4YTcxMzY0MWU5M2JkZTYyOTIyY2E4OTNhNTpzZXNzaW9uX2lkPTFfTVg0ME5UY3lNREE0TW41LU1UUTNPVFF3TURrME5EY3lOMzVYZG1ka1pqbG5hek4yVXl0UFlrMW1OVzFhV1ZaU1ptaC1mZyZjcmVhdGVfdGltZT0xNDc5NDAwOTU1Jm5vbmNlPTAuOTAzNTUwODk1ODE3Mzk4MyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDgxOTkyOTU0';
+    public _apiKey:string = '45743242';
+    private _sessionId: string = '1_MX40NTc0MzI0Mn5-MTQ4MzQwMzM1NzM5N34rUTZFS1JSY0E0Z3hXMXhlYlZYblk5amh-fg';
+    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc0MzI0MiZzaWc9Y2VkNjE3YmM4NzA0ZWY0M2FjOGNjOWNlMGM3ZWI0MGRjZDI4OWQ1YzpzZXNzaW9uX2lkPTFfTVg0ME5UYzBNekkwTW41LU1UUTRNelF3TXpNMU56TTVOMzRyVVRaRlMxSlNZMEUwWjNoWE1YaGxZbFpZYmxrNWFtaC1mZyZjcmVhdGVfdGltZT0xNDgzNDAzMzY1Jm5vbmNlPTAuMTM1MzI5MjkzNzEwNzEzNTYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4NTk5NTM2Ng==';
 
     private publisher: TNSOTPublisher;
     private subscriber: TNSOTSubscriber;
@@ -22,10 +22,10 @@ export class Demo extends Observable {
         this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
         this.subscriber = <TNSOTSubscriber> this.page.getViewById('subscriber');
         this.session.subscriber = this.subscriber;
+        this.session.connect(this._publisherToken);
     }
 
     publish() {
-        this.session.connect(this._publisherToken);
         this.publisher.publish(this.session, '', 'HIGH', '30');
     }
 

@@ -41,5 +41,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>We need your camera to display your feed.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need your microphone to hear your voice.</string>
 </dict>
 </plist>

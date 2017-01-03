@@ -33,13 +33,14 @@ export class TNSOTPublisher extends ContentView {
         );
         this._ios.view.frame = CGRectMake(0, 0, this.width, this.height);
         // this._view.frame = CGRectMake(this.originX, this.originY, this.width, this.height);
+
         this._view.addSubview(this._ios.view);
 
         session.events.on('sessionDidConnect', (result) => {
             this._ios.publishAudio = true;
+            let stream: any = result.object;
+            this.setIdleTimer(true);
             try {
-                let stream: any = result.object;
-                this.setIdleTimer(true);
                 stream.publish(this._ios);
             } catch(error) {
                 console.log(error);
@@ -72,13 +73,19 @@ export class TNSOTPublisher extends ContentView {
     }
 
     private setIdleTimer(idleTimerDisabled: boolean) {
-        let app = UIApplication.sharedApplication();
+        let app: any;
+        if(UIApplication.sharedApplication) {
+            app = UIApplication.sharedApplication;
+        }
+        else {
+            app = UIApplication.sharedApplication();
+        }
         app.idleTimerDisabled = idleTimerDisabled;
     }
 
     private getCameraResolution(cameraResolution: string): any {
         if(cameraResolution) {
-            switch(cameraResolution.toString().toUpperCase()) {
+            switch(cameraResolution) {
                 case 'LOW':
                     return OTCameraCaptureResolution.OTCameraCaptureResolutionLow;
                 case 'MEDIUM':
