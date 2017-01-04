@@ -20,8 +20,8 @@ export class TNSOTPublisher extends ContentView {
 
     constructor() {
         super();
-        this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
         this._view = UIView.alloc().init();
+        this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
     }
 
     publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string): void {
@@ -41,7 +41,7 @@ export class TNSOTPublisher extends ContentView {
             let stream: any = result.object;
             this.setIdleTimer(true);
             try {
-                stream.publish(this._ios);
+                stream.session.publish(this._ios);
             } catch(error) {
                 console.log(error);
             }
@@ -190,6 +190,7 @@ class TNSPublisherKitDelegateImpl extends NSObject {
                 })
             });
         }
+        console.log(error);
     }
 
     get events(): Observable {

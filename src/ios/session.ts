@@ -69,7 +69,7 @@ export class TNSOTSession extends NSObject {
         return this._events;
     }
 
-    public sessionDidConnect(session: any) {
+    sessionDidConnect(session: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidConnect',
@@ -80,7 +80,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionDidDisconnect(session: any) {
+    sessionDidDisconnect(session: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidDisconnect',
@@ -91,7 +91,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionDidReconnect(session: any) {
+    sessionDidReconnect(session: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidReconnect',
@@ -102,7 +102,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionDidBeginReconnecting(session: any) {
+    sessionDidBeginReconnecting(session: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidBeginReconnecting',
@@ -113,7 +113,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionStreamCreated(session: any, stream: any) {
+    sessionStreamCreated(session: any, stream: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'streamCreated',
@@ -128,7 +128,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionStreamDestroyed(session: any, stream: any) {
+    sessionStreamDestroyed(session: any, stream: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'streamDestroyed',
@@ -140,7 +140,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionDidFailWithError(session: any, error: any) {
+    sessionDidFailWithError(session: any, error: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'didFailWithError',
@@ -152,7 +152,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionConnectionDestroyed(session: any, connection: any) {
+    sessionConnectionDestroyed(session: any, connection: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'connectionDestroyed',
@@ -164,7 +164,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionConnectionCreated(session: any, connection: any) {
+    sessionConnectionCreated(session: any, connection: any) {
         if (this.events) {
             this.events.notify({
                 eventName: 'connectionCreated',
@@ -176,7 +176,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionArchiveStartedWithId(session: any, archiveId: string, name?: string) {
+    sessionArchiveStartedWithId(session: any, archiveId: string, name?: string) {
         if (this.events) {
             this.events.notify({
                 eventName: 'archiveStartedWithId',
@@ -189,7 +189,7 @@ export class TNSOTSession extends NSObject {
         }
     }
 
-    public sessionArchiveStoppedWithId(session: any, archiveId: string) {
+    sessionArchiveStoppedWithId(session: any, archiveId: string) {
         if (this.events) {
             this.events.notify({
                 eventName: 'archiveStoppedWithId',

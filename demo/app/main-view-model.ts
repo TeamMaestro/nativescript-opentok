@@ -22,10 +22,10 @@ export class Demo extends Observable {
         this.publisher = <TNSOTPublisher> this.page.getViewById('publisher');
         this.subscriber = <TNSOTSubscriber> this.page.getViewById('subscriber');
         this.session.subscriber = this.subscriber;
-        this.session.connect(this._publisherToken);
     }
 
     publish() {
+        this.session.connect(this._publisherToken);
         this.publisher.publish(this.session, '', 'HIGH', '30');
     }
 

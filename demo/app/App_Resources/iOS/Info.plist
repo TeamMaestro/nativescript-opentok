@@ -45,5 +45,7 @@
 	<string>We need your camera to display your feed.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need your microphone to hear your voice.</string>
+	<key>UIBackgroundModes</key>
+	<string>audio</strong>
 </dict>
 </plist>
