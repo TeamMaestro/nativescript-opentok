@@ -17,12 +17,12 @@ export class TNSOTPublisher extends ContentView {
     public static toggleVideoEvent = "toggleVideo";
     public static toggleAudioEvent = "toggleAudio";
     public static cycleCameraEvent;
-    private _publisherEvents;
+    private _events;
     _render_style: any;
 
     constructor() {
         super();
-
+        this._events = new Observable();
     }
 
     get android() {
@@ -45,45 +45,41 @@ export class TNSOTPublisher extends ContentView {
              TNSOTPublisher.getCameraResolution(cameraResolution),
             TNSOTPublisher.getCameraFrameRate(cameraFrameRate)
         );
-
         let pub = this._publisher.getView();
         this._android.addView(pub);
         this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
         this._publisher.setPublisherListener(new PublisherListener({
             owner: that.get(),
             onError(publisher: any, error: any) {
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'didFailWithError',
-                        object: this.owner,
-                        publisher: publisher,
-                        error: error
+                        object: new Observable({
+                            publisher: publisher,
+                            error: error
+                        })
                     });
                 }
             },
             onStreamCreated(publisher: any, stream: any) {
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'streamCreated',
-                        object: this.owner,
-                        publisher: publisher,
-                        stream: stream
+                        object: new Observable({
+                            publisher: publisher,
+                            stream: stream
+                        })
                     });
-
                 }
-
-                if (session.subscriber) {
-                    session.subscriber.subscribe(session, stream);
-                }
-
             },
             onStreamDestroyed(publisher: any, stream: any) {
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'streamDestroyed',
-                        object: this.owner,
-                        publisher: publisher,
-                        stream: stream
+                        object: new Observable({
+                            publisher: publisher,
+                            stream: stream
+                        })
                     });
                 }
             }
@@ -91,21 +87,23 @@ export class TNSOTPublisher extends ContentView {
         this._publisher.setCameraListener(new CameraListener({
             owner: that.get(),
             onCameraChanged(publisher, newCameraId) {
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'cameraChanged',
-                        object: this.owner,
-                        publisher: publisher,
-                        cameraId: newCameraId
+                        object: new Observable({
+                            publisher: publisher,
+                            cameraId: newCameraId
+                        })
                     });
                 }
             }, onCameraError(publisher, error) {
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'cameraError',
-                        object: this.owner,
-                        publisher: publisher,
-                        error: error
+                        object: new Observable({
+                            publisher: publisher,
+                            error: error
+                        })
                     });
                 }
             }
@@ -176,6 +174,9 @@ export class TNSOTPublisher extends ContentView {
         return this._publisher;
     }
 
+    get events():Observable{
+        return this._events;
+    }
     toggleCamera() {
         this.publishVideo = !this.publishVideo;
     }
