@@ -78,7 +78,7 @@ export class TNSOTSession {
                     })
                 }
             },
-            onStreamReceived:function(session: any, stream: any) {
+            onStreamReceived(session: any, stream: any) {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'streamReceived',
@@ -88,8 +88,13 @@ export class TNSOTSession {
                         })
                     });
                 }
+                if (tnsSession.subscriber) {
+                    tnsSession.subscriber.subscribe(session, stream);
+                }
             }
+
         }));
+
         tnsSession.session.setArchiveListener(new ArchiveListener({
             onArchiveStarted(session: any, id: any, name: any) {
                 if (tnsSession._sessionEvents) {

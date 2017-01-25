@@ -5,10 +5,15 @@ const StreamListener = com.opentok.android.SubscriberKit.StreamListener;
 const SubscriberListener = com.opentok.android.SubscriberKit.SubscriberListener;
 const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
 import * as utils from "utils/utils";
+import {TNSOTSession} from "./session";
 export class TNSOTSubscriber extends ContentView {
     private _android: any;
     private _subscriber: any;
-
+    private _events:Observable;
+    constructor(){
+        super();
+        this._events = new Observable();
+    }
     get android() {
         return this._android;
     }
@@ -33,30 +38,34 @@ export class TNSOTSubscriber extends ContentView {
         this._subscriber.setSubscriberListener(new com.opentok.android.SubscriberKit.SubscriberListener({
             owner: that.get(),
             onConnected(subscriber){
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'subscriberDidConnectToStream',
-                        object: this.owner,
-                        subscriber:subscriber
+                        object: new Observable({
+                            subscriber:subscriber
+                        })
+
                     });
                 }
             },
             onDisconnected(subscriber){
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'subscriberDidDisconnect',
-                        object: this.owner,
-                        subscriber:subscriber
+                        object: new Observable({
+                            subscriber:subscriber
+                        })
                     });
                 }
             },
             onError(subscriber, error){
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'didFailWithError',
-                        object: this.owner,
-                        subscriber: subscriber,
-                        error: error
+                        object: new Observable({
+                            subscriber: subscriber,
+                            error: error
+                        })
                     });
                 }
             },
@@ -64,27 +73,35 @@ export class TNSOTSubscriber extends ContentView {
         this._subscriber.setStreamListener(new com.opentok.android.SubscriberKit.StreamListener({
             owner: that.get(),
             onDisconnected(subscriber){
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'didDisconnectFromStream',
-                        object: this.owner,
-                        subscriber:subscriber
+                        object: new Observable({
+                            subscriber:subscriber
+                        })
                     });
                 }
             },
             onReconnected(subscriber){
-                if (this.owner) {
-                    this.owner.notify({
+                if (this.owner._events) {
+                    this.owner._events.notify({
                         eventName: 'didReconnectToStream',
-                        object: this.owner,
-                        subscriber:subscriber
+                        object: new Observable({
+                            subscriber:subscriber
+                        })
+
                     });
                 }
             }
         }));
         let sub = this._subscriber.getView();
         this._android.addView(sub);
-        session.session.subscribe(this._subscriber);
+
+        if(session instanceof TNSOTSession){
+            session.session.subscribe(this._subscriber);
+        }else{
+            session.subscribe(this._subscriber);
+        }
 
     }
 
@@ -114,5 +131,7 @@ export class TNSOTSubscriber extends ContentView {
         this._subscriber.setSubscribeToAudio(state);
     }
 
-
+    get events():Observable{
+        return this._events;
+    }
 }
