@@ -59,10 +59,6 @@
     "@types/es6-promise": "0.0.28"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "nativescript-permissions": "^1.2.1"
-=======
     "nativescript-permissions":"latest"
->>>>>>> origin/android-fixes
   }
 }
