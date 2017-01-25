@@ -4,6 +4,7 @@ declare var com: any, android: any;
 const StreamListener = com.opentok.android.SubscriberKit.StreamListener;
 const SubscriberListener = com.opentok.android.SubscriberKit.SubscriberListener;
 const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
+import * as utils from "utils/utils";
 export class TNSOTSubscriber extends ContentView {
     private _android: any;
     private _subscriber: any;
@@ -21,15 +22,15 @@ export class TNSOTSubscriber extends ContentView {
     }
 
     _createUI() {
-        this._android = new android.widget.LinearLayout(this._context);
+        this._android = new android.widget.LinearLayout(utils.ad.getApplicationContext());
     }
 
     subscribe(session: any, stream: any) {
         const that = new WeakRef(this);
-        this._subscriber = new com.opentok.android.Subscriber(this._context, stream);
-        this._subscriber.getRenderer().setStyle(BaseVideoRenderer.STYLE_VIDEO_SCALE,
-            BaseVideoRenderer.STYLE_VIDEO_FILL);
-        this._subscriber.setSubscriberListener(new SubscriberListener({
+        this._subscriber = new com.opentok.android.Subscriber(utils.ad.getApplicationContext(), stream);
+        this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE,
+            com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL);
+        this._subscriber.setSubscriberListener(new com.opentok.android.SubscriberKit.SubscriberListener({
             owner: that.get(),
             onConnected(subscriber){
                 if (this.owner) {
@@ -60,7 +61,7 @@ export class TNSOTSubscriber extends ContentView {
                 }
             },
         }));
-        this._subscriber.setStreamListener(new StreamListener({
+        this._subscriber.setStreamListener(new com.opentok.android.SubscriberKit.StreamListener({
             owner: that.get(),
             onDisconnected(subscriber){
                 if (this.owner) {
@@ -82,7 +83,9 @@ export class TNSOTSubscriber extends ContentView {
             }
         }));
         let sub = this._subscriber.getView();
-        this.android.addView(sub);
+        this._android.addView(sub);
+        session.session.subscribe(this._subscriber);
+
     }
 
     toggleVideo() {

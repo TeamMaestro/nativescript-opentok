@@ -10,3 +10,4 @@ demo/lib/ios
 *.log
 *.d.ts
 !opentok.d.ts
+.vscode

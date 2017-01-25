@@ -18,49 +18,18 @@ const ConnectionListener = com.opentok.android.Session.ConnectionListener;
 const ArchiveListener = com.opentok.android.Session.ArchiveListener;
 const MARSHMALLOW = 23;
 const currentapiVersion = android.os.Build.VERSION.SDK_INT;
-
+import {TNSOTSubscriber} from "./subscriber";
 import permissions = require('nativescript-permissions');
 
 export class TNSOTSession {
     private apiKey: string;
-    private subscriber: any;
     private config: any;
     public session: any;
     public publisher: any;
     private _sessionEvents: Observable;
     private options: any;
+    private _subscriber: TNSOTSubscriber;
 
-    /*
-     constructor(apiKey: string, config: any, options?: any) {
-     this.apiKey = apiKey;
-     this.config = config;
-     this._sessionEvents = new Observable();
-     this.options = options;
-     /*if (currentapiVersion >= MARSHMALLOW) {
-
-     const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.MODIFY_AUDIO_SETTINGS, android.Manifest.permission.BLUETOOTH, android.Manifest.permission.BROADCAST_STICKY];
-     if (options && options.explanation) {
-     permissions.requestPermission(perms, this.options.explanation)
-     .then(function () {
-
-     })
-     .catch(function (ex) {
-
-     });
-     } else {
-     permissions.requestPermission(perms)
-     .then(function () {
-
-     })
-     .catch(function (ex) {
-
-     });
-     }
-     }
-     else {}
-     }
-
-     */
     public static initWithApiKeySessionId(apiKey: string, sessionId: string) {
         let tnsSession = new TNSOTSession();
         tnsSession._sessionEvents = new Observable();
@@ -101,7 +70,7 @@ export class TNSOTSession {
             onStreamDropped(session: any, stream: any) {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
-                        eventName: 'streamDestroyed',
+                        eventName: 'streamDropped',
                         object: new Observable({
                             session: session,
                             stream: stream
@@ -109,10 +78,10 @@ export class TNSOTSession {
                     })
                 }
             },
-            onStreamReceived(session: any, stream: any) {
+            onStreamReceived:function(session: any, stream: any) {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
-                        eventName: 'streamCreated',
+                        eventName: 'streamReceived',
                         object: new Observable({
                             session: session,
                             stream: stream
@@ -190,9 +159,15 @@ export class TNSOTSession {
                 }
             }
         }));
+
         return tnsSession;
     }
-
+    public static requestPermission():Promise<any>{
+            if (currentapiVersion >= MARSHMALLOW) {
+                const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO];
+                return permissions.requestPermission(perms);
+            }
+    }
 
     /**
      * Asynchronously begins the session connect process. Some time later, we will
@@ -247,6 +222,14 @@ export class TNSOTSession {
 
     get events(): Observable {
         return this._sessionEvents;
+    }
+
+    set subscriber(subscriber) {
+        this._subscriber = subscriber;
+    }
+
+    get subscriber(){
+        return this._subscriber;
     }
 
 }

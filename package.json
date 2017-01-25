@@ -1,6 +1,6 @@
 {
   "name": "nativescript-opentok",
-  "version": "1.5.12",
+  "version": "1.6.0",
   "description": "Integrates OpenTok for NativeScript.",
   "main": "opentok.js",
   "typings": "./opentok.d.ts",
@@ -32,7 +32,13 @@
     "iOS",
     "{N}"
   ],
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "Osei Fortune",
+      "url": "https://github.com/triniwiz",
+      "email":"fortune.osei@yahoo.com"
+    }
+  ],
   "author": {
     "name": "Sean Perkins",
     "email": "sean@meetmaestro.com"
@@ -53,5 +59,6 @@
     "@types/es6-promise": "0.0.28"
   },
   "dependencies": {
+    "nativescript-permissions":"latest"
   }
 }
