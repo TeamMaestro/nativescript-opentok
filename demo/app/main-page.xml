@@ -14,6 +14,7 @@
                 <Button text="Toggle Mute" tap="{{ toggleMute }}" />
                 <Button text="Start Publishing" tap="{{ publish }}" />
                 <Button text="Stop Publishing" tap="{{ unpublish }}" />
+                <Button text="Subscriber Connect" tap="{{ subscriberConnect }}" />
                 <Button text="Stop Subscribing" tap="{{ unsubscribe }}" />
                 <Button text="Disconnect" tap="{{ disconnect }}" />
             </StackLayout>
