@@ -87,7 +87,6 @@ class TNSSubscriberKitDelegateImpl extends NSObject {
     }
 
     subscriberDidConnectToStream(subscriber) {
-        console.log('subscriberDidConnectToStream');
         if(this._events) {
             this._events.notify({
                 eventName: 'subscriberDidConnectToStream',
