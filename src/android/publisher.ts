@@ -33,7 +33,7 @@ export class TNSOTPublisher extends ContentView {
         return this._android;
     }
 
-    _createUI() {
+    public _createUI() {
         this._android = new android.widget.LinearLayout(this._context);
     }
 
@@ -41,10 +41,13 @@ export class TNSOTPublisher extends ContentView {
         const that = new WeakRef(this);
         this._publisher = new com.opentok.android.Publisher(
             utils.ad.getApplicationContext(),
-            name ? name : '',
-            this.getCameraResolution(cameraResolution),
-            this.getCameraFrameRate(cameraFrameRate)
+             name ? name : '',
+             TNSOTPublisher.getCameraResolution(cameraResolution),
+            TNSOTPublisher.getCameraFrameRate(cameraFrameRate)
         );
+
+        let pub = this._publisher.getView();
+        this._android.addView(pub);
         this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
         this._publisher.setPublisherListener(new PublisherListener({
             owner: that.get(),
@@ -66,6 +69,11 @@ export class TNSOTPublisher extends ContentView {
                         publisher: publisher,
                         stream: stream
                     });
+
+                }
+
+                if (session.subscriber) {
+                    session.subscriber.subscribe(session, stream);
                 }
 
             },
@@ -102,9 +110,7 @@ export class TNSOTPublisher extends ContentView {
                 }
             }
         }));
-        let pub = this._publisher.getView();
-        this._android.addView(pub);
-        session.events.on('sessionDidConnect', (result) => {
+        session.events.on('sessionDidConnect', (result:any) => {
             try {
                 let stream: any = result.object;
                 session.session.publish(this._publisher);
@@ -115,7 +121,7 @@ export class TNSOTPublisher extends ContentView {
 
     }
 
-    getCameraResolution(cameraResolution) {
+    public static getCameraResolution(cameraResolution) {
         if (cameraResolution) {
             switch (cameraResolution.toString().toUpperCase()) {
                 case 'LOW':
@@ -129,7 +135,7 @@ export class TNSOTPublisher extends ContentView {
         return com.opentok.android.Publisher.CameraCaptureResolution.MEDIUM;
     }
 
-    getCameraFrameRate(cameraFrameRate) {
+    public static getCameraFrameRate(cameraFrameRate) {
         if (cameraFrameRate) {
             switch (Number(cameraFrameRate)) {
                 case 30:
