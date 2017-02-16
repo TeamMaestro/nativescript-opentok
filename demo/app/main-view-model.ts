@@ -8,10 +8,10 @@ import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opento
 const M = 23;
 export class Demo extends Observable {
 
-    public _apiKey:string = '45755172';
-    private _sessionId: string = '2_MX40NTc1NTE3Mn5-MTQ4NTI3OTk1NjYyMn5SNHdFbjJ6OEcrQjdGcFRzaGQ5YkxWWWJ-fg';
-    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc1NTE3MiZzaWc9YzNmYWVlOWRiN2M2YmMwNWE3NWQ0NThjOTcwNmJhNWU0ZjgxN2Y3MzpzZXNzaW9uX2lkPTJfTVg0ME5UYzFOVEUzTW41LU1UUTROVEkzT1RrMU5qWXlNbjVTTkhkRmJqSjZPRWNyUWpkR2NGUnphR1E1WWt4V1dXSi1mZyZjcmVhdGVfdGltZT0xNDg1Mjg0NjY5Jm5vbmNlPTAuMTUyMzY4ODc2NDg3MjEyODcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4Nzg3NjY2Nw==';
-    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTc1NTE3MiZzaWc9MjdlYmZmZDM1NDY3MjQ5OTQ4ZTMzZjk1YTZlZjZlM2U2NmExNTYxNTpzZXNzaW9uX2lkPTJfTVg0ME5UYzFOVEUzTW41LU1UUTROVEkzT1RrMU5qWXlNbjVTTkhkRmJqSjZPRWNyUWpkR2NGUnphR1E1WWt4V1dXSi1mZyZjcmVhdGVfdGltZT0xNDg1MzUxNzg5Jm5vbmNlPTAuNzM1OTcwMzM1NDAwNDM4MSZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ4Nzk0Mzc4OA==';
+    public _apiKey:string = '45771112';
+    private _sessionId: string = '2_MX40NTc3MTExMn5-MTQ4NzE2NTQxMzkyOH5hakU5RDNCN3JGWDZhTDZ5S1NkVVBGY0h-fg';
+    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9NDNjY2I5NTA5NTdjOWM4OWE1NDgzYmNjZTkzNmUxOGRmZTllNTI0ZjpzZXNzaW9uX2lkPTJfTVg0ME5UYzNNVEV4TW41LU1UUTROekUyTlRReE16a3lPSDVoYWtVNVJETkNOM0pHV0RaaFREWjVTMU5rVlZCR1kwaC1mZyZjcmVhdGVfdGltZT0xNDg3MTY1NDUxJm5vbmNlPTAuODgyMzY2OTU5NzkyMTQzNSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDg3NzcwMjUw';
+    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9ZDJlYmU3MTJhZjliNDhlOTUzODdhZGY5ZjAyMDA3MGNmNWZlMjdkYzpzZXNzaW9uX2lkPTJfTVg0ME5UYzNNVEV4TW41LU1UUTROekUyTlRReE16a3lPSDVoYWtVNVJETkNOM0pHV0RaaFREWjVTMU5rVlZCR1kwaC1mZyZjcmVhdGVfdGltZT0xNDg3MTY1NDc3Jm5vbmNlPTAuMTEyODQ5MTE3Mjg2MTcyOTcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4Nzc3MDI3Nw==';
     private publisher: TNSOTPublisher;
     private subscriber: TNSOTSubscriber;
 
@@ -26,6 +26,9 @@ export class Demo extends Observable {
         this.publisher.events.on('streamCreated',(data:any)=>{
             this.subscriber.subscribe(this.session,data.object.stream);
         });
+        this.session.events.on('signalReceived',(data:any)=>{
+            console.dump(data);
+        });        
     }
 
     publish() {
@@ -88,6 +91,10 @@ export class Demo extends Observable {
 
     disconnect() {
         this.session.disconnect();
+    }
+
+    sendSignal() {
+        this.session.sendSignal('chat', 'hello');
     }
 
 }
