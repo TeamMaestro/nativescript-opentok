@@ -46,6 +46,20 @@ export class TNSOTSession extends NSObject {
         }
     }
 
+    sendSignal(type: string, message: string): void {
+        if (this._ios) {
+            try {
+                let errorRef = new interop.Reference();
+                this._ios.signalWithTypeStringConnectionError(type, message, null, errorRef);
+                if (errorRef.value) {
+                    console.log(errorRef.value);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }        
+    }
+
     unsubscribe(subscriber: any): void {
         try {
             if (this._ios) {
@@ -200,5 +214,19 @@ export class TNSOTSession extends NSObject {
             });
         }
     }
+
+    sessionReceivedSignalTypeFromConnectionWithString(session: any, type: any, connection: any, data: any) {
+        if (this.events) {
+            this.events.notify({
+                eventName: 'signalReceived',
+                object: new Observable({
+                    session: session,
+                    type: type,
+                    data: data,
+                    connection: connection
+                })
+            });
+        }
+    } 
 
 }

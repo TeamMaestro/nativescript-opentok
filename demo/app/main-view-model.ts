@@ -9,9 +9,9 @@ const M = 23;
 export class Demo extends Observable {
 
     public _apiKey:string = '45771112';
-    private _sessionId: string = '2_MX40NTc3MTExMn5-MTQ4NzE2NTQxMzkyOH5hakU5RDNCN3JGWDZhTDZ5S1NkVVBGY0h-fg';
-    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9NDNjY2I5NTA5NTdjOWM4OWE1NDgzYmNjZTkzNmUxOGRmZTllNTI0ZjpzZXNzaW9uX2lkPTJfTVg0ME5UYzNNVEV4TW41LU1UUTROekUyTlRReE16a3lPSDVoYWtVNVJETkNOM0pHV0RaaFREWjVTMU5rVlZCR1kwaC1mZyZjcmVhdGVfdGltZT0xNDg3MTY1NDUxJm5vbmNlPTAuODgyMzY2OTU5NzkyMTQzNSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDg3NzcwMjUw';
-    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9ZDJlYmU3MTJhZjliNDhlOTUzODdhZGY5ZjAyMDA3MGNmNWZlMjdkYzpzZXNzaW9uX2lkPTJfTVg0ME5UYzNNVEV4TW41LU1UUTROekUyTlRReE16a3lPSDVoYWtVNVJETkNOM0pHV0RaaFREWjVTMU5rVlZCR1kwaC1mZyZjcmVhdGVfdGltZT0xNDg3MTY1NDc3Jm5vbmNlPTAuMTEyODQ5MTE3Mjg2MTcyOTcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4Nzc3MDI3Nw==';
+    private _sessionId: string = '1_MX40NTc3MTExMn5-MTQ4NzI1MTY3NTg2NX5JZzFvWHI4NmFLMG1tZnRad2ZwNGl2YTR-UH4';
+    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9YjY5ODg5ZWNkNWU2YjU0YmY2YjU1ZGFiOGMzZGNlNjQ5OTQ2MjgyZjpzZXNzaW9uX2lkPTFfTVg0ME5UYzNNVEV4TW41LU1UUTROekkxTVRZM05UZzJOWDVKWnpGdldISTRObUZMTUcxdFpuUmFkMlp3TkdsMllUUi1VSDQmY3JlYXRlX3RpbWU9MTQ4NzMzNDkzNSZub25jZT0wLjg3NzA0ODc3ODc1MTA1NTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4NzkzOTczNA==';
+    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9ZGQ2MDIzNWQ1ZDEyZWM4MTZiMzEzMjE2NDNmNTg5Zjg1ZTQ1MmNkYjpzZXNzaW9uX2lkPTFfTVg0ME5UYzNNVEV4TW41LU1UUTROekkxTVRZM05UZzJOWDVKWnpGdldISTRObUZMTUcxdFpuUmFkMlp3TkdsMllUUi1VSDQmY3JlYXRlX3RpbWU9MTQ4NzMzNDk1OSZub25jZT0wLjg2OTkzODk3NTAzNjUxMDcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4NzkzOTc1OA==';
     private publisher: TNSOTPublisher;
     private subscriber: TNSOTSubscriber;
 
@@ -27,8 +27,9 @@ export class Demo extends Observable {
             this.subscriber.subscribe(this.session,data.object.stream);
         });
         this.session.events.on('signalReceived',(data:any)=>{
+            alert("signal received");
             console.dump(data);
-        });        
+        }); 
     }
 
     publish() {
