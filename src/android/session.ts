@@ -13,6 +13,7 @@ const RelativeLayout = android.widget.RelativeLayout;
 
 
 const SessionListener = com.opentok.android.Session.SessionListener;
+const SignalListener = com.opentok.android.Session.SignalListener;
 const ReconnectionListener = com.opentok.android.Session.ReconnectionListener;
 const ConnectionListener = com.opentok.android.Session.ConnectionListener;
 const ArchiveListener = com.opentok.android.Session.ArchiveListener;
@@ -93,6 +94,23 @@ export class TNSOTSession {
                 }
             }
 
+        }));
+
+        tnsSession.session.setSignalListener(new SignalListener({
+            onSignalReceived(session: any, type: any, data: any, connection: any){
+                if (tnsSession._sessionEvents) {
+                    tnsSession._sessionEvents.notify({
+                        eventName: 'signalReceived',
+                        object: new Observable({
+                            session: session,
+                            type: type,
+                            data: data,
+                            connection: connection
+                        })
+                    });                    
+                }
+            }
+            
         }));
 
         tnsSession.session.setArchiveListener(new ArchiveListener({
@@ -204,6 +222,22 @@ export class TNSOTSession {
                 reject(err)
             }
         });
+    }
+
+    public sendSignal(type: string, message: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let session = this.session;
+            if(session) {
+                try {
+                    session.sendSignal(type, message);
+                    resolve(true); 
+                } catch(err) {
+                    reject(err);
+                }
+
+            }
+        });
+
     }
 
     public subscribe(subInstance: any) {
