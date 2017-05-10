@@ -152,7 +152,7 @@ export class TNSOTSubscriber extends ContentView {
                 this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
                 break;
             default:
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
                 break;
         }
     }
