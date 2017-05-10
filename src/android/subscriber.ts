@@ -10,6 +10,8 @@ export class TNSOTSubscriber extends ContentView {
     private _android: any;
     private _subscriber: any;
     private _events:Observable;
+    _render_style: any;
+
     constructor(){
         super();
         this._events = new Observable();
@@ -33,8 +35,7 @@ export class TNSOTSubscriber extends ContentView {
     subscribe(session: any, stream: any) {
         const that = new WeakRef(this);
         this._subscriber = new com.opentok.android.Subscriber(utils.ad.getApplicationContext(), stream);
-        this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE,
-            com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL);
+        this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
         this._subscriber.setSubscriberListener(new com.opentok.android.SubscriberKit.SubscriberListener({
             owner: that.get(),
             onConnected(subscriber){
@@ -133,6 +134,27 @@ export class TNSOTSubscriber extends ContentView {
 
     get events():Observable{
         return this._events;
+    }
+
+    get render_style() {
+        return this._render_style;
+    }
+
+    set render_style(value: any) {
+        switch (value) {
+            case 'fit':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
+                break;
+            case 'fill':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
+                break;
+            case 'scale':
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
+                break;
+            default:
+                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
+                break;
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 {
   "name": "nativescript-opentok",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "Integrates OpenTok for NativeScript.",
   "main": "opentok.js",
   "typings": "./opentok.d.ts",
