@@ -8,10 +8,10 @@ import {TNSOTSession, TNSOTPublisher, TNSOTSubscriber} from 'nativescript-opento
 const M = 23;
 export class Demo extends Observable {
 
-    public _apiKey:string = '45771112';
-    private _sessionId: string = '1_MX40NTc3MTExMn5-MTQ4NzI1MTY3NTg2NX5JZzFvWHI4NmFLMG1tZnRad2ZwNGl2YTR-UH4';
-    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9YjY5ODg5ZWNkNWU2YjU0YmY2YjU1ZGFiOGMzZGNlNjQ5OTQ2MjgyZjpzZXNzaW9uX2lkPTFfTVg0ME5UYzNNVEV4TW41LU1UUTROekkxTVRZM05UZzJOWDVKWnpGdldISTRObUZMTUcxdFpuUmFkMlp3TkdsMllUUi1VSDQmY3JlYXRlX3RpbWU9MTQ4NzMzNDkzNSZub25jZT0wLjg3NzA0ODc3ODc1MTA1NTkmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4NzkzOTczNA==';
-    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTc3MTExMiZzaWc9ZGQ2MDIzNWQ1ZDEyZWM4MTZiMzEzMjE2NDNmNTg5Zjg1ZTQ1MmNkYjpzZXNzaW9uX2lkPTFfTVg0ME5UYzNNVEV4TW41LU1UUTROekkxTVRZM05UZzJOWDVKWnpGdldISTRObUZMTUcxdFpuUmFkMlp3TkdsMllUUi1VSDQmY3JlYXRlX3RpbWU9MTQ4NzMzNDk1OSZub25jZT0wLjg2OTkzODk3NTAzNjUxMDcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4NzkzOTc1OA==';
+    public _apiKey:string = '45829912';
+    private _sessionId: string = '1_MX40NTgyOTkxMn5-MTQ5NTE0Mzk3NzI2OX5vdzhEdGtBSm40MW5KWU0rY3RFU3FJNUl-fg';
+    private _publisherToken: string = 'T1==cGFydG5lcl9pZD00NTgyOTkxMiZzaWc9ZDMxMjcxMjE2MTcwZDRkMDY3ZDMyYzg4YmJkODZlYWQ0M2Q0MmQyMTpzZXNzaW9uX2lkPTFfTVg0ME5UZ3lPVGt4TW41LU1UUTVOVEUwTXprM056STJPWDV2ZHpoRWRHdEJTbTQwTVc1S1dVMHJZM1JGVTNGSk5VbC1mZyZjcmVhdGVfdGltZT0xNDk1MTQ0MDAzJm5vbmNlPTAuMjk1ODExOTA1MTIwMDI0MyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNDk3NzM2MDAy';
+    private _subscriberToken: string = 'T1==cGFydG5lcl9pZD00NTgyOTkxMiZzaWc9YTVhNzI5MWZkZWUzZjhhMGRhOWZlMGY2YjYyNzlkYjQ0MWYxOTYwODpzZXNzaW9uX2lkPTFfTVg0ME5UZ3lPVGt4TW41LU1UUTVOVEUwTXprM056STJPWDV2ZHpoRWRHdEJTbTQwTVc1S1dVMHJZM1JGVTNGSk5VbC1mZyZjcmVhdGVfdGltZT0xNDk1MTQ0MDI0Jm5vbmNlPTAuNjk3NTY4MTUzNjA3MTM0MSZyb2xlPXN1YnNjcmliZXImZXhwaXJlX3RpbWU9MTQ5NzczNjAyMw==';
     private publisher: TNSOTPublisher;
     private subscriber: TNSOTSubscriber;
 
@@ -28,7 +28,7 @@ export class Demo extends Observable {
         });
         this.session.events.on('signalReceived',(data:any)=>{
             alert("signal received");
-            console.dump(data);
+            console.dir(data);
         }); 
     }
 

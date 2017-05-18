@@ -1,48 +1,54 @@
-import {Observable} from 'data/observable';
-import {topmost} from 'ui/frame';
-import {screen} from 'platform';
-import {ContentView} from 'ui/content-view'
-import {TNSOTSession} from './session';
-
+import { Observable, fromObject } from 'tns-core-modules/data/observable';
+import { topmost } from 'tns-core-modules/ui/frame';
+import { View, layout } from 'tns-core-modules/ui/core/view';
+import { TNSOTSession } from './session';
+import * as utils from 'tns-core-modules/utils/utils';
 declare var OTPublisher: any,
-            interop: any,
-            OTPublisherKitDelegate: any,
-            OTCameraCaptureResolution: any,
-            OTCameraCaptureFrameRate: any,
-            AVCaptureDevicePositionBack: any,
-            AVCaptureDevicePositionFront: any;
+    interop: any,
+    OTPublisherKitDelegate: any,
+    OTCameraCaptureResolution: any,
+    OTCameraCaptureFrameRate: any,
+    AVCaptureDevicePositionBack: any,
+    AVCaptureDevicePositionFront: any;
 
-export class TNSOTPublisher extends ContentView {
-
+export class TNSOTPublisher extends View {
     private _ios: any = {};
-    private _view: UIView;
+    nativeView: UIView;
     private _publisherKitDelegate: any;
 
-    constructor() {
-        super();
-        this._view = UIView.alloc().init();
+    public createNativeView() {
+        return UIView.new();
+    }
+    public initNativeView() {
         this._publisherKitDelegate = TNSPublisherKitDelegateImpl.initWithOwner(new WeakRef(this));
     }
-
-    publish(session: TNSOTSession, name?:string, cameraResolution?: string, cameraFrameRate?: string): void {
+    public disposeNativeView() {
+        this._publisherKitDelegate = null;
+    }
+    public onMeasure(widthMeasureSpec: number, heightMeasureSpec: number) {
+        const nativeView = this.nativeView;
+        if (nativeView) {
+            const width = layout.getMeasureSpecSize(widthMeasureSpec);
+            const height = layout.getMeasureSpecSize(heightMeasureSpec);
+            this.setMeasuredDimension(width, height);
+        }
+    }
+    publish(session: TNSOTSession, name?: string, cameraResolution?: string, cameraFrameRate?: string): void {
         this._ios = OTPublisher.alloc().initWithDelegateNameCameraResolutionCameraFrameRate(
             this._publisherKitDelegate,
             name ? name : '',
             this.getCameraResolution(cameraResolution),
             this.getCameraFrameRate(cameraFrameRate)
         );
-        this._ios.view.frame = CGRectMake(0, 0, this.width, this.height);
-        // this._view.frame = CGRectMake(this.originX, this.originY, this.width, this.height);
-
-        this._view.addSubview(this._ios.view);
-
+        this._ios.view.frame = this.nativeView.bounds;
+        this.nativeView.addSubview(this._ios.view);
         session.events.on('sessionDidConnect', (result) => {
             this._ios.publishAudio = true;
             let stream: any = result.object;
             this.setIdleTimer(true);
             try {
                 stream.session.publish(this._ios);
-            } catch(error) {
+            } catch (error) {
                 console.log(error);
             }
         });
@@ -50,16 +56,16 @@ export class TNSOTPublisher extends ContentView {
 
     unpublish(session: TNSOTSession): void {
         try {
-            if(session) {
+            if (session) {
                 let errorRef = new interop.Reference();
                 this.setIdleTimer(false);
                 session._ios.unpublishError(this._ios, errorRef);
-                if(errorRef.value) {
+                if (errorRef.value) {
                     console.log(errorRef.value);
                 }
             }
         }
-        catch(error) {
+        catch (error) {
             console.log(error);
         }
     }
@@ -68,24 +74,15 @@ export class TNSOTPublisher extends ContentView {
         return this._ios;
     }
 
-    get _nativeView(): any {
-        return this._view;
-    }
-
     private setIdleTimer(idleTimerDisabled: boolean) {
         let app: any;
-        if(UIApplication.sharedApplication) {
-            app = UIApplication.sharedApplication;
-        }
-        else {
-            app = UIApplication.sharedApplication();
-        }
+        app = utils.ios.getter(UIApplication, UIApplication.sharedApplication);
         app.idleTimerDisabled = idleTimerDisabled;
     }
 
     private getCameraResolution(cameraResolution: string): any {
-        if(cameraResolution) {
-            switch(cameraResolution) {
+        if (cameraResolution) {
+            switch (cameraResolution) {
                 case 'LOW':
                     return OTCameraCaptureResolution.OTCameraCaptureResolutionLow;
                 case 'MEDIUM':
@@ -98,8 +95,8 @@ export class TNSOTPublisher extends ContentView {
     }
 
     private getCameraFrameRate(cameraFrameRate: string): any {
-        if(cameraFrameRate) {
-            switch(Number(cameraFrameRate)) {
+        if (cameraFrameRate) {
+            switch (Number(cameraFrameRate)) {
                 case 30:
                     return OTCameraCaptureFrameRate.OTCameraCaptureFrameRate30FPS;
                 case 15:
@@ -114,8 +111,8 @@ export class TNSOTPublisher extends ContentView {
     }
 
     cycleCamera(): void {
-        if(this._ios) {
-            if(this._ios.cameraPosition === AVCaptureDevicePositionBack) {
+        if (this._ios) {
+            if (this._ios.cameraPosition === AVCaptureDevicePositionBack) {
                 this._ios.cameraPosition = AVCaptureDevicePositionFront;
             }
             else {
@@ -125,13 +122,13 @@ export class TNSOTPublisher extends ContentView {
     }
 
     toggleCamera(): void {
-        if(this._ios) {
+        if (this._ios) {
             this._ios.publishVideo = !this._ios.publishVideo;
         }
     }
 
-    toggleMute():void  {
-        if(this._ios) {
+    toggleMute(): void {
+        if (this._ios) {
             this._ios.publishAudio = !this._ios.publishAudio;
         }
     }
@@ -157,10 +154,10 @@ class TNSPublisherKitDelegateImpl extends NSObject {
     }
 
     public publisherStreamCreated(publisher: any, stream: any) {
-        if(this._events) {
+        if (this._events) {
             this._events.notify({
                 eventName: 'streamCreated',
-                object: new Observable({
+                object: fromObject({
                     publisher: publisher,
                     stream: stream
                 })
@@ -169,10 +166,10 @@ class TNSPublisherKitDelegateImpl extends NSObject {
     }
 
     public publisherStreamDestroyed(publisher: any, stream: any) {
-        if(this._events) {
+        if (this._events) {
             this._events.notify({
                 eventName: 'streamDestroyed',
-                object: new Observable({
+                object: fromObject({
                     publisher: publisher,
                     stream: stream
                 })
@@ -181,10 +178,10 @@ class TNSPublisherKitDelegateImpl extends NSObject {
     }
 
     public publisherDidFailWithError(publisher: any, error: any) {
-        if(this._events) {
+        if (this._events) {
             this._events.notify({
                 eventName: 'didFailWithError',
-                object: new Observable({
+                object: fromObject({
                     publisher: publisher,
                     error: error
                 })

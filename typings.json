@@ -1,9 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "main": "index.d.ts",
-    "global": false,
-    "name": "nativescript-opentok",
-    "type": "typings"
-  }
-}

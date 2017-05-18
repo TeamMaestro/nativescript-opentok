@@ -4,12 +4,9 @@
         "module": "commonjs",
         "declaration": true,
         "removeComments": true,
-        "noLib": false,
+        "skipLibCheck": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": [
-            "dom"
-        ],
         "sourceMap": true,
         "pretty": true,
         "allowUnreachableCode": false,
@@ -20,23 +17,25 @@
         "noImplicitReturns": true,
         "noImplicitUseStrict": false,
         "noFallthroughCasesInSwitch": true,
-        "typeRoots": [
-            "./node_modules/@types",
-            "./node_modules"
+        "preserveConstEnums": true,
+        "noLib": false,
+        "lib": [
+            "es6",
+            "dom"
         ],
-        "types": [
-        ]
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "./node_modules/tns-core-modules/*",
+                "./node_modules/*"
+            ]
+        }
     },
-    "files": [
-      "node_modules/tns-core-modules/tns-core-modules.d.ts",
-      "node_modules/tns-platform-declarations/ios/ios.d.ts",
-      "node_modules/tns-platform-declarations/android/android17.d.ts",
-      "opentok.android.ts",
-      "opentok.ios.ts"
-    ],
     "exclude": [
         "demo",
-        "node_modules"
+        "demo-ng",
+        "node_modules",
+        "platforms"
     ],
     "compileOnSave": false
 }

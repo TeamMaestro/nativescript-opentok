@@ -1,8 +1,8 @@
-import {TNSOTSessionI} from '../common';
-import {TNSOTPublisher} from './publisher';
+import { TNSOTSessionI } from '../common';
+import { TNSOTPublisher } from './publisher';
 import * as app from 'application';
-import {Observable} from 'data/observable';
-import * as utils from "utils/utils";
+import { Observable, fromObject } from 'tns-core-modules/data/observable';
+import * as utils from "tns-core-modules/utils/utils";
 declare var com: any, android: any;
 const Session = com.opentok.android.Session;
 const Subscriber = com.opentok.android.Subscriber;
@@ -19,7 +19,7 @@ const ConnectionListener = com.opentok.android.Session.ConnectionListener;
 const ArchiveListener = com.opentok.android.Session.ArchiveListener;
 const MARSHMALLOW = 23;
 const currentapiVersion = android.os.Build.VERSION.SDK_INT;
-import {TNSOTSubscriber} from "./subscriber";
+import { TNSOTSubscriber } from "./subscriber";
 import permissions = require('nativescript-permissions');
 
 export class TNSOTSession {
@@ -41,7 +41,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'sessionDidConnect',
-                        object: new Observable({
+                        object: fromObject({
                             session: session
                         })
                     });
@@ -51,7 +51,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'sessionDidDisconnect',
-                        object: new Observable({
+                        object: fromObject({
                             session: session
                         })
                     });
@@ -61,7 +61,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'didFailWithError',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             error: error
                         })
@@ -72,7 +72,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'streamDropped',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             stream: stream
                         })
@@ -83,7 +83,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'streamReceived',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             stream: stream
                         })
@@ -97,20 +97,20 @@ export class TNSOTSession {
         }));
 
         tnsSession.session.setSignalListener(new SignalListener({
-            onSignalReceived(session: any, type: any, data: any, connection: any){
+            onSignalReceived(session: any, type: any, data: any, connection: any) {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'signalReceived',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             type: type,
                             data: data,
                             connection: connection
                         })
-                    });                    
+                    });
                 }
             }
-            
+
         }));
 
         tnsSession.session.setArchiveListener(new ArchiveListener({
@@ -118,7 +118,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'archiveStartedWithId',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             archiveId: id,
                             name: name
@@ -129,7 +129,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'archiveStoppedWithId',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             archiveId: id
                         })
@@ -142,7 +142,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'connectionCreated',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             connection: connection
                         })
@@ -153,7 +153,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'connectionDestroyed',
-                        object: new Observable({
+                        object: fromObject({
                             session: session,
                             connection: connection
                         })
@@ -166,7 +166,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'sessionDidReconnect',
-                        object: new Observable({
+                        object: fromObject({
                             session: session
                         })
                     })
@@ -175,7 +175,7 @@ export class TNSOTSession {
                 if (tnsSession._sessionEvents) {
                     tnsSession._sessionEvents.notify({
                         eventName: 'sessionDidBeginReconnecting',
-                        object: new Observable({
+                        object: fromObject({
                             session: session
                         })
                     })
@@ -185,11 +185,11 @@ export class TNSOTSession {
 
         return tnsSession;
     }
-    public static requestPermission():Promise<any>{
-            if (currentapiVersion >= MARSHMALLOW) {
-                const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO];
-                return permissions.requestPermission(perms);
-            }
+    public static requestPermission(): any {
+        if (currentapiVersion >= MARSHMALLOW) {
+            const perms = [android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO];
+            return permissions.requestPermission(perms);
+        }
     }
 
     /**
@@ -227,11 +227,11 @@ export class TNSOTSession {
     public sendSignal(type: string, message: string): Promise<any> {
         return new Promise((resolve, reject) => {
             let session = this.session;
-            if(session) {
+            if (session) {
                 try {
                     session.sendSignal(type, message);
-                    resolve(true); 
-                } catch(err) {
+                    resolve(true);
+                } catch (err) {
                     reject(err);
                 }
 
@@ -256,7 +256,7 @@ export class TNSOTSession {
         this._subscriber = subscriber;
     }
 
-    get subscriber(){
+    get subscriber() {
         return this._subscriber;
     }
 

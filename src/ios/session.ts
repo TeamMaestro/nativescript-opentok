@@ -1,7 +1,7 @@
-import {Observable} from 'data/observable';
-import {topmost} from 'ui/frame';
-import {TNSOTPublisher} from './publisher';
-import {TNSOTSubscriber} from './subscriber';
+import { Observable, fromObject } from 'tns-core-modules/data/observable';
+import { topmost } from 'tns-core-modules/ui/frame';
+import { TNSOTPublisher } from './publisher';
+import { TNSOTSubscriber } from './subscriber';
 
 declare var OTSession: any,
     OTSessionDelegate: any,
@@ -19,9 +19,12 @@ export class TNSOTSession extends NSObject {
 
     public static initWithApiKeySessionId(apiKey: string, sessionId: string): TNSOTSession {
         let instance = <TNSOTSession>TNSOTSession.new();
-        instance._events = new Observable();
+        instance._events = fromObject({});
         instance._ios = OTSession.alloc().initWithApiKeySessionIdDelegate(apiKey.toString(), sessionId.toString(), instance);
         return instance;
+    }
+
+    public static requestPermission(): any {
     }
 
     connect(token: string): void {
@@ -57,7 +60,7 @@ export class TNSOTSession extends NSObject {
             } catch (error) {
                 console.log(error);
             }
-        }        
+        }
     }
 
     unsubscribe(subscriber: any): void {
@@ -87,7 +90,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidConnect',
-                object: new Observable({
+                object: fromObject({
                     session: session
                 })
             });
@@ -98,7 +101,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidDisconnect',
-                object: new Observable({
+                object: fromObject({
                     session: session
                 })
             });
@@ -109,7 +112,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidReconnect',
-                object: new Observable({
+                object: fromObject({
                     session: session
                 })
             });
@@ -120,7 +123,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'sessionDidBeginReconnecting',
-                object: new Observable({
+                object: fromObject({
                     session: session
                 })
             });
@@ -131,7 +134,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'streamCreated',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     stream: stream
                 })
@@ -146,7 +149,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'streamDestroyed',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     stream: stream
                 })
@@ -158,7 +161,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'didFailWithError',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     error: error
                 })
@@ -170,7 +173,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'connectionDestroyed',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     connection: connection
                 })
@@ -182,7 +185,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'connectionCreated',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     connection: connection
                 })
@@ -194,7 +197,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'archiveStartedWithId',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     archiveId: archiveId,
                     name: name
@@ -207,7 +210,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'archiveStoppedWithId',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     archiveId: archiveId
                 })
@@ -219,7 +222,7 @@ export class TNSOTSession extends NSObject {
         if (this.events) {
             this.events.notify({
                 eventName: 'signalReceived',
-                object: new Observable({
+                object: fromObject({
                     session: session,
                     type: type,
                     data: data,
@@ -227,6 +230,6 @@ export class TNSOTSession extends NSObject {
                 })
             });
         }
-    } 
+    }
 
 }

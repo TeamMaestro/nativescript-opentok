@@ -20,3 +20,4 @@ export interface TNSOTPublisherI {
 export interface TNSOTSubscriberI {
     subscriberEvents: Observable;
 }
+export declare type RENDERSTYLE = "fit | scale | fill";
