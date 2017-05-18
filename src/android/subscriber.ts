@@ -1,69 +1,80 @@
-import {Observable} from "data/observable";
-import {ContentView} from 'ui/content-view';
-import {TNSOTSession} from "./session";
+import { Observable, fromObject } from "data/observable";
+import { ContentView } from 'tns-core-modules/ui/content-view';
+import { TNSOTSession } from "./session";
+import { RENDERSTYLE } from "../common";
+import {
+    Property,
+    View,
+    CssProperty,
+    Style
+} from "tns-core-modules/ui/core/view";
 declare var com: any, android: any;
 const StreamListener = com.opentok.android.SubscriberKit.StreamListener;
 const SubscriberListener = com.opentok.android.SubscriberKit.SubscriberListener;
 const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
 import * as utils from "utils/utils";
-export class TNSOTSubscriber extends ContentView {
+
+const renderStyle = new CssProperty<Style, string>({
+    name: 'renderStyle',
+    cssName: 'render-style',
+    defaultValue: 'fill',
+    valueConverter: (v: RENDERSTYLE) => { return String(v) }
+});
+
+export class TNSOTSubscriber extends View {
     private _android: any;
     private _subscriber: any;
-    private _events:Observable;
-    _render_style: any;
-
-    constructor(){
+    private _events: Observable;
+    public renderStyle: any;
+    private _renderStyle: any;
+    constructor() {
         super();
-        this._events = new Observable();
+        this._events = fromObject({});
     }
+
     get android() {
-        return this._android;
+        return this.nativeView;
     }
-
-    get _nativeView() {
-        return this._android;
-    }
-
     get subscriber() {
         return this._subscriber;
     }
 
-    _createUI() {
-        this._android = new android.widget.LinearLayout(utils.ad.getApplicationContext());
+    public createNativeView() {
+        return new android.widget.LinearLayout(utils.ad.getApplicationContext());
     }
 
     subscribe(session: any, stream: any) {
         const that = new WeakRef(this);
         this._subscriber = new com.opentok.android.Subscriber(utils.ad.getApplicationContext(), stream);
-        this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
+        //this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
+        this.renderStyle = this._renderStyle;
         this._subscriber.setSubscriberListener(new com.opentok.android.SubscriberKit.SubscriberListener({
             owner: that.get(),
-            onConnected(subscriber){
+            onConnected(subscriber) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'subscriberDidConnectToStream',
-                        object: new Observable({
-                            subscriber:subscriber
+                        object: fromObject({
+                            subscriber: subscriber
                         })
-
                     });
                 }
             },
-            onDisconnected(subscriber){
+            onDisconnected(subscriber) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'subscriberDidDisconnect',
-                        object: new Observable({
-                            subscriber:subscriber
+                        object: fromObject({
+                            subscriber: subscriber
                         })
                     });
                 }
             },
-            onError(subscriber, error){
+            onError(subscriber, error) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'didFailWithError',
-                        object: new Observable({
+                        object: fromObject({
                             subscriber: subscriber,
                             error: error
                         })
@@ -73,34 +84,35 @@ export class TNSOTSubscriber extends ContentView {
         }));
         this._subscriber.setStreamListener(new com.opentok.android.SubscriberKit.StreamListener({
             owner: that.get(),
-            onDisconnected(subscriber){
+            onDisconnected(subscriber) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'didDisconnectFromStream',
-                        object: new Observable({
-                            subscriber:subscriber
+                        object: fromObject({
+                            subscriber: subscriber
                         })
                     });
                 }
             },
-            onReconnected(subscriber){
+            onReconnected(subscriber) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'didReconnectToStream',
-                        object: new Observable({
-                            subscriber:subscriber
+                        object: fromObject({
+                            subscriber: subscriber
                         })
 
                     });
                 }
             }
         }));
+        
         let sub = this._subscriber.getView();
-        this._android.addView(sub);
+        this.nativeView.addView(sub);
 
-        if(session instanceof TNSOTSession){
+        if (session instanceof TNSOTSession) {
             session.session.subscribe(this._subscriber);
-        }else{
+        } else {
             session.subscribe(this._subscriber);
         }
 
@@ -132,29 +144,26 @@ export class TNSOTSubscriber extends ContentView {
         this._subscriber.setSubscribeToAudio(state);
     }
 
-    get events():Observable{
+    get events(): Observable {
         return this._events;
     }
 
-    get render_style() {
-        return this._render_style;
-    }
+    [renderStyle.setNative](value: string) {
+        this._renderStyle = value;
+        if (this._subscriber) {
+            switch (value) {
+                case 'fit':
+                    this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT);
+                    break;
+                case 'scale':
+                    this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE);
+                    break;
+                default:
+                    this._subscriber.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL);
+                    break;
+            }
 
-    set render_style(value: any) {
-        switch (value) {
-            case 'fit':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
-                break;
-            case 'fill':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
-                break;
-            case 'scale':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
-                break;
-            default:
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
-                break;
         }
     }
-
 }
+renderStyle.register(Style);

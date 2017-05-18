@@ -1,8 +1,9 @@
-import * as  utils from "utils/utils";
-import * as app from 'application';
-import {ContentView} from 'ui/content-view'
-import {Observable} from "data/observable";
-import {TNSOTSession} from "./session";
+import * as  utils from "tns-core-modules/utils/utils";
+import * as app from 'tns-core-modules/application';
+import { View, CssProperty, Style } from 'tns-core-modules/ui/core/view'
+import { Observable, fromObject } from "tns-core-modules/data/observable";
+import { TNSOTSession } from "./session";
+import { RENDERSTYLE } from "../common";
 declare var com: any, android: any;
 const CameraListener = com.opentok.android.Publisher.CameraListener;
 const PublisherListener = com.opentok.android.PublisherKit.PublisherListener;
@@ -11,50 +12,52 @@ const BaseVideoRenderer = com.opentok.android.BaseVideoRenderer;
 const AbsoluteLayout = android.widget.AbsoluteLayout;
 const RelativeLayout = android.widget.RelativeLayout;
 
-export class TNSOTPublisher extends ContentView {
-    private _android: any;
+const renderStyle = new CssProperty<Style, string>({
+    name: 'renderStyle',
+    cssName: 'render-style',
+    defaultValue: 'fill',
+    valueConverter: (v: RENDERSTYLE) => { return String(v) }
+});
+
+export class TNSOTPublisher extends View {
     private _publisher: any;
     public static toggleVideoEvent = "toggleVideo";
     public static toggleAudioEvent = "toggleAudio";
     public static cycleCameraEvent;
-    private _events;
-    _render_style: any;
-
+    private _events: any;
+    private _renderStyle: any;
+    public renderStyle: any;
     constructor() {
         super();
-        this._events = new Observable();
+        this._events = fromObject({});
     }
 
     get android() {
-        return this._android;
+        return this.nativeView;
     }
 
-    get _nativeView() {
-        return this._android;
-    }
-
-    public _createUI() {
-        this._android = new android.widget.LinearLayout(this._context);
+    public createNativeView() {
+        return new android.widget.LinearLayout(this._context);
     }
 
     publish(session: TNSOTSession, name?: string, cameraResolution?: string, cameraFrameRate?: string) {
         const that = new WeakRef(this);
         this._publisher = new com.opentok.android.Publisher(
             utils.ad.getApplicationContext(),
-             name ? name : '',
-             TNSOTPublisher.getCameraResolution(cameraResolution),
+            name ? name : '',
+            TNSOTPublisher.getCameraResolution(cameraResolution),
             TNSOTPublisher.getCameraFrameRate(cameraFrameRate)
         );
         let pub = this._publisher.getView();
-        this._android.addView(pub);
-        this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, this.render_style);
+        this.nativeView.addView(pub);
+        this.renderStyle = this._renderStyle;
         this._publisher.setPublisherListener(new PublisherListener({
             owner: that.get(),
             onError(publisher: any, error: any) {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'didFailWithError',
-                        object: new Observable({
+                        object: fromObject({
                             publisher: publisher,
                             error: error
                         })
@@ -65,7 +68,7 @@ export class TNSOTPublisher extends ContentView {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'streamCreated',
-                        object: new Observable({
+                        object: fromObject({
                             publisher: publisher,
                             stream: stream
                         })
@@ -76,7 +79,7 @@ export class TNSOTPublisher extends ContentView {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'streamDestroyed',
-                        object: new Observable({
+                        object: fromObject({
                             publisher: publisher,
                             stream: stream
                         })
@@ -90,7 +93,7 @@ export class TNSOTPublisher extends ContentView {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'cameraChanged',
-                        object: new Observable({
+                        object: fromObject({
                             publisher: publisher,
                             cameraId: newCameraId
                         })
@@ -100,7 +103,7 @@ export class TNSOTPublisher extends ContentView {
                 if (this.owner._events) {
                     this.owner._events.notify({
                         eventName: 'cameraError',
-                        object: new Observable({
+                        object: fromObject({
                             publisher: publisher,
                             error: error
                         })
@@ -108,7 +111,7 @@ export class TNSOTPublisher extends ContentView {
                 }
             }
         }));
-        session.events.on('sessionDidConnect', (result:any) => {
+        session.events.on('sessionDidConnect', (result: any) => {
             try {
                 let stream: any = result.object;
                 session.session.publish(this._publisher);
@@ -149,23 +152,17 @@ export class TNSOTPublisher extends ContentView {
         return com.opentok.android.Publisher.CameraCaptureFrameRate.FPS_30;
     }
 
-    get render_style() {
-        return this._render_style;
-    }
-
-    set render_style(value: any) {
+    [renderStyle.setNative](value: any) {
+        this._renderStyle = value;
         switch (value) {
-            case 'fit':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
-                break;
             case 'fill':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL;
+                this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FILL);
                 break;
             case 'scale':
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE;
+                this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE);
                 break;
             default:
-                this._render_style = com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT;
+                this._publisher.getRenderer().setStyle(com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_SCALE, com.opentok.android.BaseVideoRenderer.STYLE_VIDEO_FIT);
                 break;
         }
     }
@@ -174,9 +171,10 @@ export class TNSOTPublisher extends ContentView {
         return this._publisher;
     }
 
-    get events():Observable{
+    get events(): Observable {
         return this._events;
     }
+
     toggleCamera() {
         this.publishVideo = !this.publishVideo;
     }
@@ -218,3 +216,4 @@ export class TNSOTPublisher extends ContentView {
     }
 
 }
+renderStyle.register(Style);

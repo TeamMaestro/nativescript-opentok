@@ -75,3 +75,4 @@ export interface TNSOTSubscriberI {
     subscriberEvents: Observable;
 
 }
+export type RENDERSTYLE = "fit | scale | fill";
