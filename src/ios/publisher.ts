@@ -42,8 +42,6 @@ export class TNSOTPublisher extends View {
         );
         this._ios.view.frame = this.nativeView.bounds;
         this.nativeView.addSubview(this._ios.view);
-
-
         session.events.on('sessionDidConnect', (result) => {
             this._ios.publishAudio = true;
             let stream: any = result.object;
