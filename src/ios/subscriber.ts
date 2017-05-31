@@ -6,6 +6,7 @@ import { TNSOTSession } from './session';
 import { TNSOTPublisher } from './publisher';
 
 declare var OTSubscriber: any,
+    OTSession: any,
     OTStream: any,
     OTSubscriberKitDelegate: any,
     interop: any,
