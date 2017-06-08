@@ -11,4 +11,3 @@ demo/lib/ios
 *.d.ts
 !opentok.d.ts
 .vscode
-!src/worker.js
