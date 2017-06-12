@@ -33,6 +33,18 @@ export class TNSOTPublisher extends View {
             this.setMeasuredDimension(width, height);
         }
     }
+
+    showCamera(name?: string, cameraResolution?: string, cameraFrameRate?: string): void {
+        this._ios = OTPublisher.alloc().initWithDelegateNameCameraResolutionCameraFrameRate(
+            this._publisherKitDelegate,
+            name ? name : '',
+            this.getCameraResolution(cameraResolution),
+            this.getCameraFrameRate(cameraFrameRate)
+        );
+        this._ios.view.frame = this.nativeView.bounds;
+        this.nativeView.addSubview(this._ios.view);
+    }
+
     publish(session: TNSOTSession, name?: string, cameraResolution?: string, cameraFrameRate?: string): void {
         this._ios = OTPublisher.alloc().initWithDelegateNameCameraResolutionCameraFrameRate(
             this._publisherKitDelegate,
